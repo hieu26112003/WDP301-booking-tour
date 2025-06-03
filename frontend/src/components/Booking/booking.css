@@ -1,0 +1,150 @@
+/* booking.css */
+
+.booking {
+   padding: 2rem;
+   border-radius: 0.5rem;
+   border: 1px solid var(--secondary-color);
+   background-color: #fff;
+   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+   position: sticky;
+   top: 80px;
+}
+
+.booking__top {
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   padding-bottom: 1rem;
+   border-bottom: 1px solid rgb(229, 231, 235);
+}
+
+.booking__top h3 {
+   font-size: 1.5rem;
+   font-weight: 700;
+   margin: 0;
+}
+
+.booking__top h3 span {
+   font-size: 1rem;
+   font-weight: 400;
+   color: var(--text-color);
+}
+
+.booking__top span {
+   font-size: 1rem;
+   font-weight: 600;
+   color: var(--text-color);
+   display: flex;
+   align-items: center;
+}
+
+.booking__top span i {
+   color: var(--secondary-color);
+   margin-right: 0.25rem;
+}
+
+.booking__form {
+   padding-top: 1rem;
+}
+
+.booking__form h5 {
+   margin-bottom: 1rem;
+   font-size: 1.2rem;
+   font-weight: 700;
+}
+
+.booking__form input,
+.booking__form select {
+   width: 100%;
+   padding: 0.6rem;
+   margin-bottom: 1rem;
+   border-radius: 0.5rem;
+   font-size: 1rem;
+   border: 1px solid rgb(229, 231, 235);
+   background-color: #f9f9f9;
+   color: var(--heading-color);
+}
+
+.booking__form input:focus,
+.booking__form select:focus {
+   outline: none;
+   border-color: var(--secondary-color);
+   background-color: #fff;
+   box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+.booking__info-form {
+   padding: 1rem;
+   border: 1px solid rgb(229, 231, 235);
+   border-radius: 0.5rem;
+   background-color: #f7f7f7;
+}
+
+.booking__bottom {
+   padding-top: 1rem;
+}
+
+.booking__bottom li {
+   display: flex;
+   align-items: center;
+   justify-content: space-between;
+   padding: 0.5rem 0;
+}
+
+.booking__bottom li h5,
+.booking__bottom li span {
+   font-size: 0.9rem;
+   font-weight: 500;
+   color: var(--text-color);
+}
+
+.total h5,
+.total span {
+   font-size: 1.2rem !important;
+   font-weight: 700 !important;
+   color: var(--heading-color) !important;
+}
+
+.booking__bottom Button {
+   width: 100%;
+   padding: 0.75rem;
+   font-size: 1rem;
+   font-weight: 700;
+   color: #fff;
+   background-color: var(--primary-color);
+   border: none;
+   border-radius: 0.5rem;
+   transition: transform 0.3s, background-color 0.3s;
+}
+
+.booking__bottom Button:hover {
+   transform: scale(1.05);
+   background-color: darken(var(--primary-color), 10%);
+}
+
+.itinerary {
+   margin-top: 2rem;
+}
+
+.itinerary h5 {
+   font-size: 1.2rem;
+   font-weight: 700;
+   margin-bottom: 1rem;
+}
+
+.itinerary__day h6 {
+   font-size: 1rem;
+   font-weight: 600;
+   margin-bottom: 0.5rem;
+}
+
+.itinerary__day ul {
+   list-style-type: disc;
+   margin-left: 1.5rem;
+}
+
+.itinerary__day li {
+   font-size: 0.9rem;
+   color: var(--text-color);
+   margin-bottom: 0.5rem;
+}
