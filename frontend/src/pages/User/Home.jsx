@@ -11,7 +11,6 @@ import CommonSection from "../../shared/CommonSection";
 const Home = () => {
   return (
     <>
-      {/* ========== HERO SECTION ========== */}
       <CommonSection title={"Home"} />
       <section>
         <Container>
