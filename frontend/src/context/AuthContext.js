@@ -1,7 +1,10 @@
 import { createContext, useEffect, useReducer } from "react";
+import { BASE_URL } from "../utils/config";
 
 const initial_state = {
-  user: null,
+  user: localStorage.getItem("user")
+    ? JSON.parse(localStorage.getItem("user"))
+    : null,
   loading: false,
   error: null,
 };
@@ -35,12 +38,14 @@ const AuthReducer = (state, action) => {
         error: null,
       };
     case "LOGOUT":
+      localStorage.removeItem("user");
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
       return {
         user: null,
         loading: false,
         error: null,
       };
-    // New actions for password reset
     case "RESET_PASSWORD_START":
       return {
         ...state,
@@ -68,7 +73,45 @@ export const AuthContextProvider = ({ children }) => {
   const [state, dispatch] = useReducer(AuthReducer, initial_state);
 
   useEffect(() => {
-    localStorage.setItem("user", JSON.stringify(state.user));
+    const verifyToken = async () => {
+      if (state.user) return;
+
+      try {
+        const accessToken = localStorage.getItem("accessToken");
+        if (!accessToken) return;
+
+        const res = await fetch(`${BASE_URL}/auth/me`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+
+        const result = await res.json();
+
+        if (res.ok && result.success) {
+          dispatch({ type: "LOGIN_SUCCESS", payload: result.data });
+        } else {
+          dispatch({ type: "LOGIN_FAILURE", payload: result.message });
+          localStorage.removeItem("user");
+          localStorage.removeItem("accessToken");
+          localStorage.removeItem("refreshToken");
+        }
+      } catch (err) {
+        dispatch({ type: "LOGIN_FAILURE", payload: err.message });
+        localStorage.removeItem("user");
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+      }
+    };
+
+    verifyToken();
+  }, []);
+
+  useEffect(() => {
+    if (state.user) {
+      localStorage.setItem("user", JSON.stringify(state.user));
+    }
   }, [state.user]);
 
   return (
@@ -84,3 +127,5 @@ export const AuthContextProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
+
+export default AuthContextProvider;

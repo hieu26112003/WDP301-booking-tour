@@ -5,6 +5,7 @@ import Logo from "../../assets/images/logo.png";
 import "./header.css";
 import { AuthContext } from "../../context/AuthContext";
 import Dropdown from "react-bootstrap/Dropdown";
+import Swal from "sweetalert2";
 
 const nav__links = [
   {
@@ -37,10 +38,27 @@ const Header = () => {
   const { user, dispatch } = useContext(AuthContext);
 
   const logout = () => {
-    dispatch({ type: "LOGOUT" });
-    navigate("/");
+    Swal.fire({
+      title: "Bạn có chắc muốn đăng xuất?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Đăng xuất",
+      cancelButtonText: "Hủy",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        dispatch({ type: "LOGOUT" });
+        navigate("/");
+        Swal.fire({
+          icon: "success",
+          title: "Đăng xuất thành công",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      }
+    });
   };
-
   const stickyHeaderFunc = () => {
     window.addEventListener("scroll", () => {
       if (
