@@ -16,7 +16,7 @@ const Register = () => {
     phone: "",
     email: "",
     password: "",
-    avatar: null, // Thay đổi từ string thành null để xử lý file
+    avatar: null,
   });
 
   const { dispatch } = useContext(AuthContext);

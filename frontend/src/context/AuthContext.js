@@ -38,7 +38,9 @@ const AuthReducer = (state, action) => {
         error: null,
       };
     case "LOGOUT":
-      localStorage.removeItem("user"); // Xóa user khỏi localStorage khi logout
+      localStorage.removeItem("user");
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
       return {
         user: null,
         loading: false,
@@ -70,15 +72,19 @@ const AuthReducer = (state, action) => {
 export const AuthContextProvider = ({ children }) => {
   const [state, dispatch] = useReducer(AuthReducer, initial_state);
 
-  // Kiểm tra token và khôi phục user khi tải trang
   useEffect(() => {
     const verifyToken = async () => {
-      if (state.user) return; // Nếu đã có user, không cần kiểm tra lại
+      if (state.user) return;
 
       try {
-        const res = await fetch(`${BASE_URL}/auth/getCurrentUser`, {
+        const accessToken = localStorage.getItem("accessToken");
+        if (!accessToken) return;
+
+        const res = await fetch(`${BASE_URL}/auth/me`, {
           method: "GET",
-          credentials: "include",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
         });
 
         const result = await res.json();
@@ -88,17 +94,20 @@ export const AuthContextProvider = ({ children }) => {
         } else {
           dispatch({ type: "LOGIN_FAILURE", payload: result.message });
           localStorage.removeItem("user");
+          localStorage.removeItem("accessToken");
+          localStorage.removeItem("refreshToken");
         }
       } catch (err) {
         dispatch({ type: "LOGIN_FAILURE", payload: err.message });
         localStorage.removeItem("user");
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
       }
     };
 
     verifyToken();
   }, []);
 
-  // Lưu user vào localStorage khi thay đổi
   useEffect(() => {
     if (state.user) {
       localStorage.setItem("user", JSON.stringify(state.user));

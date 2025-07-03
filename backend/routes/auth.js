@@ -16,7 +16,7 @@ const router = express.Router();
 
 router.post("/register", upload.single("avatar"), register);
 router.post("/login", login);
-router.post("/refreshToken", refreshToken);
+router.post("/refresh-token", refreshToken);
 router.post("/logout", logout);
 router.get("/me", verifyToken, getCurrentUser);
 router.post("/reset-password", resetPassword);

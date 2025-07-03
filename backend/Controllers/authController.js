@@ -16,11 +16,9 @@ export const register = async (req, res) => {
       });
     }
 
-    // Hash mật khẩu
     const salt = bcrypt.genSaltSync(10);
     const hash = bcrypt.hashSync(req.body.password, salt);
 
-    // Tạo người dùng mới
     const newUser = new User({
       username: req.body.username,
       email: req.body.email,
@@ -43,7 +41,6 @@ export const register = async (req, res) => {
   }
 };
 
-// Đăng nhập người dùng
 export const login = async (req, res) => {
   try {
     const email = req.body.email;
@@ -69,38 +66,22 @@ export const login = async (req, res) => {
 
     const { password, role, ...rest } = user._doc;
 
-    // Tạo accessToken (hết hạn trong 15 phút)
     const accessToken = jwt.sign(
       { id: user._id, role: user.role },
       process.env.JWT_SECRET_KEY,
       { expiresIn: "15m" }
     );
 
-    // Tạo refreshToken (hết hạn trong 15 ngày)
     const refreshToken = jwt.sign(
       { id: user._id, role: user.role },
       process.env.JWT_REFRESH_SECRET_KEY,
       { expiresIn: "15d" }
     );
 
-    // Lưu refreshToken và accessToken vào cookie
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 15 * 24 * 60 * 60 * 1000, // 15 ngày
-    });
-
-    res.cookie("accessToken", accessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 15 * 60 * 1000, // 15 phút
-    });
-
     res.status(200).json({
       success: true,
       accessToken,
+      refreshToken,
       role: user.role,
       data: { ...rest, role: user.role },
     });
@@ -113,10 +94,9 @@ export const login = async (req, res) => {
   }
 };
 
-// Làm mới token
 export const refreshToken = async (req, res) => {
   try {
-    const refreshToken = req.cookies.refreshToken;
+    const refreshToken = req.body.refreshToken;
     if (!refreshToken) {
       return res.status(401).json({
         success: false,
@@ -124,7 +104,6 @@ export const refreshToken = async (req, res) => {
       });
     }
 
-    // Xác minh refreshToken
     jwt.verify(
       refreshToken,
       process.env.JWT_REFRESH_SECRET_KEY,
@@ -136,20 +115,11 @@ export const refreshToken = async (req, res) => {
           });
         }
 
-        // Tạo accessToken mới
         const newAccessToken = jwt.sign(
           { id: user.id, role: user.role },
           process.env.JWT_SECRET_KEY,
           { expiresIn: "15m" }
         );
-
-        // Lưu accessToken mới vào cookie
-        res.cookie("accessToken", newAccessToken, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "strict",
-          maxAge: 15 * 60 * 1000,
-        });
 
         res.status(200).json({
           success: true,
@@ -166,7 +136,6 @@ export const refreshToken = async (req, res) => {
   }
 };
 
-// Lấy thông tin người dùng hiện tại
 export const getCurrentUser = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select("-password");
@@ -189,11 +158,8 @@ export const getCurrentUser = async (req, res) => {
   }
 };
 
-// Đăng xuất
 export const logout = async (req, res) => {
   try {
-    res.clearCookie("accessToken");
-    res.clearCookie("refreshToken");
     res.status(200).json({
       success: true,
       message: "Đăng xuất thành công!",
@@ -207,7 +173,6 @@ export const logout = async (req, res) => {
   }
 };
 
-// Đặt lại mật khẩu
 export const resetPassword = async (req, res) => {
   try {
     const { email, newPassword } = req.body;
@@ -239,7 +204,6 @@ export const resetPassword = async (req, res) => {
   }
 };
 
-// Cập nhật hồ sơ người dùng
 export const updateUserProfile = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -279,7 +243,6 @@ export const updateUserProfile = async (req, res) => {
   }
 };
 
-// Đổi mật khẩu
 export const changePassword = async (req, res) => {
   try {
     const { id } = req.params;

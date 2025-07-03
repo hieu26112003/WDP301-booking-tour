@@ -17,20 +17,24 @@ const Login = () => {
   const { dispatch, user } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  // Kiểm tra token khi component mount
   useEffect(() => {
     const verifyToken = async () => {
       try {
-        const res = await fetch(`${BASE_URL}/auth/getCurrentUser`, {
+        const accessToken = localStorage.getItem("accessToken");
+        if (!accessToken) return;
+
+        const res = await fetch(`${BASE_URL}/auth/me`, {
           method: "GET",
-          credentials: "include",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
         });
 
         const result = await res.json();
 
         if (res.ok && result.success) {
           dispatch({ type: "LOGIN_SUCCESS", payload: result.data });
-          // Điều hướng theo vai trò
+
           if (result.data.role === "admin") {
             navigate("/admin");
           } else {
@@ -60,7 +64,6 @@ const Login = () => {
       const res = await fetch(`${BASE_URL}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include",
         body: JSON.stringify(credentials),
       });
 
@@ -76,9 +79,11 @@ const Login = () => {
         return;
       }
 
+      localStorage.setItem("accessToken", result.accessToken);
+      localStorage.setItem("refreshToken", result.refreshToken);
+
       dispatch({ type: "LOGIN_SUCCESS", payload: result.data });
 
-      // Hiển thị thông báo thành công
       Swal.fire({
         icon: "success",
         title: "Đăng nhập thành công",
@@ -87,7 +92,6 @@ const Login = () => {
         confirmButtonColor: "#3085d6",
         timer: 1500,
       }).then(() => {
-        // Điều hướng theo vai trò
         if (result.role === "admin") {
           navigate("/admin");
         } else {
