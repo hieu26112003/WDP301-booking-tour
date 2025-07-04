@@ -1,17 +1,16 @@
+// // src/components/Layout/DefaultLayout.jsx
 import React from 'react';
-import Header from './../Header/Header';
-import Routers from '../../router/Routers';
-import Footer from './../Footer/Footer';
-import ScrollUpButton from '../Scrollup/Scrollup';
-const Layout = () => {
+import Sidebar from '../../pages/Admin/components/Sidebar';
+
+const DefaultLayout = ({ children }) => {
    return (
-      <>
-         <Header />
-         <Routers />
-         <Footer />
-         <ScrollUpButton /> 
-      </>
+      <div className="d-flex">
+         <Sidebar />
+         <div className="flex-grow-1 p-4" style={{ background: "#f9f9f9", minHeight: "100vh" }}>
+            {children}
+         </div>
+      </div>
    );
 };
 
-export default Layout;
+export default DefaultLayout;
