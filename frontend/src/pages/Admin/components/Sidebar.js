@@ -10,7 +10,7 @@ const Sidebar = () => {
       {/* Menu Items */}
       <ul>
         <SidebarItem to="/admin" icon={<FaTachometerAlt />} label="Dashboard" />
-        <SidebarItem to="/admin/user" icon={<FaUsers />} label="Manage Accounts" />
+        <SidebarItem to="/admin/user" icon={<FaUsers />} label="Manage Users" />
         <SidebarItem to="/manage-hotels" icon={<FaCommentDots />} label="Manage Hotel" />
         <SidebarItem to="/manage-tours" icon={<FaMapMarkedAlt />} label="Manage Tours" />
       </ul>
