@@ -18,7 +18,7 @@ const Routers = () => {
         path="/admin"
         element={
           <AdminLayout>
-            <h2>Admin</h2> {/* Hoặc là một <h2>Dashboard</h2> tạm thời */}
+            <h2>Admin!</h2> {/* Hoặc là một <h2>Dashboard</h2> tạm thời */}
           </AdminLayout>
         }
       />
