@@ -10,7 +10,7 @@ import {
   updateUserProfile,
 } from "../Controllers/authController.js";
 import upload from "../middleware/upload.js";
-import { verifyToken, verifyUser } from "../middleware/VerifyToken.js";
+import { verifyToken, verifyUser } from "../middleware/verifyToken.js";
 
 const router = express.Router();
 
