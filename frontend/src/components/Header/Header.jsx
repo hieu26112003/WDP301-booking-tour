@@ -6,6 +6,8 @@ import "./header.css";
 import { AuthContext } from "../../context/AuthContext";
 import Dropdown from "react-bootstrap/Dropdown";
 import Swal from "sweetalert2";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faChevronDown, faBars } from "@fortawesome/free-solid-svg-icons";
 
 const nav__links = [
   {
@@ -18,7 +20,6 @@ const nav__links = [
   },
   {
     path: "/about",
-
     display: "About",
   },
   {
@@ -59,6 +60,7 @@ const Header = () => {
       }
     });
   };
+
   const stickyHeaderFunc = () => {
     window.addEventListener("scroll", () => {
       if (
@@ -74,10 +76,7 @@ const Header = () => {
 
   useEffect(() => {
     stickyHeaderFunc();
-
-    return () => {
-      window.removeEventListener("scroll", stickyHeaderFunc);
-    };
+    return () => window.removeEventListener("scroll", stickyHeaderFunc);
   }, []);
 
   const toggleMenu = () => menuRef.current.classList.toggle("show__menu");
@@ -89,16 +88,13 @@ const Header = () => {
           <div className="nav__wrapper d-flex align-items-center justify-content-between">
             {/* ========== LOGO ========== */}
             <div className="logo">
-              {/* Make the logo a button that navigates to the home page */}
               <Link to="/home">
                 <img src={Logo} alt="Logo" />
               </Link>
             </div>
-
             {/* ========================== */}
 
             {/* ========== MENU START ========== */}
-
             <div className="navigation" ref={menuRef} onClick={toggleMenu}>
               <ul className="menu d-flex align-items-center gap-5">
                 {nav__links.map((item, index) => (
@@ -115,33 +111,41 @@ const Header = () => {
                 ))}
               </ul>
             </div>
-
-            {/* ================================ */}
+            {/* ========================== */}
 
             <div className="nav__right d-flex align-items-center gap-5">
               <div className="nav__btns d-flex align-items-center gap-2">
                 {user ? (
-                  <>
-                    <Dropdown>
-                      <Dropdown.Toggle
-                        id="dropdown-button-dark-example1"
-                        variant="secondary"
-                      >
-                        {user.username}
-                      </Dropdown.Toggle>
-
-                      <Dropdown.Menu>
-                        <Dropdown.Item as={Link} to="/profile">
-                          Profile
-                        </Dropdown.Item>
-                        <Dropdown.Item as={Link} to="/my-booking">
-                          MyBooking
-                        </Dropdown.Item>
-                        <Dropdown.Divider />
-                        <Dropdown.Item onClick={logout}>Logout</Dropdown.Item>
-                      </Dropdown.Menu>
-                    </Dropdown>
-                  </>
+                  <Dropdown>
+                    <Dropdown.Toggle
+                      id="dropdown-button-dark-example1"
+                      variant="secondary"
+                      className="d-flex align-items-center gap-2"
+                    >
+                      {user.avatar && (
+                        <img
+                          src={user.avatar}
+                          alt="Avatar"
+                          className="user-avatar"
+                        />
+                      )}
+                      <span>{user.username}</span>
+                      <FontAwesomeIcon icon={faChevronDown} />
+                    </Dropdown.Toggle>
+                    <Dropdown.Menu>
+                      <Dropdown.Item as={Link} to="/profile">
+                        Profile
+                      </Dropdown.Item>
+                      <Dropdown.Item as={Link} to="/change-password">
+                        Change Password
+                      </Dropdown.Item>
+                      <Dropdown.Item as={Link} to="/my-booking">
+                        MyBooking
+                      </Dropdown.Item>
+                      <Dropdown.Divider />
+                      <Dropdown.Item onClick={logout}>Logout</Dropdown.Item>
+                    </Dropdown.Menu>
+                  </Dropdown>
                 ) : (
                   <>
                     <Button className="btn primary__btn">
@@ -158,7 +162,7 @@ const Header = () => {
                 )}
               </div>
               <span className="mobile__menu" onClick={toggleMenu}>
-                <i className="ri-menu-line"></i>
+                <FontAwesomeIcon icon={faBars} />
               </span>
             </div>
           </div>
