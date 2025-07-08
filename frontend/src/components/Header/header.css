@@ -1,100 +1,183 @@
 :root {
-   --primary-color     : #ff7e01;
-   --secondary-color   : #faa935;
-   --heading-color     : #0b2727;
-   --text-color        : #6e7074;
-   --font-name         : "Montserrat", sans-serif;
-   --subtitle-font-name: "Island Moments", cursive;
+  --primary-color: #ff7e01;
+  --secondary-color: #faa935;
+  --heading-color: #0b2727;
+  --text-color: #6e7074;
+  --font-name: "Montserrat", sans-serif;
+  --subtitle-font-name: "Island Moments", cursive;
 }
 
 .header {
-   width      : 100%;
-   height     : 100px;
-   line-height: 83px;
-   box-shadow   : 0px 2px 4px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  height: 100px;
+  line-height: 83px;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .logo img {
-   margin-right: 50px;
-   width: 20%;
+  margin-right: 50px;
+  width: 20%;
 }
 
 .menu {
-   margin-bottom: 0;
+  margin-bottom: 0;
 }
 
 .nav__item a {
-   text-decoration: none;
-   color          : var(--heading-color);
-   font-weight    : 500;
-   font-size      : 1.5rem;
+  text-decoration: none;
+  color: var(--heading-color);
+  font-weight: 500;
+  font-size: 1.5rem;
 }
 
 .nav__item a:hover {
-   color: inherit;
+  color: var(--secondary-color);
 }
 
 .nav__item a.active__link {
-   color: var(--secondary-color);
+  color: var(--secondary-color);
 }
 
 .mobile__menu {
-   font-size: 1.3rem;
-   color    : var(--heading-color);
-   display  : none;
+  font-size: 1.3rem;
+  color: var(--heading-color);
+  display: none;
+}
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--text-color);
+}
+
+.nav__right .dropdown-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.1rem;
+  color: var(--heading-color);
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.nav__right .dropdown-toggle .fa-chevron-down {
+  font-size: 1rem;
+  color: var(--heading-color);
+}
+
+.nav__right .dropdown-toggle span {
+  font-weight: 500;
+}
+
+.nav__right .dropdown-toggle::after {
+  display: none; /* Hide default Bootstrap arrow */
+}
+
+.nav__right .dropdown-menu {
+  font-size: 1rem;
+}
+
+.nav__right .mobile__menu .fa-bars {
+  font-size: 1.3rem;
 }
 
 /* =============== RESPONSIVE ================ */
-@media only screen and (max-width:992px) {
-   .logo img {
-      
-      width: 10%;
-   }
+@media only screen and (max-width: 992px) {
+  .logo img {
+    width: 10%;
+  }
 
-   .navigation {
-      width     : 100%;
-      height    : 100%;
-      position  : fixed;
-      top       : 0;
-      left      : 0;
-      background: rgba(0, 0, 0, 0.4);
-      z-index   : 999;
-      display   : none;
-   }
+  .navigation {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 999;
+    display: none;
+  }
 
-   .menu {
-      position       : absolute;
-      top            : 0;
-      right          : 0;
-      width          : calc(100% - 75%);
-      height         : 100%;
-      background     : #ffffff;
-      flex-direction : column;
-      line-height    : 0.5rem;
-      justify-content: center;
-      z-index        : 9999;
-   }
+  .menu {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: calc(100% - 75%);
+    height: 100%;
+    background: #ffffff;
+    flex-direction: column;
+    line-height: 0.5rem;
+    justify-content: center;
+    z-index: 9999;
+  }
 
-   .show__menu {
-      display: block;
-   }
+  .show__menu {
+    display: block;
+  }
 
-   .mobile__menu {
-      display: block;
-   }
+  .mobile__menu {
+    display: block;
+  }
+
+  .user-avatar {
+    width: 32px;
+    height: 32px;
+  }
+
+  .nav__right .dropdown-toggle {
+    font-size: 1rem;
+    gap: 6px;
+  }
+
+  .nav__right .dropdown-toggle .fa-chevron-down {
+    font-size: 0.9rem;
+  }
+
+  .nav__right .dropdown-toggle span {
+    font-size: 1rem;
+  }
+
+  .nav__right .mobile__menu .fa-bars {
+    font-size: 1.2rem;
+  }
 }
 
 /* =============== RESPONSIVE ================ */
 @media only screen and (max-width: 768px) {
-   .logo img {
-      width: 50%;
-   }
+  .logo img {
+    width: 50%;
+  }
 
-   .menu {
-      width: calc(100% - 50%);
-   }
+  .menu {
+    width: calc(100% - 50%);
+  }
+
+  .user-avatar {
+    width: 28px;
+    height: 28px;
+  }
+
+  .nav__right .dropdown-toggle {
+    font-size: 0.9rem;
+    gap: 5px;
+  }
+
+  .nav__right .dropdown-toggle .fa-chevron-down {
+    font-size: 0.8rem;
+  }
+
+  .nav__right .dropdown-toggle span {
+    font-size: 0.9rem;
+  }
+
+  .nav__right .mobile__menu .fa-bars {
+    font-size: 1.1rem;
+  }
 }
+
 .navigation {
   margin-right: 100px;
 }
-
