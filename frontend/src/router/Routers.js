@@ -3,7 +3,8 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import Home from "../pages/User/Home";
 import Login from "../pages/User/Login";
 import Register from "../pages/User/Register";
-import ManagerUser from "../pages/Admin/components/managerAccount"
+import ManagerUser from "../pages/Admin/components/managerAccount";
+import ManageStaff from "../pages/Admin/components/ManageStaff"; // Thêm import ManageStaff
 
 import AdminLayout from "../components/Layout/AdminLayout";
 
@@ -27,6 +28,14 @@ const Routers = () => {
         element={
           <AdminLayout>
             <ManagerUser />
+          </AdminLayout>
+        }
+      />
+      <Route
+        path="/admin/staff"
+        element={
+          <AdminLayout>
+            <ManageStaff />
           </AdminLayout>
         }
       />
