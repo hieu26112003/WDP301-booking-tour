@@ -2,6 +2,7 @@ import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import nodemailer from "nodemailer";
 dotenv.config();
 
 export const register = async (req, res) => {
@@ -172,35 +173,74 @@ export const logout = async (req, res) => {
     });
   }
 };
-
 export const resetPassword = async (req, res) => {
+  const { email } = req.body;
   try {
-    const { email, newPassword } = req.body;
-
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "Người dùng không tìm thấy!",
-      });
+      return res
+        .status(404)
+        .json({ success: false, message: "Người dùng không tồn tại!" });
+    }
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET_KEY, {
+      expiresIn: "1h",
+    });
+    const transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true, 
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+      tls: {
+        rejectUnauthorized: false, 
+      },
+    });
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Đặt lại mật khẩu",
+      html: `
+        <p>Bạn đã yêu cầu đặt lại mật khẩu. Nhấn vào link dưới đây để đặt lại:</p>
+        <a href="${process.env.REACT_URL}/reset-password/${token}">Đặt lại mật khẩu</a>
+        <p>Link này sẽ hết hạn sau 1 giờ.</p>
+      `,
+    };
+    await transporter.sendMail(mailOptions);
+    res.status(200).json({
+      success: true,
+      message: "Link đặt lại mật khẩu đã được gửi qua email!",
+    });
+  } catch (error) {
+    console.error("Lỗi gửi email đặt lại mật khẩu:", error);
+    res.status(500).json({ success: false, message: `Lỗi: ${error.message}` });
+  }
+};
+export const resetPasswordConfirm = async (req, res) => {
+  const { token, newPassword } = req.body;
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+    const user = await User.findById(decoded.id);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Người dùng không tồn tại!" });
     }
 
     const salt = bcrypt.genSaltSync(10);
-    const hash = bcrypt.hashSync(newPassword, salt);
-
-    user.password = hash;
+    user.password = bcrypt.hashSync(newPassword, salt);
     await user.save();
 
-    res.status(200).json({
-      success: true,
-      message: "Đặt lại mật khẩu thành công!",
-    });
+    res
+      .status(200)
+      .json({ success: true, message: "Đặt lại mật khẩu thành công!" });
   } catch (error) {
     console.error("Lỗi đặt lại mật khẩu:", error);
-    res.status(500).json({
-      success: false,
-      message: `Lỗi đặt lại mật khẩu: ${error.message}`,
-    });
+    res
+      .status(400)
+      .json({ success: false, message: "Link không hợp lệ hoặc đã hết hạn!" });
   }
 };
 
