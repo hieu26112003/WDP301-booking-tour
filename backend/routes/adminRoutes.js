@@ -1,5 +1,6 @@
 import express from "express";
 import {
+
     getAllUsers,
     getUserById,
     createUser,
@@ -11,6 +12,7 @@ import {
 } from "../Controllers/adminControllers.js";
 
 import { verifyAdmin } from "../middleware/VerifyToken.js";
+
 
 const router = express.Router();
 
