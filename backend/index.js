@@ -5,6 +5,8 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import authRoute from "./routes/auth.js";
 import adminRoute from "./routes/adminRoutes.js"
+import tourRoute from './routes/tour.js'
+import categoryRoute from './routes/category.js'
 
 dotenv.config();
 const app = express();
@@ -33,6 +35,8 @@ app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use("/api/auth", authRoute);
 app.use("/api/admin", adminRoute);
+app.use('/api/tours', tourRoute)
+app.use('/api/categories', categoryRoute)
 
 app.listen(port, () => {
   connect();

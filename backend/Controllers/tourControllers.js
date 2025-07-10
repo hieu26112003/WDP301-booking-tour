@@ -57,33 +57,29 @@ export const deleteTour = async (req, res) => {
 
 //Getsingle Tour
 export const getSingleTour = async (req, res) => {
-  const id = req.params.id;
-
   try {
-    const tour = await Tour.findById(id).populate("reviews");
+    const tour = await Tour.findById(req.params.id)
+      .populate('reviews')
+      .populate('categoryId')
 
-    res
-      .status(200)
-      .json({ success: true, message: "Successfully", data: tour });
+    res.status(200).json({ success: true, message: 'Success', data: tour })
   } catch (error) {
-    res.status(404).json({ success: false, message: "Not Found" });
+    res.status(404).json({ success: false, message: 'Tour not found' })
   }
-};
-
+}
+//Get all tour
 export const getAllTour = async (req, res) => {
   try {
-    // Lấy số trang từ query, nếu không có mặc định là 1
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 6;
     const skip = (page - 1) * limit;
 
-    // Lấy danh sách tour
     const tours = await Tour.find({})
-      .populate("reviews") // Nếu cần lấy review
+      .populate('reviews')
+      .populate('categoryId')
       .skip(skip)
       .limit(limit);
 
-    // Đếm tổng số tour để tính số trang
     const totalTours = await Tour.countDocuments();
     const totalPages = Math.ceil(totalTours / limit);
 
@@ -95,11 +91,24 @@ export const getAllTour = async (req, res) => {
       data: tours,
     });
   } catch (error) {
-    console.error("Error fetching tours:", error);
-    res.status(500).json({ success: false, message: "Failed to fetch tours" });
+    res.status(500).json({ success: false, message: 'Failed to fetch tours' });
   }
-};
+}
 
+//Get tour by catagory
+export const getToursByCategory = async (req, res) => {
+  const categoryId = req.params.categoryId
+
+  try {
+    const tours = await Tour.find({ categoryId })
+      .populate('reviews')
+      .populate('categoryId')
+
+    res.status(200).json({ success: true, data: tours })
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Failed to fetch tours by category' })
+  }
+}
 // Get tour by search
 export const getTourBySearch = async (req, res) => {
   // hear 'i' means case sensitive
