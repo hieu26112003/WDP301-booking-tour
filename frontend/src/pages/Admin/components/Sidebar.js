@@ -1,6 +1,12 @@
 import { Link } from "react-router-dom";
-import { FaTachometerAlt,FaTags, FaUsers, FaCommentDots, FaMapMarkedAlt } from "react-icons/fa";
-import './index.css';
+import {
+  FaTachometerAlt,
+  FaTags,
+  FaUsers,
+  FaCommentDots,
+  FaMapMarkedAlt,
+} from "react-icons/fa";
+import "./index.css";
 const Sidebar = () => {
   return (
     <div className="sidebar">
@@ -9,15 +15,27 @@ const Sidebar = () => {
 
       {/* Menu Items */}
       <ul>
-        <SidebarItem to="/admin" icon={<FaTachometerAlt />} label="Dashboard" />
-        <SidebarItem to="/admin/user" icon={<FaUsers />} label="Manage Users" />
-       
-        <SidebarItem to="/manage-tours" icon={<FaMapMarkedAlt />} label="Manage Tours" />
-      
-        <SidebarItem to="/manage-accounts" icon={<FaUsers />} label="Manage Accounts" />
-        <SidebarItem to="/manage-hotels" icon={<FaCommentDots />} label="Manage Hotel" />
-       
-        <SidebarItem to="/manage-categories" icon={<FaTags />} label="Manage Categories" />
+        <SidebarItem to="/Admin" icon={<FaTachometerAlt />} label="Dashboard" />
+        <SidebarItem
+          to="/manage-accounts"
+          icon={<FaUsers />}
+          label="Manage Accounts"
+        />
+        <SidebarItem
+          to="/manage-hotels"
+          icon={<FaCommentDots />}
+          label="Manage Hotel"
+        />
+        <SidebarItem
+          to="/manage-tours"
+          icon={<FaMapMarkedAlt />}
+          label="Manage Tours"
+        />
+        <SidebarItem
+          to="/manage-categories"
+          icon={<FaTags />}
+          label="Manage Categories"
+        />
       </ul>
 
       {/* Footer */}
