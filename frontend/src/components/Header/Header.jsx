@@ -139,9 +139,9 @@ const Header = () => {
                       <Dropdown.Item as={Link} to="/change-password">
                         Change Password
                       </Dropdown.Item>
-                      <Dropdown.Item as={Link} to="/my-booking">
+                      {/* <Dropdown.Item as={Link} to="/my-booking">
                         MyBooking
-                      </Dropdown.Item>
+                      </Dropdown.Item> */}
                       <Dropdown.Divider />
                       <Dropdown.Item onClick={logout}>Logout</Dropdown.Item>
                     </Dropdown.Menu>
