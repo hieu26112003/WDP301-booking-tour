@@ -10,6 +10,8 @@ import Profile from "../pages/User/Profile";
 import ChangePassword from "../pages/User/ChangePassword";
 import ResetPassword from "../pages/User/ResetPassword";
 import ResetPasswordConfirm from "../pages/User/ResetPasswordConfirm";
+import ManageTours from "../pages/Admin/components/ManageTours";
+import ManageCategories from "../pages/Admin/components/ManageCategories";
 
 const Routers = () => {
   return (
@@ -35,6 +37,30 @@ const Routers = () => {
         element={
           <AdminLayout>
             <ManagerUser />
+          </AdminLayout>
+        }
+      />
+      {/* <Route
+        path="/admin/hotels"
+        element={
+          <AdminLayout>
+            <ManageHotels />
+          </AdminLayout>
+        }
+      /> */}
+      <Route
+        path="/admin/tours"
+        element={
+          <AdminLayout>
+            <ManageTours />
+          </AdminLayout>
+        }
+      />
+      <Route
+        path="/admin/categories"
+        element={
+          <AdminLayout>
+            <ManageCategories />
           </AdminLayout>
         }
       />
