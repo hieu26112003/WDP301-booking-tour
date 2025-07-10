@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { FaTachometerAlt, FaUsers, FaCommentDots, FaMapMarkedAlt } from "react-icons/fa";
+import { FaTachometerAlt,FaTags, FaUsers, FaCommentDots, FaMapMarkedAlt } from "react-icons/fa";
 import './index.css';
 const Sidebar = () => {
   return (
@@ -11,8 +11,13 @@ const Sidebar = () => {
       <ul>
         <SidebarItem to="/admin" icon={<FaTachometerAlt />} label="Dashboard" />
         <SidebarItem to="/admin/user" icon={<FaUsers />} label="Manage Users" />
-        <SidebarItem to="/manage-hotels" icon={<FaCommentDots />} label="Manage Hotel" />
+       
         <SidebarItem to="/manage-tours" icon={<FaMapMarkedAlt />} label="Manage Tours" />
+      
+        <SidebarItem to="/manage-accounts" icon={<FaUsers />} label="Manage Accounts" />
+        <SidebarItem to="/manage-hotels" icon={<FaCommentDots />} label="Manage Hotel" />
+       
+        <SidebarItem to="/manage-categories" icon={<FaTags />} label="Manage Categories" />
       </ul>
 
       {/* Footer */}
