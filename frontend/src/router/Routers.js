@@ -12,6 +12,9 @@ import ResetPassword from "../pages/User/ResetPassword";
 import ResetPasswordConfirm from "../pages/User/ResetPasswordConfirm";
 import ManageTours from "../pages/Admin/components/ManageTours";
 import ManageCategories from "../pages/Admin/components/ManageCategories";
+import StaffLayout from "../components/Layout/StaffLayout";
+import StaffChatPage from "../pages/Staff/StaffChatPage";
+
 
 const Routers = () => {
   return (
@@ -62,6 +65,14 @@ const Routers = () => {
           <AdminLayout>
             <ManageCategories />
           </AdminLayout>
+        }
+      />
+      <Route
+        path="/staff/chat"
+        element={
+          <StaffLayout>
+            <StaffChatPage />
+          </StaffLayout>
         }
       />
     </Routes>
