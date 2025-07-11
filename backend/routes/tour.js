@@ -1,32 +1,19 @@
 import express from "express";
 import {
   createTour,
-  deleteTour,
-  getAllTour,
-  getFeaturedTour,
-  getSingleTour,
-  getTourBySearch,
-  getTourCount,
+  getAllTours,
   updateTour,
-  getToursByCategory,
+  deleteTour,
+  getTourById,
 } from "../Controllers/tourControllers.js";
+import { verifyAdmin } from "../middleware/VerifyToken.js";
+import upload from "../middleware/upload.js";
 
 const router = express.Router();
 
-router.post("/", createTour);
-
-router.put("/:id", updateTour);
-
-router.delete("/:id", deleteTour);
-
-router.get("/:id", getSingleTour);
-
-router.get("/", getAllTour);
-
-router.get("/search/getTourBySearch", getTourBySearch);
-router.get("/search/getFeaturedTour", getFeaturedTour);
-router.get("/search/getTourCount", getTourCount);
-
-router.get("/category/:categoryId", getToursByCategory);
-
+router.post("/", verifyAdmin, upload.single("image"), createTour);
+router.get("/", verifyAdmin, getAllTours);
+router.put("/:id", verifyAdmin, upload.single("image"), updateTour);
+router.delete("/:id", verifyAdmin, deleteTour);
+router.get("/:id", verifyAdmin, getTourById);
 export default router;

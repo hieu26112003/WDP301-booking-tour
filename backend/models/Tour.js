@@ -2,66 +2,65 @@ import mongoose from "mongoose";
 
 const tourSchema = new mongoose.Schema(
   {
+    id: {
+      type: Number,
+      unique: true,
+      sparse: true,
+    },
     title: {
       type: String,
       required: true,
       unique: true,
     },
-    city: {
+    summary: {
       type: String,
       required: true,
     },
-    address: {
+    days: {
+      type: String, // Chuyển sang String
+      required: true,
+    },
+    serviceStandards: {
       type: String,
       required: true,
     },
-    distance: {
+    priceChild: {
       type: Number,
       required: true,
     },
-    photo: {
-      type: String,
-      required: true,
-    },
-    desc: {
-      type: String,
-      required: true,
-    },
-    price: {
+    priceAdult: {
       type: Number,
       required: true,
     },
-    maxGroupSize: {
-      type: Number,
+    notes: {
+      type: String,
+      required: true,
+    },
+    cancellationPolicy: {
+      type: String,
+      required: true,
+    },
+    schedule: {
+      type: String,
+      required: true,
+    },
+    departureDate: {
+      type: String,
+      required: true,
+    },
+    time: {
+      type: String,
       required: true,
     },
     categoryId: {
-  type: mongoose.Schema.Types.ObjectId,
-  ref: 'Category',
-  required: true,
-},
-    reviews: [
-      {
-        type: mongoose.Types.ObjectId,
-        ref: "Review",
-      },
-    ],
-    featured: {
-      type: Boolean,
-      default: false,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
+      required: true,
     },
-    itineraries: [
-      {
-        type: mongoose.Types.ObjectId,
-        ref: "Itinerary",
-      }
-    ],
-    hotels: [
-      {
-        type: mongoose.Types.ObjectId,
-        ref: "Hotel",
-      }
-    ],
+    image: {
+      type: String,
+      required: true,
+    },
   },
   { timestamps: true }
 );

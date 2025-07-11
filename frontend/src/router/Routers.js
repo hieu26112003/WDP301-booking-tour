@@ -15,6 +15,7 @@ import ManageCategories from "../pages/Admin/components/ManageCategories";
 import StaffLayout from "../components/Layout/StaffLayout";
 import StaffChatPage from "../pages/Staff/StaffChatPage";
 
+import TourDetail from "../pages/Admin/components/TourDetail";
 
 const Routers = () => {
   return (
@@ -51,6 +52,14 @@ const Routers = () => {
           </AdminLayout>
         }
       /> */}
+      <Route
+        path="/tour-detail/:id"
+        element={
+          <AdminLayout>
+            <TourDetail />
+          </AdminLayout>
+        }
+      />
       <Route
         path="/admin/tours"
         element={
