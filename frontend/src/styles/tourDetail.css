@@ -1,0 +1,131 @@
+.tour-detail-section {
+  padding: 20px 0;
+  max-width: 100%;
+  background: linear-gradient(135deg, #e0eaff, #f5f7fa);
+}
+
+.header-section {
+  margin-bottom: 20px;
+}
+
+.tour-title {
+  font-size: 2.8rem;
+  font-weight: 800;
+  color: #152238;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.tour-image-container {
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+  margin-bottom: 40px;
+}
+
+.tour-image {
+  width: 50%;
+  max-width: 50%;
+  max-height: 300px;
+  height: 100%;
+  object-fit: cover;
+  margin: 0 auto;
+  display: block;
+}
+
+.tour-details {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.section-panel {
+  background: #ffffff;
+  border-radius: 15px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  animation: slideUp 1s ease-in-out;
+}
+
+.section-item {
+  border-right: 1px solid #c3d8ff;
+  border-bottom: 1px solid #c3d8ff;
+  transition: transform 0.4s ease, background 0.4s ease;
+}
+
+.section-item:hover {
+  transform: translateY(-4px);
+  background: rgba(195, 216, 255, 0.4);
+}
+
+.section-item:nth-child(3n) {
+  border-right: none; /* Loại bỏ viền phải cho cột cuối cùng trong mỗi hàng */
+}
+
+.section-item:nth-child(n + 4) {
+  border-top: 1px solid #c3d8ff; /* Tách hàng thứ hai */
+}
+
+.section-title {
+  cursor: pointer;
+  padding: 20px;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #152238;
+  text-align: center;
+  background: linear-gradient(90deg, #e6f0ff, #ffffff);
+  transition: transform 0.4s ease, background 0.4s ease, color 0.4s ease,
+    box-shadow 0.4s ease;
+}
+
+.section-title:hover {
+  background: linear-gradient(90deg, #a3bffa, #dbeafe);
+  color: #1e3a8a;
+  transform: scale(1.03);
+  box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+.detail-content {
+  margin-top: 15px;
+}
+
+.content {
+  padding: 20px;
+  color: #4a5568;
+  line-height: 2;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  transition: transform 0.4s ease, opacity 0.4s ease;
+}
+
+.content ul {
+  list-style: none;
+  padding: 0;
+}
+
+.content ul li {
+  margin-bottom: 15px;
+  padding: 10px 0;
+}
+
+.content ul li strong {
+  color: #152238;
+}
+
+/* Animations */
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

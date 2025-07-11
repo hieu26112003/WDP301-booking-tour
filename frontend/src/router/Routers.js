@@ -12,6 +12,7 @@ import ResetPassword from "../pages/User/ResetPassword";
 import ResetPasswordConfirm from "../pages/User/ResetPasswordConfirm";
 import ManageTours from "../pages/Admin/components/ManageTours";
 import ManageCategories from "../pages/Admin/components/ManageCategories";
+import TourDetail from "../pages/Admin/components/TourDetail";
 
 const Routers = () => {
   return (
@@ -48,6 +49,14 @@ const Routers = () => {
           </AdminLayout>
         }
       /> */}
+      <Route
+        path="/tour-detail/:id"
+        element={
+          <AdminLayout>
+            <TourDetail />
+          </AdminLayout>
+        }
+      />
       <Route
         path="/admin/tours"
         element={
