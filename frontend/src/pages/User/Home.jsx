@@ -7,6 +7,7 @@ import SearchBar from "./../../shared/SearchBar";
 import ServiceList from "../../services/ServiceList";
 import FeaturedTourList from "../../components/Featured-tours/FeaturedTourList";
 import CommonSection from "../../shared/CommonSection";
+import ChatWidget from "../../components/Chat/ChatWidget";
 
 const Home = () => {
   return (
@@ -27,6 +28,7 @@ const Home = () => {
           </Row>
         </Container>
       </section>
+      <ChatWidget />
     </>
   );
 };

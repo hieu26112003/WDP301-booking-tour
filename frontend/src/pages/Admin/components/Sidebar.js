@@ -10,44 +10,39 @@ import "./index.css";
 const Sidebar = () => {
   return (
     <div className="sidebar">
-      {/* Logo */}
       <div className="logo">Admin Panel</div>
 
-      {/* Menu Items */}
       <ul>
-
-        <SidebarItem to="/Admin" icon={<FaTachometerAlt />} label="Dashboard" />
+        <SidebarItem to="/admin" icon={<FaTachometerAlt />} label="Dashboard" />
         <SidebarItem
-          to="/manage-accounts"
+          to="/admin/user"
           icon={<FaUsers />}
           label="Manage Accounts"
         />
         <SidebarItem to="/admin/staff" icon={<FaUsers />} label="Manage Staff" />
         <SidebarItem
-          to="/manage-hotels"
+          to="/admin/hotels"
           icon={<FaCommentDots />}
           label="Manage Hotel"
         />
         <SidebarItem
-          to="/manage-tours"
+          to="/admin/tours"
           icon={<FaMapMarkedAlt />}
           label="Manage Tours"
         />
         <SidebarItem
-          to="/manage-categories"
+          to="/admin/categories"
           icon={<FaTags />}
           label="Manage Categories"
         />
 
       </ul>
 
-      {/* Footer */}
       <div className="footer">© 2025 Admin Dashboard</div>
     </div>
   );
 };
 
-// Component cho từng mục menu
 const SidebarItem = ({ to, icon, label }) => {
   return (
     <li>
