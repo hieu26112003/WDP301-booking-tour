@@ -37,7 +37,10 @@ const Login = () => {
 
           if (result.data.role === "admin") {
             navigate("/admin");
-          } else {
+          } else if (result.data.role === "staff") {
+            navigate("/staff");
+          }
+          else {
             navigate("/home");
           }
         }
@@ -94,7 +97,10 @@ const Login = () => {
       }).then(() => {
         if (result.data.role === "admin") {
           navigate("/admin");
-        } else {
+        } else if (result.data.role === "staff") {
+          navigate("/staff");
+        }
+        else {
           navigate("/home");
         }
       });

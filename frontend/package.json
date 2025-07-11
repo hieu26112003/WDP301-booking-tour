@@ -29,7 +29,8 @@
     "reactstrap": "^9.2.3",
     "remixicon": "^2.5.0",
     "slick-carousel": "^1.8.1",
-    "sweetalert2": "^11.22.2",
+    "socket.io-client": "^4.8.1",
+    "sweetalert2": "^11.12.2",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
