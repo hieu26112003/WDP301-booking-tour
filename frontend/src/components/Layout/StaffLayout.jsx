@@ -19,7 +19,7 @@ const StaffLayout = ({ children }) => {
     return (
         <div className="d-flex">
             <Sidebar />
-            <div className="flex-grow-1 p-4" style={{ background: "#f4f6f9", minHeight: "100vh" }}>
+            <div className="flex-grow-1 p-4" style={{ background: "#f4f6f9", minHeight: "60vh" }}>
                 {children}
             </div>
         </div>

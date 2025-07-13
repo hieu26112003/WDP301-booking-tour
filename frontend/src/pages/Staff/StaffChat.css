@@ -1,7 +1,7 @@
 /* Layout tổng thể của khung chat hỗ trợ */
 .support-chat-container {
     display: flex;
-    height: 90vh;
+    height: 70vh;
     max-width: 900px;
     /* ✅ Giới hạn chiều rộng */
     margin: 20px auto;

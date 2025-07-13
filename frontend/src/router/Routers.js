@@ -77,6 +77,14 @@ const Routers = () => {
         }
       />
       <Route
+        path="/staff"
+        element={
+          <StaffLayout>
+            <h1>Dashboard</h1>
+          </StaffLayout>
+        }
+      />
+      <Route
         path="/staff/chat"
         element={
           <StaffLayout>
