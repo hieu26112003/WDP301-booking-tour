@@ -1,60 +1,71 @@
-"use client"
-import { useEffect, useRef, useContext, useState } from "react"
-import { Container, Row, Button } from "reactstrap"
-import { NavLink, Link, useNavigate } from "react-router-dom"
-import Logo from "../../assets/images/logo.png"
-import "./header.css"
-import { AuthContext } from "../../context/AuthContext"
-import Dropdown from "react-bootstrap/Dropdown"
-import Swal from "sweetalert2"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faChevronDown, faBars, faSearch, faPhone } from "@fortawesome/free-solid-svg-icons"
-
-const nav__links = [
-  {
-    path: "/",
-    display: "TRANG CHỦ",
-  },
-  {
-    path: "/tours",
-    display: "TOUR DU LỊCH",
-    hasDropdown: true,
-    dropdownItems: [
-      { path: "/tours/quoc-te", display: "Tour Quốc tế" },
-      { path: "/tours/trong-nuoc", display: "Tour trong nước" },
-      { path: "/tours/le-tet", display: "Tour lễ tết" },
-      { path: "/tours/combo", display: "Combo du lịch" },
-    ],
-  },
-  {
-    path: "/cam-nang",
-    display: "CẨM NANG DU LỊCH",
-    hasDropdown: true,
-    dropdownItems: [
-      { path: "/cam-nang/kinh-nghiem", display: "Kinh nghiệm" },
-      { path: "/cam-nang/am-thuc", display: "Ẩm thực" },
-      { path: "/cam-nang/review", display: "Review" },
-      { path: "/cam-nang/xu-huong", display: "Xu hướng" },
-    ],
-  },
-  {
-    path: "/about",
-    display: "VỀ ASK TRAVEL",
-  },
-  {
-    path: "/contact",
-    display: "LIÊN HỆ",
-  },
-]
+import { useEffect, useRef, useContext, useState } from "react";
+import { Container, Row, Button } from "reactstrap";
+import { NavLink, Link, useNavigate } from "react-router-dom";
+import Logo from "../../assets/images/logo.png";
+import "./header.css";
+import { AuthContext } from "../../context/AuthContext";
+import Dropdown from "react-bootstrap/Dropdown";
+import Swal from "sweetalert2";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faChevronDown, faBars, faSearch, faPhone } from "@fortawesome/free-solid-svg-icons";
+import { getCategories } from "../../services/categoryService";
 
 const Header = () => {
-  const headerRef = useRef(null)
-  const topHeaderRef = useRef(null)
-  const menuRef = useRef(null)
-  const navigate = useNavigate()
-  const { user, dispatch } = useContext(AuthContext)
-  const [activeDropdown, setActiveDropdown] = useState(null)
-  const [isScrolled, setIsScrolled] = useState(false)
+  const headerRef = useRef(null);
+  const topHeaderRef = useRef(null);
+  const menuRef = useRef(null);
+  const navigate = useNavigate();
+  const { user, dispatch } = useContext(AuthContext);
+  const [activeDropdown, setActiveDropdown] = useState(null);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await getCategories();
+        setCategories(res.data?.data || []); // Giả sử backend trả { data: [...] }
+      } catch (error) {
+        console.error("Failed to fetch categories", error);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const nav__links = [
+    {
+      path: "/",
+      display: "TRANG CHỦ",
+    },
+    {
+      path: "/tours",
+      display: "TOUR DU LỊCH",
+      hasDropdown: true,
+      dropdownItems: categories.map((cat) => ({
+        path: `/tours/${cat._id}`,
+        display: cat.name,
+      })),
+    },
+    {
+      path: "/cam-nang",
+      display: "CẨM NANG DU LỊCH",
+      hasDropdown: true,
+      dropdownItems: [
+        { path: "/cam-nang/kinh-nghiem", display: "Kinh nghiệm" },
+        { path: "/cam-nang/am-thuc", display: "Ẩm thực" },
+        { path: "/cam-nang/review", display: "Review" },
+        { path: "/cam-nang/xu-huong", display: "Xu hướng" },
+      ],
+    },
+    {
+      path: "/about",
+      display: "VỀ ASK TRAVEL",
+    },
+    {
+      path: "/contact",
+      display: "LIÊN HỆ",
+    },
+  ];
 
   const logout = () => {
     Swal.fire({
@@ -67,55 +78,54 @@ const Header = () => {
       cancelButtonText: "Hủy",
     }).then((result) => {
       if (result.isConfirmed) {
-        dispatch({ type: "LOGOUT" })
-        navigate("/")
+        dispatch({ type: "LOGOUT" });
+        navigate("/");
         Swal.fire({
           icon: "success",
           title: "Đăng xuất thành công",
           showConfirmButton: false,
           timer: 1500,
-        })
+        });
       }
-    })
-  }
+    });
+  };
 
   const stickyHeaderFunc = () => {
     const handleScroll = () => {
-      const scrollTop = document.body.scrollTop || document.documentElement.scrollTop
-
+      const scrollTop = document.body.scrollTop || document.documentElement.scrollTop;
       if (scrollTop > 100) {
         if (!isScrolled) {
-          setIsScrolled(true)
-          headerRef.current?.classList.add("sticky__header")
-          topHeaderRef.current?.classList.add("hide__top__header")
+          setIsScrolled(true);
+          headerRef.current?.classList.add("sticky__header");
+          topHeaderRef.current?.classList.add("hide__top__header");
         }
       } else {
         if (isScrolled) {
-          setIsScrolled(false)
-          headerRef.current?.classList.remove("sticky__header")
-          topHeaderRef.current?.classList.remove("hide__top__header")
+          setIsScrolled(false);
+          headerRef.current?.classList.remove("sticky__header");
+          topHeaderRef.current?.classList.remove("hide__top__header");
         }
       }
-    }
+    };
 
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
-  }
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  };
 
   useEffect(() => {
-    const cleanup = stickyHeaderFunc()
-    return cleanup
-  }, [isScrolled])
+    const cleanup = stickyHeaderFunc();
+    return cleanup;
+  }, [isScrolled]);
 
-  const toggleMenu = () => menuRef.current.classList.toggle("show__menu")
+  const toggleMenu = () => menuRef.current.classList.toggle("show__menu");
 
   const handleMouseEnter = (index) => {
-    setActiveDropdown(index)
-  }
+    setActiveDropdown(index);
+  };
 
   const handleMouseLeave = () => {
-    setActiveDropdown(null)
-  }
+    setActiveDropdown(null);
+  };
 
   return (
     <header className="header" ref={headerRef}>
@@ -144,7 +154,7 @@ const Header = () => {
                 <div className="phone-section">
                   <FontAwesomeIcon icon={faPhone} className="phone-icon" />
                   <div className="phone-info">
-                    <div className="phone-number">Phone: 090.990.4227</div>
+                    <div className="phone-number">Phone: 079.810.712</div>
                     <div className="phone-subtitle">Gọi để được tư vấn ngay</div>
                   </div>
                 </div>
@@ -241,7 +251,7 @@ const Header = () => {
         </Container>
       </div>
     </header>
-  )
-}
+  );
+};
 
-export default Header
+export default Header;
