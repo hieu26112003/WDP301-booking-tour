@@ -18,6 +18,7 @@ import ManageCategories from "../pages/Admin/components/ManageCategories";
 import StaffLayout from "../components/Layout/StaffLayout";
 import StaffChatPage from "../pages/Staff/StaffChatPage";
 import Guide from "../pages/User/Guide";
+import ManageGuide from "../pages/Staff/ManageGuide";
 
 import TourDetail from "../pages/Admin/components/TourDetail";
 
@@ -79,6 +80,14 @@ const Routers = () => {
           <AdminLayout>
             <ManageStaff />
           </AdminLayout>
+        }
+      />
+      <Route
+        path="/staff/guides"
+        element={
+          <StaffLayout>
+            <ManageGuide />
+          </StaffLayout>
         }
       />
       <Route

@@ -1,5 +1,6 @@
 // import React from "react";
 // import { Link } from "react-router-dom";
+import { FaBook } from "react-icons/fa";
 
 // const Sidebar = () => {
 //     return (
@@ -20,6 +21,7 @@ import {
     FaMapMarkedAlt,
 } from "react-icons/fa";
 import "../Admin/components/index.css";
+
 const Sidebar = () => {
     return (
         <div className="sidebar">
@@ -31,6 +33,11 @@ const Sidebar = () => {
                     to="/staff/chat"
                     icon={<FaCommentDots />}
                     label="Inbox"
+                />
+                <SidebarItem
+                    to="/staff/guides"
+                    icon={<FaBook />}
+                    label="Manage Guide"
                 />
                 {/* <SidebarItem
           to="/admin/tours"
