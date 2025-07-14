@@ -319,7 +319,7 @@ const ManageTours = () => {
   };
 
   return (
-    <section>
+    <section className="manage-tours-section">
       <Container>
         <Row>
           <Col lg="12">

@@ -1,5 +1,5 @@
-/* General */
-section {
+/* Manage Tours Section */
+.manage-tours-section {
   padding: 40px 0;
   background: linear-gradient(135deg, #f8fafc, #e2e8f0);
   min-height: 100vh;
@@ -256,14 +256,15 @@ h2 {
   opacity: 0.6;
 }
 
-/* HTML Content */
-.html-content {
+/* Description Content */
+.description-content {
   font-size: 0.9rem;
   color: #1e293b;
-  max-width: 300px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  max-width: 600px;
+  overflow: visible;
+  white-space: normal;
+  line-height: 1.6;
+  text-align: center; /* Center content within cells */
 }
 
 /* Table */
@@ -282,6 +283,7 @@ h2 {
   padding: 0.75rem 1rem;
   font-size: 0.9rem;
   vertical-align: middle;
+  text-align: center; /* Center all content in td */
 }
 
 .table th {
@@ -319,15 +321,15 @@ h2 {
 }
 
 /* Image Column */
-.table th:nth-child(2),
-.table td.image-cell {
+.manage-tours-section .table th:nth-child(2),
+.manage-tours-section .table td.image-cell {
   text-align: center;
-  width: 90px;
+  width: 90px; /* Unchanged, supports current image size */
 }
 
-.tour-image {
-  width: 32px;
-  height: 32px;
+.manage-tours-section .table .tour-image {
+  width: 36px !important; /* Unchanged, as per previous adjustment */
+  height: 36px !important;
   object-fit: cover;
   border-radius: 4px;
   border: 1px solid #e2e8f0;
@@ -336,8 +338,8 @@ h2 {
   margin: 0 auto;
 }
 
-.tour-image:hover {
-  transform: scale(1.1);
+.manage-tours-section .table .tour-image:hover {
+  transform: scale(1.15);
 }
 
 .no-image {
@@ -345,6 +347,57 @@ h2 {
   text-align: center;
   color: #1e293b;
   font-size: 0.85rem;
+}
+
+/* Table Column Widths */
+.table th:nth-child(1),
+.table td:nth-child(1) {
+  width: 3%; /* No., reduced from 4% */
+}
+
+.table th:nth-child(2),
+.table td.image-cell {
+  width: 8%; /* Image, unchanged */
+}
+
+.table th:nth-child(3),
+.table td:nth-child(3) {
+  width: 15%; /* Title, unchanged */
+}
+
+.table th:nth-child(4),
+.table td:nth-child(4) {
+  width: 16%; /* Summary, unchanged */
+}
+
+.table th:nth-child(5),
+.table td:nth-child(5) {
+  width: 10%; /* Price (Adult), unchanged */
+}
+
+.table th:nth-child(6),
+.table td:nth-child(6) {
+  width: 27%; /* Notes, unchanged */
+}
+
+.table th:nth-child(7),
+.table td:nth-child(7) {
+  width: 27%; /* Cancellation Policy, unchanged */
+}
+
+.table th:nth-child(8),
+.table td:nth-child(8) {
+  width: 15%; /* Category, increased from 10% */
+}
+
+.table th:nth-child(9),
+.table td:nth-child(9) {
+  width: 5%; /* Featured, unchanged */
+}
+
+.table th:nth-child(10),
+.table td:nth-child(10) {
+  width: 8%; /* Actions, reduced from 10% */
 }
 
 /* Responsive */
@@ -369,14 +422,19 @@ h2 {
     font-size: 0.85rem;
   }
 
-  .table th:nth-child(2),
-  .table td.image-cell {
-    width: 70px;
+  .manage-tours-section .table th:nth-child(2),
+  .manage-tours-section .table td.image-cell {
+    width: 80px;
   }
 
-  .tour-image {
-    width: 28px;
-    height: 28px;
+  .manage-tours-section .table .tour-image {
+    width: 32px !important;
+    height: 32px !important;
+  }
+
+  .description-content {
+    max-width: 300px;
+    font-size: 0.85rem;
   }
 
   .modal-content {

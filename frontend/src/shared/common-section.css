@@ -1,7 +1,9 @@
+/* common-section.css */
 .common__section {
   background: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)),
     url("../assets/images/tour.jpg") no-repeat center center;
-  height: 100px;
+  height: 400px;
+  min-height: 100px; /* Prevent min-height overrides */
   display: flex;
   text-align: center;
   align-items: center;
