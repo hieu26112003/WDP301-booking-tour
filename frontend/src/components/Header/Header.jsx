@@ -1,4 +1,3 @@
-"use client";
 import { useEffect, useRef, useContext, useState } from "react";
 import { Container, Row, Button } from "reactstrap";
 import { NavLink, Link, useNavigate } from "react-router-dom";
@@ -8,49 +7,8 @@ import { AuthContext } from "../../context/AuthContext";
 import Dropdown from "react-bootstrap/Dropdown";
 import Swal from "sweetalert2";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faChevronDown,
-  faBars,
-  faSearch,
-  faPhone,
-} from "@fortawesome/free-solid-svg-icons";
-
-const nav__links = [
-  {
-    path: "/",
-    display: "TRANG CHỦ",
-  },
-  {
-    path: "/tours",
-    display: "TOUR DU LỊCH",
-    hasDropdown: true,
-    dropdownItems: [
-      { path: "/tours/quoc-te", display: "Tour Quốc tế" },
-      { path: "/tours/trong-nuoc", display: "Tour trong nước" },
-      { path: "/tours/le-tet", display: "Tour lễ tết" },
-      { path: "/tours/combo", display: "Combo du lịch" },
-    ],
-  },
-  {
-    path: "/cam-nang",
-    display: "CẨM NANG DU LỊCH",
-    hasDropdown: true,
-    dropdownItems: [
-      { path: "/cam-nang/kinh-nghiem", display: "Kinh nghiệm" },
-      { path: "/cam-nang/am-thuc", display: "Ẩm thực" },
-      { path: "/cam-nang/review", display: "Review" },
-      { path: "/cam-nang/xu-huong", display: "Xu hướng" },
-    ],
-  },
-  {
-    path: "/about",
-    display: "VỀ ASK TRAVEL",
-  },
-  {
-    path: "/contact",
-    display: "LIÊN HỆ",
-  },
-];
+import { faChevronDown, faBars, faSearch, faPhone } from "@fortawesome/free-solid-svg-icons";
+import { getCategories } from "../../services/categoryService";
 
 const Header = () => {
   const headerRef = useRef(null);
@@ -60,6 +18,54 @@ const Header = () => {
   const { user, dispatch } = useContext(AuthContext);
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await getCategories();
+        setCategories(res.data?.data || []); // Giả sử backend trả { data: [...] }
+      } catch (error) {
+        console.error("Failed to fetch categories", error);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const nav__links = [
+    {
+      path: "/",
+      display: "TRANG CHỦ",
+    },
+    {
+      path: "/tours",
+      display: "TOUR DU LỊCH",
+      hasDropdown: true,
+      dropdownItems: categories.map((cat) => ({
+        path: `/tours/${cat._id}`,
+        display: cat.name,
+      })),
+    },
+    {
+      path: "/cam-nang",
+      display: "CẨM NANG DU LỊCH",
+      hasDropdown: true,
+      dropdownItems: [
+        { path: "/cam-nang/kinh-nghiem", display: "Kinh nghiệm" },
+        { path: "/cam-nang/am-thuc", display: "Ẩm thực" },
+        { path: "/cam-nang/review", display: "Review" },
+        { path: "/cam-nang/xu-huong", display: "Xu hướng" },
+      ],
+    },
+    {
+      path: "/about",
+      display: "VỀ ASK TRAVEL",
+    },
+    {
+      path: "/contact",
+      display: "LIÊN HỆ",
+    },
+  ];
 
   const logout = () => {
     Swal.fire({
@@ -84,28 +90,17 @@ const Header = () => {
     });
   };
 
-  const stickyHeaderFunc = () => {
-    const handleScroll = () => {
-      const scrollTop =
-        document.body.scrollTop || document.documentElement.scrollTop;
-
-      if (scrollTop > 100) {
-        if (!isScrolled) {
-          setIsScrolled(true);
-          headerRef.current?.classList.add("sticky__header");
-          topHeaderRef.current?.classList.add("hide__top__header");
-        }
+ const stickyHeaderFunc = () => {
+    window.addEventListener("scroll", () => {
+      if (
+        document.body.scrollTop > 80 ||
+        document.documentElement.scrollTop > 80
+      ) {
+        headerRef.current.classList.add("sticky__header");
       } else {
-        if (isScrolled) {
-          setIsScrolled(false);
-          headerRef.current?.classList.remove("sticky__header");
-          topHeaderRef.current?.classList.remove("hide__top__header");
-        }
+        headerRef.current.classList.remove("sticky__header");
       }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    });
   };
 
   useEffect(() => {
@@ -154,10 +149,10 @@ const Header = () => {
                 <div className="phone-section">
                   <FontAwesomeIcon icon={faPhone} className="phone-icon" />
                   <div className="phone-info">
-                    <div className="phone-number">Phone: 090.990.4227</div>
-                    <div className="phone-subtitle">
-                      Gọi để được tư vấn ngay
-                    </div>
+
+                    <div className="phone-number">Phone: 079.810.712</div>
+                    <div className="phone-subtitle">Gọi để được tư vấn ngay</div>
+
                   </div>
                 </div>
 
