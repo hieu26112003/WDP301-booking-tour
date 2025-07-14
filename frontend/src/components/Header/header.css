@@ -152,17 +152,18 @@
 /* Navigation Bar */
 .navigation-bar {
   background: linear-gradient(
-    90deg,
     var(--green-nav),
-    #2a7e68
+    #021c07b2
   ); /* Subtle gradient */
-  padding: 0; /* No padding for minimal height */
+
   position: sticky;
   top: 0; /* Stick directly to top */
   z-index: 999;
   margin: 0; /* No margin to prevent gaps */
   transition: box-shadow 0.3s ease;
   margin-top: -50px;
+  padding-bottom: -10px;
+  padding-top: 5px;
 }
 
 .sticky__header .navigation-bar {
@@ -175,7 +176,7 @@
 
 .menu {
   margin: 0; /* No margin to prevent gaps */
-  padding: 1px 0; /* Ultra-minimal padding */
+  padding: 0px 0; /* Ultra-minimal padding */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -337,8 +338,8 @@
   }
 
   .navigation {
-    width: 100%;
-    height: 100%;
+    width: 80%;
+    height: 60%;
     position: fixed;
     top: 0;
     left: 0;
@@ -432,7 +433,7 @@
 
   .menu {
     width: 80%;
-    padding: 6px 10px;
+    padding: 0px 0px;
     gap: 3px;
   }
 }
