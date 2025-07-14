@@ -3,6 +3,9 @@ import axios from "axios";
 
 const ManageAccounts = () => {
   const [users, setUsers] = useState([]);
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+
   const [editUserId, setEditUserId] = useState(null);
   const [editFormData, setEditFormData] = useState({
     fullname: "",
@@ -15,11 +18,24 @@ const ManageAccounts = () => {
     fetchUsers();
   }, []);
 
+  useEffect(() => {
+    handleSearch(searchTerm);
+  }, [users, searchTerm]);
+
   const fetchUsers = () => {
     axios
       .get("http://localhost:8000/api/admin/users", { withCredentials: true })
-      .then((res) => setUsers(res.data))
+      .then((res) => {
+        setUsers(res.data);
+      })
       .catch((err) => console.error("Failed to fetch users", err));
+  };
+
+  const handleSearch = (term) => {
+    const filtered = users.filter((user) =>
+      user.fullname.toLowerCase().includes(term.toLowerCase())
+    );
+    setFilteredUsers(filtered);
   };
 
   const handleDelete = (userId) => {
@@ -90,6 +106,18 @@ const ManageAccounts = () => {
   return (
     <div className="container mt-4">
       <h2>Manage Accounts</h2>
+
+      {/* Search Input */}
+      <div className="mb-3 mt-3">
+        <input
+          type="text"
+          className="form-control"
+          placeholder="Search by name..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
+
       <table className="table table-bordered table-hover mt-3">
         <thead className="table-light">
           <tr>
@@ -102,7 +130,7 @@ const ManageAccounts = () => {
           </tr>
         </thead>
         <tbody>
-          {users?.map((user, index) => (
+          {filteredUsers?.map((user, index) => (
             <tr key={user._id}>
               <td>{index + 1}</td>
 
