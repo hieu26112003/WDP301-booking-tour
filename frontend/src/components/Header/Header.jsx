@@ -1,14 +1,19 @@
-"use client"
-import { useEffect, useRef, useContext, useState } from "react"
-import { Container, Row, Button } from "reactstrap"
-import { NavLink, Link, useNavigate } from "react-router-dom"
-import Logo from "../../assets/images/logo.png"
-import "./header.css"
-import { AuthContext } from "../../context/AuthContext"
-import Dropdown from "react-bootstrap/Dropdown"
-import Swal from "sweetalert2"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faChevronDown, faBars, faSearch, faPhone } from "@fortawesome/free-solid-svg-icons"
+"use client";
+import { useEffect, useRef, useContext, useState } from "react";
+import { Container, Row, Button } from "reactstrap";
+import { NavLink, Link, useNavigate } from "react-router-dom";
+import Logo from "../../assets/images/logo.png";
+import "./header.css";
+import { AuthContext } from "../../context/AuthContext";
+import Dropdown from "react-bootstrap/Dropdown";
+import Swal from "sweetalert2";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faChevronDown,
+  faBars,
+  faSearch,
+  faPhone,
+} from "@fortawesome/free-solid-svg-icons";
 
 const nav__links = [
   {
@@ -45,16 +50,16 @@ const nav__links = [
     path: "/contact",
     display: "LIÊN HỆ",
   },
-]
+];
 
 const Header = () => {
-  const headerRef = useRef(null)
-  const topHeaderRef = useRef(null)
-  const menuRef = useRef(null)
-  const navigate = useNavigate()
-  const { user, dispatch } = useContext(AuthContext)
-  const [activeDropdown, setActiveDropdown] = useState(null)
-  const [isScrolled, setIsScrolled] = useState(false)
+  const headerRef = useRef(null);
+  const topHeaderRef = useRef(null);
+  const menuRef = useRef(null);
+  const navigate = useNavigate();
+  const { user, dispatch } = useContext(AuthContext);
+  const [activeDropdown, setActiveDropdown] = useState(null);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   const logout = () => {
     Swal.fire({
@@ -67,55 +72,56 @@ const Header = () => {
       cancelButtonText: "Hủy",
     }).then((result) => {
       if (result.isConfirmed) {
-        dispatch({ type: "LOGOUT" })
-        navigate("/")
+        dispatch({ type: "LOGOUT" });
+        navigate("/");
         Swal.fire({
           icon: "success",
           title: "Đăng xuất thành công",
           showConfirmButton: false,
           timer: 1500,
-        })
+        });
       }
-    })
-  }
+    });
+  };
 
   const stickyHeaderFunc = () => {
     const handleScroll = () => {
-      const scrollTop = document.body.scrollTop || document.documentElement.scrollTop
+      const scrollTop =
+        document.body.scrollTop || document.documentElement.scrollTop;
 
       if (scrollTop > 100) {
         if (!isScrolled) {
-          setIsScrolled(true)
-          headerRef.current?.classList.add("sticky__header")
-          topHeaderRef.current?.classList.add("hide__top__header")
+          setIsScrolled(true);
+          headerRef.current?.classList.add("sticky__header");
+          topHeaderRef.current?.classList.add("hide__top__header");
         }
       } else {
         if (isScrolled) {
-          setIsScrolled(false)
-          headerRef.current?.classList.remove("sticky__header")
-          topHeaderRef.current?.classList.remove("hide__top__header")
+          setIsScrolled(false);
+          headerRef.current?.classList.remove("sticky__header");
+          topHeaderRef.current?.classList.remove("hide__top__header");
         }
       }
-    }
+    };
 
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
-  }
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  };
 
   useEffect(() => {
-    const cleanup = stickyHeaderFunc()
-    return cleanup
-  }, [isScrolled])
+    const cleanup = stickyHeaderFunc();
+    return cleanup;
+  }, [isScrolled]);
 
-  const toggleMenu = () => menuRef.current.classList.toggle("show__menu")
+  const toggleMenu = () => menuRef.current.classList.toggle("show__menu");
 
   const handleMouseEnter = (index) => {
-    setActiveDropdown(index)
-  }
+    setActiveDropdown(index);
+  };
 
   const handleMouseLeave = () => {
-    setActiveDropdown(null)
-  }
+    setActiveDropdown(null);
+  };
 
   return (
     <header className="header" ref={headerRef}>
@@ -135,7 +141,11 @@ const Header = () => {
               <div className="search-bar">
                 <div className="search-input-wrapper">
                   <FontAwesomeIcon icon={faSearch} className="search-icon" />
-                  <input type="text" placeholder="Nhập khách sạn hoặc địa điểm muốn tìm..." className="search-input" />
+                  <input
+                    type="text"
+                    placeholder="Nhập khách sạn hoặc địa điểm muốn tìm..."
+                    className="search-input"
+                  />
                 </div>
               </div>
 
@@ -145,7 +155,9 @@ const Header = () => {
                   <FontAwesomeIcon icon={faPhone} className="phone-icon" />
                   <div className="phone-info">
                     <div className="phone-number">Phone: 090.990.4227</div>
-                    <div className="phone-subtitle">Gọi để được tư vấn ngay</div>
+                    <div className="phone-subtitle">
+                      Gọi để được tư vấn ngay
+                    </div>
                   </div>
                 </div>
 
@@ -159,7 +171,11 @@ const Header = () => {
                         className="d-flex align-items-center gap-2"
                       >
                         {user.avatar && (
-                          <img src={user.avatar || "/placeholder.svg"} alt="Avatar" className="user-avatar" />
+                          <img
+                            src={user.avatar || "/placeholder.svg"}
+                            alt="Avatar"
+                            className="user-avatar"
+                          />
                         )}
                         <span>{user.username}</span>
                         <FontAwesomeIcon icon={faChevronDown} />
@@ -211,25 +227,50 @@ const Header = () => {
                   <li
                     className="nav__item"
                     key={index}
-                    onMouseEnter={() => item.hasDropdown && handleMouseEnter(index)}
+                    onMouseEnter={() =>
+                      item.hasDropdown && handleMouseEnter(index)
+                    }
                     onMouseLeave={() => item.hasDropdown && handleMouseLeave()}
                   >
                     {item.hasDropdown ? (
                       <div className="dropdown-wrapper">
-                        <NavLink to={item.path} className={(navClass) => (navClass.isActive ? "active__link" : "")}>
+                        <NavLink
+                          to={item.path}
+                          className={(navClass) =>
+                            navClass.isActive ? "active__link" : ""
+                          }
+                        >
                           {item.display}
-                          <FontAwesomeIcon icon={faChevronDown} className="dropdown-arrow" />
+                          <FontAwesomeIcon
+                            icon={faChevronDown}
+                            className="dropdown-arrow"
+                          />
                         </NavLink>
-                        <div className={`dropdown-menu-custom ${activeDropdown === index ? "show" : ""}`}>
-                          {item.dropdownItems.map((dropdownItem, dropdownIndex) => (
-                            <Link key={dropdownIndex} to={dropdownItem.path} className="dropdown-item-custom">
-                              {dropdownItem.display}
-                            </Link>
-                          ))}
+                        <div
+                          className={`dropdown-menu-custom ${
+                            activeDropdown === index ? "show" : ""
+                          }`}
+                        >
+                          {item.dropdownItems.map(
+                            (dropdownItem, dropdownIndex) => (
+                              <Link
+                                key={dropdownIndex}
+                                to={dropdownItem.path}
+                                className="dropdown-item-custom"
+                              >
+                                {dropdownItem.display}
+                              </Link>
+                            )
+                          )}
                         </div>
                       </div>
                     ) : (
-                      <NavLink to={item.path} className={(navClass) => (navClass.isActive ? "active__link" : "")}>
+                      <NavLink
+                        to={item.path}
+                        className={(navClass) =>
+                          navClass.isActive ? "active__link" : ""
+                        }
+                      >
                         {item.display}
                       </NavLink>
                     )}
@@ -241,7 +282,7 @@ const Header = () => {
         </Container>
       </div>
     </header>
-  )
-}
+  );
+};
 
-export default Header
+export default Header;

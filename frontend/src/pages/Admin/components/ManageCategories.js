@@ -29,10 +29,8 @@ const ManageCategories = () => {
   const [editId, setEditId] = useState(null);
   const [modal, setModal] = useState(false);
 
-  // Mở/đóng modal
   const toggleModal = () => setModal(!modal);
 
-  // Lấy tất cả danh mục
   const fetchCategories = async () => {
     try {
       const accessToken = localStorage.getItem("accessToken");
