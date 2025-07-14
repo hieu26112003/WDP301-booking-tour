@@ -12,8 +12,9 @@ import upload from "../middleware/upload.js";
 const router = express.Router();
 
 router.post("/", verifyAdmin, upload.single("image"), createTour);
-router.get("/", verifyAdmin, getAllTours);
+router.get("/", getAllTours);
 router.put("/:id", verifyAdmin, upload.single("image"), updateTour);
 router.delete("/:id", verifyAdmin, deleteTour);
 router.get("/:id", verifyAdmin, getTourById);
+
 export default router;
