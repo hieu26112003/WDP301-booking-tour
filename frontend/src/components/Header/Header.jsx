@@ -23,8 +23,14 @@ const nav__links = [
     display: "About",
   },
   {
-    path: "/deals",
-    display: "Promotion",
+    path: "/Guide",
+    display: "Cẩm nang du lịch",
+    subMenu: [
+      { path: "/Guide/kinh-nghiem", display: "Kinh nghiệm" },
+      { path: "/Guide/am-thuc", display: "Ẩm thực" },
+      { path: "/Guide/review", display: "Review" },
+      { path: "/Guide/xu-huong", display: "Xu hướng" },
+    ],
   },
   {
     path: "/contact",
@@ -96,21 +102,39 @@ const Header = () => {
 
             {/* ========== MENU START ========== */}
             <div className="navigation" ref={menuRef} onClick={toggleMenu}>
-              <ul className="menu d-flex align-items-center gap-5">
+              <ul className="menu">
                 {nav__links.map((item, index) => (
-                  <li className="nav__item" key={index}>
+                  <li className="nav__item dropdown__menu-wrapper" key={index}>
                     <NavLink
                       to={item.path}
                       className={(navClass) =>
-                        navClass.isActive ? "active__link" : ""
+                        `dropdown__label ${navClass.isActive ? "active__link" : ""}`
                       }
                     >
                       {item.display}
                     </NavLink>
+
+                    {item.subMenu && (
+                      <ul className="dropdown__menu">
+                        {item.subMenu.map((subItem, subIndex) => (
+                          <li key={subIndex}>
+                            <NavLink
+                              to={subItem.path}
+                              className={(navClass) =>
+                                navClass.isActive ? "active__link" : ""
+                              }
+                            >
+                              {subItem.display}
+                            </NavLink>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </li>
                 ))}
               </ul>
             </div>
+
             {/* ========================== */}
 
             <div className="nav__right d-flex align-items-center gap-5">

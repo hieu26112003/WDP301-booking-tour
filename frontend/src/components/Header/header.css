@@ -7,43 +7,59 @@
   --subtitle-font-name: "Island Moments", cursive;
 }
 
+/* =============== HEADER ================ */
 .header {
   width: 100%;
   height: 100px;
   line-height: 83px;
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+  z-index: 999;
+  position: sticky;
+  top: 0;
 }
 
+/* =============== LOGO ================ */
 .logo img {
-  margin-right: 50px;
-  width: 20%;
+  width: 140px;
+}
+
+/* =============== MENU NAVIGATION ================ */
+.navigation {
+  flex: 1;
+  margin: 0 50px;
 }
 
 .menu {
-  margin-bottom: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+}
+
+.nav__item {
+  white-space: nowrap;
 }
 
 .nav__item a {
   text-decoration: none;
   color: var(--heading-color);
   font-weight: 500;
-  font-size: 1.5rem;
+  font-size: 1.2rem;
+  padding: 10px 16px;
+  display: inline-block;
+  transition: color 0.2s ease;
 }
 
-.nav__item a:hover {
-  color: var(--secondary-color);
-}
-
+.nav__item a:hover,
 .nav__item a.active__link {
   color: var(--secondary-color);
 }
 
-.mobile__menu {
-  font-size: 1.3rem;
-  color: var(--heading-color);
-  display: none;
-}
-
+/* =============== USER ================ */
 .user-avatar {
   width: 40px;
   height: 40px;
@@ -56,128 +72,116 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 1.1rem;
+  font-size: 1rem;
   color: var(--heading-color);
   background: none;
   border: none;
   padding: 0;
 }
 
-.nav__right .dropdown-toggle .fa-chevron-down {
-  font-size: 1rem;
-  color: var(--heading-color);
-}
-
-.nav__right .dropdown-toggle span {
-  font-weight: 500;
-}
-
 .nav__right .dropdown-toggle::after {
-  display: none; /* Hide default Bootstrap arrow */
+  display: none;
 }
 
-.nav__right .dropdown-menu {
-  font-size: 1rem;
+/* =============== MOBILE MENU ================ */
+.mobile__menu {
+  display: none;
+  font-size: 1.5rem;
+  color: var(--heading-color);
+  cursor: pointer;
 }
 
-.nav__right .mobile__menu .fa-bars {
-  font-size: 1.3rem;
-}
-
-/* =============== RESPONSIVE ================ */
 @media only screen and (max-width: 992px) {
-  .logo img {
-    width: 10%;
-  }
-
-  .navigation {
-    width: 100%;
-    height: 100%;
-    position: fixed;
-    top: 0;
-    left: 0;
-    background: rgba(0, 0, 0, 0.4);
-    z-index: 999;
+  .menu {
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    position: absolute;
+    top: 100px;
+    right: 0;
+    width: 70%;
+    background-color: #fff;
+    padding: 20px;
+    height: 100vh;
     display: none;
   }
 
-  .menu {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: calc(100% - 75%);
-    height: 100%;
-    background: #ffffff;
-    flex-direction: column;
-    line-height: 0.5rem;
-    justify-content: center;
-    z-index: 9999;
-  }
-
   .show__menu {
-    display: block;
+    display: flex !important;
   }
 
   .mobile__menu {
     display: block;
   }
 
-  .user-avatar {
-    width: 32px;
-    height: 32px;
+  .nav__right {
+    flex-direction: row-reverse;
   }
 
-  .nav__right .dropdown-toggle {
-    font-size: 1rem;
-    gap: 6px;
-  }
-
-  .nav__right .dropdown-toggle .fa-chevron-down {
-    font-size: 0.9rem;
-  }
-
-  .nav__right .dropdown-toggle span {
-    font-size: 1rem;
-  }
-
-  .nav__right .mobile__menu .fa-bars {
-    font-size: 1.2rem;
+  .navigation {
+    margin: 0;
   }
 }
 
-/* =============== RESPONSIVE ================ */
-@media only screen and (max-width: 768px) {
-  .logo img {
-    width: 50%;
-  }
-
-  .menu {
-    width: calc(100% - 50%);
-  }
-
-  .user-avatar {
-    width: 28px;
-    height: 28px;
-  }
-
-  .nav__right .dropdown-toggle {
-    font-size: 0.9rem;
-    gap: 5px;
-  }
-
-  .nav__right .dropdown-toggle .fa-chevron-down {
-    font-size: 0.8rem;
-  }
-
-  .nav__right .dropdown-toggle span {
-    font-size: 0.9rem;
-  }
-
-  .nav__right .mobile__menu .fa-bars {
-    font-size: 1.1rem;
-  }
+/* Optional: Sticky Header */
+.sticky__header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.navigation {
-  margin-right: 100px;
+.dropdown__menu-wrapper {
+  position: relative;
 }
+
+.dropdown__label {
+  cursor: pointer;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  display: block;
+  white-space: nowrap;
+}
+
+.dropdown__menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  min-width: 160px;
+  display: none;
+  z-index: 999;
+  padding: 0;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.dropdown__menu-wrapper:hover .dropdown__menu {
+  display: block;
+}
+
+.dropdown__menu li {
+  list-style: none;
+}
+
+.dropdown__menu li a {
+  display: block;
+  padding: 8px 16px;
+  text-decoration: none;
+  color: var(--heading-color);
+  font-weight: 500;
+}
+
+.dropdown__menu li a:hover {
+  background-color: #f5f5f5;
+  color: var(--secondary-color);
+}
+.dropdown__menu-wrapper:hover .dropdown__menu {
+  display: block;
+}
+
+

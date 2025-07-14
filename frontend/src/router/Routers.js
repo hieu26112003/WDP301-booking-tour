@@ -17,6 +17,7 @@ import ManageTours from "../pages/Admin/components/ManageTours";
 import ManageCategories from "../pages/Admin/components/ManageCategories";
 import StaffLayout from "../components/Layout/StaffLayout";
 import StaffChatPage from "../pages/Staff/StaffChatPage";
+import Guide from "../pages/User/Guide";
 
 
 const Routers = () => {
@@ -30,6 +31,7 @@ const Routers = () => {
       <Route path="/change-password" element={<ChangePassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/reset-password/:token" element={<ResetPasswordConfirm />} />
+      <Route path="/Guide" element={<Guide />} />
       <Route
         path="/admin"
         element={
@@ -59,6 +61,14 @@ const Routers = () => {
         element={
           <AdminLayout>
             <ManageTours />
+          </AdminLayout>
+        }
+      />
+      <Route
+        path="/admin/staff"
+        element={
+          <AdminLayout>
+            <ManageStaff />
           </AdminLayout>
         }
       />
