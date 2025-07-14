@@ -88,26 +88,21 @@ const Header = () => {
     const handleScroll = () => {
       const scrollTop =
         document.body.scrollTop || document.documentElement.scrollTop;
-
       if (scrollTop > 100) {
         if (!isScrolled) {
           setIsScrolled(true);
-          headerRef.current?.classList.add("sticky__header");
           topHeaderRef.current?.classList.add("hide__top__header");
         }
       } else {
         if (isScrolled) {
           setIsScrolled(false);
-          headerRef.current?.classList.remove("sticky__header");
           topHeaderRef.current?.classList.remove("hide__top__header");
         }
       }
     };
-
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   };
-
   useEffect(() => {
     const cleanup = stickyHeaderFunc();
     return cleanup;
@@ -132,7 +127,7 @@ const Header = () => {
             <div className="top-header__wrapper d-flex align-items-center justify-content-between">
               {/* Logo */}
               <div className="logo">
-                <Link to="/home">
+                <Link to="/home" className="logo-link">
                   <img src={Logo || "/placeholder.svg"} alt="ASK TRAVEL Logo" />
                 </Link>
               </div>
@@ -143,21 +138,19 @@ const Header = () => {
                   <FontAwesomeIcon icon={faSearch} className="search-icon" />
                   <input
                     type="text"
-                    placeholder="Nhập khách sạn hoặc địa điểm muốn tìm..."
+                    placeholder="Tìm kiếm khách sạn, địa điểm..."
                     className="search-input"
                   />
                 </div>
               </div>
 
               {/* Phone & User Section */}
-              <div className="header-right d-flex align-items-center gap-4">
+              <div className="header-right d-flex align-items-center gap-3">
                 <div className="phone-section">
                   <FontAwesomeIcon icon={faPhone} className="phone-icon" />
                   <div className="phone-info">
-                    <div className="phone-number">Phone: 090.990.4227</div>
-                    <div className="phone-subtitle">
-                      Gọi để được tư vấn ngay
-                    </div>
+                    <div className="phone-number">090.990.4227</div>
+                    <div className="phone-subtitle">Tư vấn ngay</div>
                   </div>
                 </div>
 
@@ -168,7 +161,7 @@ const Header = () => {
                       <Dropdown.Toggle
                         id="dropdown-button-dark-example1"
                         variant="secondary"
-                        className="d-flex align-items-center gap-2"
+                        className="d-flex align-items-center gap-2 user-toggle"
                       >
                         {user.avatar && (
                           <img
@@ -193,14 +186,14 @@ const Header = () => {
                     </Dropdown>
                   ) : (
                     <>
-                      <Button className="btn primary__btn">
+                      <Button className="btn primary__btn login-btn">
                         <Link to="/login" className="link-btn">
-                          Login
+                          Đăng nhập
                         </Link>
                       </Button>
-                      <Button className="btn primary__btn">
+                      <Button className="btn primary__btn register-btn">
                         <Link to="/register" className="link-btn">
-                          Register
+                          Đăng ký
                         </Link>
                       </Button>
                     </>
@@ -222,7 +215,7 @@ const Header = () => {
         <Container>
           <Row>
             <div className="navigation" ref={menuRef}>
-              <ul className="menu d-flex align-items-center justify-content-center gap-5">
+              <ul className="menu d-flex align-items-center justify-content-center gap-4">
                 {nav__links.map((item, index) => (
                   <li
                     className="nav__item"
