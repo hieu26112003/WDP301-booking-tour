@@ -29,7 +29,6 @@ export const createCategory = async (req, res) => {
   }
 };
 
-// Get All
 export const getAllCategories = async (req, res) => {
   try {
     const categories = await Category.find();

@@ -10,7 +10,7 @@ import { verifyAdmin } from "../middleware/VerifyToken.js";
 const router = express.Router();
 
 router.post("/", verifyAdmin, createCategory);
-router.get("/", verifyAdmin, getAllCategories);
+router.get("/", getAllCategories);
 router.put("/:id", verifyAdmin, updateCategory);
 router.delete("/:id", verifyAdmin, deleteCategory);
 

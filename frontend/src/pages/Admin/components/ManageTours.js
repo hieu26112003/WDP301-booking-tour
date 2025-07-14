@@ -319,7 +319,7 @@ const ManageTours = () => {
   };
 
   return (
-    <section>
+    <section className="manage-tours-section">
       <Container>
         <Row>
           <Col lg="12">
@@ -527,7 +527,7 @@ const ManageTours = () => {
                   <th>Title</th>
                   <th>Summary</th>
                   <th>Price (Adult)</th>
-                  <th>Days</th>
+                  {/* <th>Days</th> */}
                   <th>Notes</th>
                   <th>Cancellation Policy</th>
                   <th>Category</th>
@@ -539,7 +539,7 @@ const ManageTours = () => {
                 {tours.map((tour, index) => (
                   <tr key={tour._id}>
                     <td>{index + 1}</td>
-                    <td>
+                    <td className="image-cell">
                       {tour.image ? (
                         <img
                           src={tour.image}
@@ -547,13 +547,13 @@ const ManageTours = () => {
                           className="tour-image"
                         />
                       ) : (
-                        "N/A"
+                        <span className="no-image">N/A</span>
                       )}
                     </td>
                     <td>{tour.title}</td>
                     <td>{tour.summary}</td>
                     <td>{tour.priceAdult}</td>
-                    <td>{tour.days}</td>
+                    {/* <td>{tour.days}</td> */}
                     <td className="html-content">{truncateText(tour.notes)}</td>
                     <td className="html-content">
                       {truncateText(tour.cancellationPolicy)}
