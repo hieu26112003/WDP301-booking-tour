@@ -1,0 +1,381 @@
+/* General */
+section {
+  padding: 20px 0;
+  background: #f5f7fa;
+}
+
+/* Header */
+h2 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 0;
+}
+
+/* Flex container */
+.d-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+/* Modal */
+.modal-content {
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  width: 800px; /* Tăng chiều rộng modal */
+  max-width: 90%; /* Đảm bảo responsive */
+}
+
+.modal-header {
+  background: #ffffff;
+  border-bottom: 1px solid #e9ecef;
+  padding: 15px 20px;
+}
+
+.modal-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.modal-body {
+  padding: 25px; /* Tăng padding */
+  background: #ffffff;
+  min-height: 500px; /* Tăng chiều cao tối thiểu */
+}
+
+.modal-footer {
+  border-top: 1px solid #e9ecef;
+  padding: 15px 20px;
+  background: #ffffff;
+}
+
+/* Form */
+.form-group {
+  margin-bottom: 25px; /* Tăng khoảng cách giữa các trường */
+}
+
+.form-group label {
+  font-size: 0.95rem; /* Tăng cỡ chữ label */
+  font-weight: 500;
+  color: #34495e;
+  margin-bottom: 10px; /* Tăng khoảng cách dưới label */
+  display: block;
+}
+
+.form-control {
+  width: 100%;
+  padding: 12px; /* Tăng padding input */
+  font-size: 0.95rem; /* Tăng cỡ chữ input */
+  border: 1px solid #d1d8e0;
+  border-radius: 6px;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-control:focus {
+  border-color: #3498db;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+  outline: none;
+}
+
+.form-control[type="textarea"] {
+  min-height: 150px; /* Tăng chiều cao textarea */
+  resize: vertical;
+}
+
+.form-control[type="select"],
+.form-control[type="text"] {
+  height: 50px; /* Tăng chiều cao select và text */
+}
+
+/* File input */
+.form-control[type="file"] {
+  padding: 5px;
+  border: none;
+  background: none;
+}
+
+.form-control[type="file"]::-webkit-file-upload-button {
+  background: #3498db;
+  color: #fff;
+  border: none;
+  padding: 10px 20px; /* Tăng kích thước nút upload */
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.form-control[type="file"]::-webkit-file-upload-button:hover {
+  background: #2980b9;
+}
+
+.form-check {
+  display: flex;
+  align-items: center;
+  margin-top: 15px; /* Tăng khoảng cách checkbox */
+}
+
+.form-check-input {
+  margin-right: 10px;
+}
+
+.form-check-label {
+  font-size: 0.95rem;
+  color: #34495e;
+}
+
+/* React Quill */
+.quill {
+  background: #fff;
+  border: 1px solid #d1d8e0;
+  border-radius: 6px;
+}
+
+.ql-toolbar {
+  border-bottom: 1px solid #d1d8e0 !important;
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+}
+
+.ql-container {
+  border-bottom-left-radius: 6px;
+  border-bottom-right-radius: 6px;
+  min-height: 200px; /* Tăng chiều cao editor */
+}
+
+.ql-editor {
+  font-size: 0.85rem;
+  color: #34495e;
+}
+
+.ql-editor img {
+  max-width: 100px;
+  height: auto;
+  border-radius: 4px;
+}
+
+.ql-toolbar .ql-size {
+  width: 100px;
+  font-size: 0.85rem;
+}
+
+.ql-toolbar .ql-size .ql-picker-item[data-value="12px"]::before,
+.ql-toolbar .ql-size .ql-picker-label[data-value="12px"]::before {
+  content: "12px";
+}
+
+.ql-toolbar .ql-size .ql-picker-item[data-value="14px"]::before,
+.ql-toolbar .ql-size .ql-picker-label[data-value="14px"]::before {
+  content: "14px";
+}
+
+.ql-toolbar .ql-size .ql-picker-item[data-value="16px"]::before,
+.ql-toolbar .ql-size .ql-picker-label[data-value="16px"]::before {
+  content: "16px";
+}
+
+.ql-toolbar .ql-size .ql-picker-item[data-value="18px"]::before,
+.ql-toolbar .ql-size .ql-picker-label[data-value="18px"]::before {
+  content: "18px";
+}
+
+.ql-toolbar .ql-size .ql-picker-item[data-value="20px"]::before,
+.ql-toolbar .ql-size .ql-picker-label[data-value="20px"]::before {
+  content: "20px";
+}
+
+.ql-picker-options {
+  font-size: 0.85rem;
+}
+
+/* Buttons */
+.btn {
+  font-size: 0.95rem; /* Tăng cỡ chữ nút */
+  font-weight: 500;
+  padding: 12px 20px; /* Tăng kích thước nút */
+  border-radius: 6px;
+  transition: background-color 0.3s, transform 0.1s;
+}
+
+.btn-primary {
+  background-color: #3498db;
+  border-color: #3498db;
+}
+
+.btn-primary:hover {
+  background-color: #2980b9;
+  border-color: #2980b9;
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background-color: #95a5a6;
+  border-color: #95a5a6;
+}
+
+.btn-secondary:hover {
+  background-color: #7f8c8d;
+  border-color: #7f8c8d;
+  transform: translateY(-1px);
+}
+
+.icon-btn {
+  padding: 10px; /* Tăng kích thước icon button */
+  font-size: 1.1rem;
+  color: #3498db;
+  background: none;
+  border: none;
+  transition: color 0.3s, transform 0.1s;
+}
+
+.icon-btn:hover {
+  color: #2980b9;
+  transform: scale(1.1);
+}
+
+.icon-btn svg {
+  vertical-align: middle;
+}
+
+/* Active/Inactive Check */
+.active-check {
+  color: #27ae60;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.inactive-check {
+  color: #bdc3c7;
+  font-size: 1.2rem;
+  opacity: 0.5;
+}
+
+/* HTML Content */
+.html-content {
+  font-size: 0.85rem;
+  color: #34495e;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Table */
+.table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.table th,
+.table td {
+  padding: 12px 15px;
+  text-align: left;
+  font-size: 0.85rem;
+}
+
+.table th {
+  background: #ecf0f1;
+  color: #2c3e50;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+}
+
+.table td {
+  border-top: 1px solid #e9ecef;
+  color: #34495e;
+}
+
+.table tbody tr {
+  transition: background 0.2s;
+}
+
+.table tbody tr:hover {
+  background: #f8f9fa;
+}
+
+.table .icon-btn {
+  margin-right: 10px;
+}
+
+.table .icon-btn:last-child {
+  color: #e74c3c;
+}
+
+.table .icon-btn:last-child:hover {
+  color: #c0392b;
+}
+
+/* Tour Image */
+.tour-image {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
+  transition: transform 0.3s;
+}
+
+.tour-image:hover {
+  transform: scale(1.1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  h2 {
+    font-size: 1.5rem;
+  }
+
+  .d-flex {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .icon-btn {
+    margin-top: 10px;
+  }
+
+  .table th,
+  .table td {
+    padding: 10px;
+    font-size: 0.8rem;
+  }
+
+  .tour-image {
+    width: 30px;
+    height: 30px;
+  }
+
+  .modal-content {
+    width: 90%; /* Responsive trên mobile */
+  }
+
+  .modal-body {
+    padding: 15px;
+    min-height: 400px; /* Giảm chiều cao trên mobile */
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  .form-control {
+    padding: 10px;
+  }
+
+  .btn {
+    padding: 10px 15px;
+  }
+
+  .ql-container {
+    min-height: 150px; /* Giảm chiều cao editor trên mobile */
+  }
+}

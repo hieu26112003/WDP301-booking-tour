@@ -1,33 +1,28 @@
-// src/components/Layout/DefaultLayout.jsx
-import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Sidebar from '../../pages/Admin/components/Sidebar';
+import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import Sidebar from "../../pages/Admin/components/Sidebar";
+import "../../styles/defaultLayout.css";
 
 const DefaultLayout = ({ children }) => {
-   const navigate = useNavigate();
+  const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem("user"));
 
-   // Giả sử bạn lưu user sau khi đăng nhập vào localStorage
-   const user = JSON.parse(localStorage.getItem("user"));
+  useEffect(() => {
+    if (!user || user.role !== "admin") {
+      navigate("/login");
+    }
+  }, [user, navigate]);
 
-   useEffect(() => {
-      if (!user || user.role !== "admin") {
-         // Nếu chưa đăng nhập hoặc không phải admin → chuyển hướng
-         navigate("/login");
-      }
-   }, [user, navigate]);
+  if (!user || user.role !== "admin") {
+    return null;
+  }
 
-   if (!user || user.role !== "admin") {
-      return null; // hoặc <div>Not authorized</div> nếu muốn hiển thị gì đó
-   }
-
-   return (
-      <div className="d-flex">
-         <Sidebar />
-         <div className="flex-grow-1 p-4" style={{ background: "#f9f9f9", minHeight: "100vh" }}>
-            {children}
-         </div>
-      </div>
-   );
+  return (
+    <div className="admin-layout">
+      <Sidebar />
+      <div className="main-content">{children}</div>
+    </div>
+  );
 };
 
 export default DefaultLayout;
