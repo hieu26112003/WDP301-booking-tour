@@ -19,6 +19,8 @@ import StaffLayout from "../components/Layout/StaffLayout";
 import StaffChatPage from "../pages/Staff/StaffChatPage";
 import Guide from "../pages/User/Guide";
 import ManageGuide from "../pages/Staff/ManageGuide";
+import AboutUs from "../components/About/About";
+import Contact from "../components/Contact/Contact";
 
 import TourDetail from "../pages/Admin/components/TourDetail";
 
@@ -34,6 +36,8 @@ const Routers = () => {
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/reset-password/:token" element={<ResetPasswordConfirm />} />
       <Route path="/Guide" element={<Guide />} />
+      <Route path="/about" element={<AboutUs />} />
+      <Route path="/contact" element={<Contact />} />
       <Route
         path="/admin"
         element={

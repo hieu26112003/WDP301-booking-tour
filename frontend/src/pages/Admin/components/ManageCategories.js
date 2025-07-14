@@ -29,10 +29,8 @@ const ManageCategories = () => {
   const [editId, setEditId] = useState(null);
   const [modal, setModal] = useState(false);
 
-  // Mở/đóng modal
   const toggleModal = () => setModal(!modal);
 
-  // Lấy tất cả danh mục
   const fetchCategories = async () => {
     try {
       const accessToken = localStorage.getItem("accessToken");
@@ -185,7 +183,7 @@ const ManageCategories = () => {
   };
 
   return (
-    <section>
+    <section className="manage-categories-section">
       <Container>
         <Row>
           <Col lg="12">
@@ -267,7 +265,9 @@ const ManageCategories = () => {
                 {categories.map((category) => (
                   <tr key={category._id}>
                     <td>{category.name}</td>
-                    <td>{category.description}</td>
+                    <td className="description-content">
+                      {category.description}
+                    </td>
                     <td>
                       <FaCheck
                         className={
