@@ -20,10 +20,15 @@ const ChatWidget = () => {
 
         socket.emit("join", userId);
 
-        socket.on("receiveMessage", (data) => {
-            setChat((prev) => [...prev, { text: data.message, from: "staff" }]);
-        });
+        // socket.on("receiveMessage", (data) => {
+        //     setChat((prev) => [...prev, { text: data.message, from: "staff" }]);
+        // });
 
+        socket.on("receiveMessage", (data) => {
+            if (data.senderId !== userId) {
+                setChat((prev) => [...prev, { text: data.message, from: "staff" }]);
+            }
+        });
         return () => {
             socket.off("receiveMessage");
         };
@@ -79,14 +84,14 @@ const ChatWidget = () => {
             {userId && (
                 <div className="chat-widget-container">
                     <button className="chat-toggle-btn" onClick={toggleChat}>
-                        💬 Chat
+                        💬
                     </button>
 
                     {isOpen && (
                         <div className={`chat-box ${isOpen ? "open" : ""}`}>
                             <div className="chat-header">
                                 Hỗ trợ khách hàng
-                                <button onClick={toggleChat}>✖</button>
+                                <button onClick={toggleChat}>X</button>
                             </div>
                             <div className="chat-body">
                                 {chat.map((msg, index) => (

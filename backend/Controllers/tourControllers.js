@@ -167,6 +167,7 @@ export const getTourById = async (req, res) => {
   }
 };
 
+
 // Cập nhật tour
 export const updateTour = async (req, res) => {
   try {

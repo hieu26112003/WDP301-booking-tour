@@ -22,4 +22,5 @@ router.get("/", getAllTours);
 router.put("/:id", verifyAdmin, upload.single("image"), updateTour);
 router.delete("/:id", verifyAdmin, deleteTour);
 router.get("/:id", verifyAdmin, getTourById);
+
 export default router;

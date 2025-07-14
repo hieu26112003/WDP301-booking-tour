@@ -5,6 +5,9 @@ import Login from "../pages/User/Login";
 import Register from "../pages/User/Register";
 import ManagerUser from "../pages/Admin/components/managerAccount";
 
+import ManageStaff from "../pages/Admin/components/ManageStaff"; // Thêm import ManageStaff
+
+
 import AdminLayout from "../components/Layout/AdminLayout";
 import Profile from "../pages/User/Profile";
 import ChangePassword from "../pages/User/ChangePassword";
@@ -14,6 +17,10 @@ import ManageTours from "../pages/Admin/components/ManageTours";
 import ManageCategories from "../pages/Admin/components/ManageCategories";
 import StaffLayout from "../components/Layout/StaffLayout";
 import StaffChatPage from "../pages/Staff/StaffChatPage";
+import Guide from "../pages/User/Guide";
+import ManageGuide from "../pages/Staff/ManageGuide";
+import AboutUs from "../components/About/About";
+import Contact from "../components/Contact/Contact";
 
 import TourDetail from "../pages/Admin/components/TourDetail";
 
@@ -28,6 +35,9 @@ const Routers = () => {
       <Route path="/change-password" element={<ChangePassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/reset-password/:token" element={<ResetPasswordConfirm />} />
+      <Route path="/Guide" element={<Guide />} />
+      <Route path="/about" element={<AboutUs />} />
+      <Route path="/contact" element={<Contact />} />
       <Route
         path="/admin"
         element={
@@ -69,6 +79,22 @@ const Routers = () => {
         }
       />
       <Route
+        path="/admin/staff"
+        element={
+          <AdminLayout>
+            <ManageStaff />
+          </AdminLayout>
+        }
+      />
+      <Route
+        path="/staff/guides"
+        element={
+          <StaffLayout>
+            <ManageGuide />
+          </StaffLayout>
+        }
+      />
+      <Route
         path="/admin/categories"
         element={
           <AdminLayout>
@@ -97,3 +123,4 @@ const Routers = () => {
 };
 
 export default Routers;
+

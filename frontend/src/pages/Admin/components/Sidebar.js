@@ -19,6 +19,7 @@ const Sidebar = () => {
           icon={<FaUsers />}
           label="Manage Accounts"
         />
+        <SidebarItem to="/admin/staff" icon={<FaUsers />} label="Manage Staff" />
         <SidebarItem
           to="/admin/hotels"
           icon={<FaCommentDots />}
@@ -34,6 +35,7 @@ const Sidebar = () => {
           icon={<FaTags />}
           label="Manage Categories"
         />
+
       </ul>
 
       <div className="footer">© 2025 Admin Dashboard</div>
