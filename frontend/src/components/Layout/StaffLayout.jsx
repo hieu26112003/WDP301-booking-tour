@@ -12,16 +12,16 @@ const StaffLayout = ({ children }) => {
     }
   }, [user, navigate]);
 
-  if (!user || user.role !== "staff") {
-    return null;
-  }
+    if (!user || user.role !== "staff") {
+        return null;
+    }
 
   return (
     <div className="d-flex">
       <Sidebar />
       <div
         className="flex-grow-1 p-4"
-        style={{ background: "#f4f6f9", minHeight: "100vh" }}
+        style={{ background: "#f4f6f9", minHeight: "60vh" }}
       >
         {children}
       </div>
