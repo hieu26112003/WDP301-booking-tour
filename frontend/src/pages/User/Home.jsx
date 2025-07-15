@@ -19,6 +19,7 @@ const sliderImages = [
 const Home = () => {
   return (
     <>
+
       {/* 🖼️ Slider trước CommonSection */}
       <div style={{ position: "relative" }}>
         <Carousel interval={3000}>
@@ -51,6 +52,7 @@ const Home = () => {
       </div>
 
       {/* Nội dung trang */}
+
       <section>
         <Container>
           <Row></Row>
@@ -60,7 +62,10 @@ const Home = () => {
         <Container>
           <Row>
             <Col lg="12" className="text-center mb-4">
-              <h2 className="section__title text-uppercase" style={{ color: "#ff8000" }}>
+              <h2
+                className="section__title text-uppercase"
+                style={{ color: "#ff8000" }}
+              >
                 TOUR MIỀN BẮC
               </h2>
             </Col>
@@ -72,7 +77,10 @@ const Home = () => {
           <Container>
             <Row>
               <Col lg="12" className="text-center mb-4">
-                <h2 className="section__title text-uppercase" style={{ color: "#ff8000" }}>
+                <h2
+                  className="section__title text-uppercase"
+                  style={{ color: "#ff8000" }}
+                >
                   TOUR MIỀN NAM
                 </h2>
               </Col>
@@ -84,7 +92,10 @@ const Home = () => {
         <Container className="mt-5 py-5">
           <Row>
             <Col lg="12" className="text-center mb-4">
-              <h2 className="section__title text-uppercase" style={{ color: "#ff8000" }}>
+              <h2
+                className="section__title text-uppercase"
+                style={{ color: "#ff8000" }}
+              >
                 COMBO TOUR
               </h2>
             </Col>

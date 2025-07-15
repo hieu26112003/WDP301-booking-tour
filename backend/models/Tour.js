@@ -17,7 +17,7 @@ const tourSchema = new mongoose.Schema(
       required: true,
     },
     days: {
-      type: String, // Chuyển sang String
+      type: String,
       required: true,
     },
     serviceStandards: {
