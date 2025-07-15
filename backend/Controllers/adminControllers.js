@@ -78,3 +78,39 @@ export const toggleUserStatus = async (req, res) => {
         res.status(500).json({ error: "Failed to toggle user status" });
     }
 };
+
+// PATCH /admin/users/:id/promote
+export const promoteToStaff = async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id);
+        if (!user) return res.status(404).json({ error: "User not found" });
+
+        if(user.role === "staff") {
+            return res.status(400).json({ error: "User is already staff" });
+        }
+
+        user.role = "staff";
+        await user.save();
+        res.json({ message: "User promoted to staff successfully", user });
+    } catch (err) {
+        res.status(500).json({ error: "Failed to promote user to staff" });
+    }
+};
+
+// PATCH /admin/users/:id/demote
+export const demoteFromStaff = async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id);
+        if (!user) return res.status(404).json({ error: "User not found" });
+
+        if(user.role !== "staff") {
+            return res.status(400).json({ error: "User is not staff" });
+        }
+
+        user.role = "user"; // hoặc role mặc định khi hạ staff
+        await user.save();
+        res.json({ message: "User demoted from staff successfully", user });
+    } catch (err) {
+        res.status(500).json({ error: "Failed to demote user from staff" });
+    }
+};

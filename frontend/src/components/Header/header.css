@@ -8,6 +8,7 @@
   --subtitle-font-name: "Island Moments", cursive;
 }
 
+/* =============== HEADER ================ */
 .header {
   width: 100%;
   background: #ffffff;
@@ -37,6 +38,7 @@
   justify-content: space-between;
 }
 
+/* =============== LOGO ================ */
 .logo img {
   height: 40px; /* Smaller logo for compact header */
   width: auto;
@@ -369,7 +371,7 @@
   }
 
   .show__menu {
-    display: block;
+    display: flex !important;
   }
 
   .mobile__menu {
@@ -449,3 +451,51 @@
     font-size: 11px;
   }
 }
+
+.dropdown__label {
+  cursor: pointer;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  display: block;
+  white-space: nowrap;
+}
+
+.dropdown__menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  min-width: 160px;
+  display: none;
+  z-index: 999;
+  padding: 0;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.dropdown__menu-wrapper:hover .dropdown__menu {
+  display: block;
+}
+
+.dropdown__menu li {
+  list-style: none;
+}
+
+.dropdown__menu li a {
+  display: block;
+  padding: 8px 16px;
+  text-decoration: none;
+  color: var(--heading-color);
+  font-weight: 500;
+}
+
+.dropdown__menu li a:hover {
+  background-color: #f5f5f5;
+  color: var(--secondary-color);
+}
+.dropdown__menu-wrapper:hover .dropdown__menu {
+  display: block;
+}
+
+
