@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import path from "path";
 import slugify from "slugify";
 
-// [GET] /api/guides - Lấy tất cả bài viết
+
 export const createGuide = async (req, res) => {
   try {
     const { title, content } = req.body;

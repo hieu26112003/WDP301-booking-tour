@@ -1,50 +1,56 @@
-import { useEffect, useRef, useContext, useState } from "react";
-import { Container, Row, Button } from "reactstrap";
-import { NavLink, Link, useNavigate } from "react-router-dom";
-import Logo from "../../assets/images/logo.png";
+import React, { useEffect, useRef, useContext, useState } from "react";
+import { Container } from "reactstrap";
+import { Link, useNavigate } from "react-router-dom";
+import { Search, Phone, ChevronDown, Menu, User } from "lucide-react";
 import "./header.css";
 import { AuthContext } from "../../context/AuthContext";
-import Dropdown from "react-bootstrap/Dropdown";
 import Swal from "sweetalert2";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronDown, faBars, faSearch, faPhone } from "@fortawesome/free-solid-svg-icons";
 import { getCategories } from "../../services/categoryService";
 
 const Header = () => {
   const headerRef = useRef(null);
-  const topHeaderRef = useRef(null);
   const menuRef = useRef(null);
   const navigate = useNavigate();
   const { user, dispatch } = useContext(AuthContext);
   const [activeDropdown, setActiveDropdown] = useState(null);
-  const [isScrolled, setIsScrolled] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const [categories, setCategories] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
+      setIsLoading(true);
       try {
         const res = await getCategories();
-        setCategories(res.data?.data || []); // Giả sử backend trả { data: [...] }
+        setCategories(res.data?.data || []);
       } catch (error) {
         console.error("Failed to fetch categories", error);
+        Swal.fire({
+          icon: "error",
+          title: "Lỗi",
+          text: "Không thể tải danh mục",
+          confirmButtonColor: "#d33",
+        });
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchData();
   }, []);
 
   const nav__links = [
-    {
-      path: "/",
-      display: "TRANG CHỦ",
-    },
+    { path: "/", display: "TRANG CHỦ" },
     {
       path: "/tours",
       display: "TOUR DU LỊCH",
       hasDropdown: true,
-      dropdownItems: categories.map((cat) => ({
-        path: `/tours/${cat._id}`,
-        display: cat.name,
-      })),
+      dropdownItems:
+        categories.length > 0
+          ? categories.map((cat) => ({
+              path: `/tours/${cat._id}`,
+              display: cat.name,
+            }))
+          : [],
     },
     {
       path: "/cam-nang",
@@ -57,14 +63,9 @@ const Header = () => {
         { path: "/cam-nang/xu-huong", display: "Xu hướng" },
       ],
     },
-    {
-      path: "/about",
-      display: "VỀ ASK TRAVEL",
-    },
-    {
-      path: "/contact",
-      display: "LIÊN HỆ",
-    },
+    { path: "/about", display: "VỀ ASK TRAVEL" },
+
+    { path: "/contact", display: "LIÊN HỆ" },
   ];
 
   const logout = () => {
@@ -90,190 +91,263 @@ const Header = () => {
     });
   };
 
- const stickyHeaderFunc = () => {
-    window.addEventListener("scroll", () => {
+  useEffect(() => {
+    const handleScroll = () => {
       if (
-        document.body.scrollTop > 80 ||
-        document.documentElement.scrollTop > 80
+        document.body.scrollTop > 50 ||
+        document.documentElement.scrollTop > 50
       ) {
         headerRef.current.classList.add("sticky__header");
       } else {
         headerRef.current.classList.remove("sticky__header");
       }
-    });
-  };
-  useEffect(() => {
-    const cleanup = stickyHeaderFunc();
-    return cleanup;
-  }, [isScrolled]);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
-  const toggleMenu = () => menuRef.current.classList.toggle("show__menu");
-
-  const handleMouseEnter = (index) => {
-    setActiveDropdown(index);
+  const toggleMenu = () => {
+    if (menuRef.current) {
+      menuRef.current.classList.toggle("show__menu");
+    }
   };
 
-  const handleMouseLeave = () => {
-    setActiveDropdown(null);
-  };
+  const handleMouseEnter = (index) => setActiveDropdown(index);
+  const handleMouseLeave = () => setActiveDropdown(null);
+  const handleDropdownClick = (index) =>
+    setActiveDropdown(index === activeDropdown ? null : index);
+
+  const handleSearch = (e) => setSearchQuery(e.target.value);
 
   return (
-    <header className="header" ref={headerRef}>
+    <header className="header-redesign" ref={headerRef}>
       {/* Top Header Section */}
-      <div className="top-header" ref={topHeaderRef}>
+      <div className="top-header-redesign">
         <Container>
-          <Row>
-            <div className="top-header__wrapper d-flex align-items-center justify-content-between">
-              {/* Logo */}
-              <div className="logo">
-                <Link to="/home" className="logo-link">
-                  <img src={Logo || "/placeholder.svg"} alt="ASK TRAVEL Logo" />
-                </Link>
-              </div>
-
-              {/* Search Bar */}
-              <div className="search-bar">
-                <div className="search-input-wrapper">
-                  <FontAwesomeIcon icon={faSearch} className="search-icon" />
-                  <input
-                    type="text"
-                    placeholder="Tìm kiếm khách sạn, địa điểm..."
-                    className="search-input"
-                  />
+          <div className="top-header-wrapper-redesign">
+            {/* Logo */}
+            <div className="logo-redesign">
+              <Link to="/" className="logo-link-redesign">
+                <div className="logo-icon-redesign">
+                  <span className="logo-text-redesign">🥥</span>
                 </div>
-              </div>
-
-              {/* Phone & User Section */}
-              <div className="header-right d-flex align-items-center gap-3">
-                <div className="phone-section">
-                  <FontAwesomeIcon icon={faPhone} className="phone-icon" />
-                  <div className="phone-info">
-
-                    <div className="phone-number">Phone: 079.810.712</div>
-                    <div className="phone-subtitle">Gọi để được tư vấn ngay</div>
-
+                <div className="logo-content-redesign">
+                  <div className="logo-title-redesign">ASK TRAVEL</div>
+                  <div className="logo-subtitle-redesign">
+                    Khám phá trải nghiệm
                   </div>
                 </div>
+              </Link>
+            </div>
 
-                {/* User Section */}
-                <div className="user-section">
-                  {user ? (
-                    <Dropdown>
-                      <Dropdown.Toggle
-                        id="dropdown-button-dark-example1"
-                        variant="secondary"
-                        className="d-flex align-items-center gap-2 user-toggle"
-                      >
-                        {user.avatar && (
-                          <img
-                            src={user.avatar || "/placeholder.svg"}
-                            alt="Avatar"
-                            className="user-avatar"
-                          />
-                        )}
-                        <span>{user.username}</span>
-                        <FontAwesomeIcon icon={faChevronDown} />
-                      </Dropdown.Toggle>
-                      <Dropdown.Menu>
-                        <Dropdown.Item as={Link} to="/profile">
-                          Profile
-                        </Dropdown.Item>
-                        <Dropdown.Item as={Link} to="/change-password">
-                          Change Password
-                        </Dropdown.Item>
-                        <Dropdown.Divider />
-                        <Dropdown.Item onClick={logout}>Logout</Dropdown.Item>
-                      </Dropdown.Menu>
-                    </Dropdown>
-                  ) : (
-                    <>
-                      <Button className="btn primary__btn login-btn">
-                        <Link to="/login" className="link-btn">
-                          Đăng nhập
-                        </Link>
-                      </Button>
-                      <Button className="btn primary__btn register-btn">
-                        <Link to="/register" className="link-btn">
-                          Đăng ký
-                        </Link>
-                      </Button>
-                    </>
-                  )}
-                </div>
-
-                {/* Mobile Menu Toggle */}
-                <span className="mobile__menu" onClick={toggleMenu}>
-                  <FontAwesomeIcon icon={faBars} />
-                </span>
+            {/* Search Bar */}
+            <div className="search-bar-redesign">
+              <div className="search-wrapper-redesign">
+                <Search className="search-icon-redesign" size={14} />
+                <input
+                  type="text"
+                  placeholder="Tìm tour, địa điểm..."
+                  className="search-input-redesign"
+                  value={searchQuery}
+                  onChange={handleSearch}
+                />
               </div>
             </div>
-          </Row>
+
+            {/* Phone & User Section */}
+            <div className="header-right-redesign">
+              <div className="phone-section-redesign">
+                <Phone className="phone-icon-redesign" size={14} />
+                <div className="phone-content-redesign">
+                  <div className="phone-number-redesign">090.990.4227</div>
+                  <div className="phone-subtitle-redesign">Tư vấn ngay</div>
+                </div>
+              </div>
+
+              <div className="user-section-redesign">
+                {user ? (
+                  <div
+                    className="user-menu-redesign"
+                    onMouseEnter={() => handleMouseEnter("user")}
+                    onMouseLeave={handleMouseLeave}
+                    onClick={() => handleDropdownClick("user")} // Enable click to toggle
+                  >
+                    <div className="user-toggle-redesign">
+                      <div className="user-avatar-redesign">
+                        {user.avatar ? (
+                          <img
+                            src={user.avatar}
+                            alt="User Avatar"
+                            className="user-avatar-img-redesign"
+                          />
+                        ) : (
+                          <User className="user-icon-redesign" size={14} />
+                        )}
+                      </div>
+                      <span className="user-name-redesign">
+                        {user.username}
+                      </span>
+                      <ChevronDown
+                        className="chevron-down-redesign"
+                        size={12}
+                      />
+                    </div>
+                    <div
+                      className={`user-dropdown-redesign ${
+                        activeDropdown === "user" ? "show" : ""
+                      }`}
+                    >
+                      <Link
+                        to="/profile"
+                        className="user-dropdown-item-redesign"
+                      >
+                        Hồ sơ
+                      </Link>
+                      <Link
+                        to="/change-password"
+                        className="user-dropdown-item-redesign"
+                      >
+                        Đổi mật khẩu
+                      </Link>
+                      <div className="user-dropdown-divider-redesign"></div>
+                      <button
+                        onClick={logout}
+                        className="user-dropdown-item-redesign"
+                      >
+                        Đăng xuất
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="auth-buttons-redesign">
+                    <Link to="/login" className="login-btn-redesign">
+                      Đăng nhập
+                    </Link>
+                    <Link to="/register" className="register-btn-redesign">
+                      Đăng ký
+                    </Link>
+                  </div>
+                )}
+              </div>
+
+              <button
+                onClick={toggleMenu}
+                className="mobile-menu-toggle-redesign"
+              >
+                <Menu className="mobile-menu-icon-redesign" size={16} />
+              </button>
+            </div>
+          </div>
         </Container>
       </div>
 
       {/* Navigation Bar */}
-      <div className="navigation-bar">
+      <div className="navigation-bar-redesign">
         <Container>
-          <Row>
-            <div className="navigation" ref={menuRef}>
-              <ul className="menu d-flex align-items-center justify-content-center gap-4">
-                {nav__links.map((item, index) => (
-                  <li
-                    className="nav__item"
-                    key={index}
-                    onMouseEnter={() =>
-                      item.hasDropdown && handleMouseEnter(index)
-                    }
-                    onMouseLeave={() => item.hasDropdown && handleMouseLeave()}
-                  >
-                    {item.hasDropdown ? (
-                      <div className="dropdown-wrapper">
-                        <NavLink
-                          to={item.path}
-                          className={(navClass) =>
-                            navClass.isActive ? "active__link" : ""
-                          }
-                        >
-                          {item.display}
-                          <FontAwesomeIcon
-                            icon={faChevronDown}
-                            className="dropdown-arrow"
-                          />
-                        </NavLink>
-                        <div
-                          className={`dropdown-menu-custom ${
-                            activeDropdown === index ? "show" : ""
-                          }`}
-                        >
-                          {item.dropdownItems.map(
-                            (dropdownItem, dropdownIndex) => (
-                              <Link
-                                key={dropdownIndex}
-                                to={dropdownItem.path}
-                                className="dropdown-item-custom"
-                              >
-                                {dropdownItem.display}
-                              </Link>
+          <nav className="navigation-redesign" ref={menuRef}>
+            <ul className="menu-redesign">
+              {nav__links.map((item, index) => (
+                <li
+                  key={index}
+                  className="nav-item-redesign"
+                  onMouseEnter={() =>
+                    item.hasDropdown && handleMouseEnter(index)
+                  }
+                  onMouseLeave={() => item.hasDropdown && handleMouseLeave()}
+                  onClick={() => item.hasDropdown && handleDropdownClick(index)}
+                >
+                  {item.hasDropdown ? (
+                    <div className="dropdown-wrapper-redesign">
+                      <Link to={item.path} className="nav-link-redesign">
+                        {item.display}
+                        <ChevronDown
+                          className="dropdown-arrow-redesign"
+                          size={10}
+                        />
+                      </Link>
+                      <div
+                        className={`dropdown-menu-redesign ${
+                          activeDropdown === index ? "show" : ""
+                        }`}
+                      >
+                        <div className="dropdown-content-redesign">
+                          {isLoading ? (
+                            <div className="dropdown-loading-redesign">
+                              Đang tải...
+                            </div>
+                          ) : item.dropdownItems.length > 0 ? (
+                            item.dropdownItems.map(
+                              (dropdownItem, dropdownIndex) => (
+                                <Link
+                                  key={dropdownIndex}
+                                  to={dropdownItem.path}
+                                  className="dropdown-item-redesign"
+                                >
+                                  {dropdownItem.display}
+                                </Link>
+                              )
                             )
+                          ) : (
+                            <div className="dropdown-empty-redesign">
+                              Không có danh mục
+                            </div>
                           )}
                         </div>
                       </div>
-                    ) : (
-                      <NavLink
-                        to={item.path}
-                        className={(navClass) =>
-                          navClass.isActive ? "active__link" : ""
-                        }
-                      >
-                        {item.display}
-                      </NavLink>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </Row>
+                    </div>
+                  ) : (
+                    <Link to={item.path} className="nav-link-redesign">
+                      {item.display}
+                    </Link>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </nav>
         </Container>
+      </div>
+
+      {/* Mobile Menu */}
+      <div className="mobile-menu-redesign">
+        <div className="mobile-menu-overlay-redesign">
+          <div className="mobile-menu-content-redesign">
+            <div className="mobile-menu-header-redesign">
+              <div className="mobile-menu-title-redesign">Menu</div>
+              <button
+                onClick={toggleMenu}
+                className="mobile-menu-close-redesign"
+              >
+                ×
+              </button>
+            </div>
+            <ul className="mobile-menu-list-redesign">
+              {nav__links.map((item, index) => (
+                <li key={index} className="mobile-menu-item-redesign">
+                  <Link to={item.path} className="mobile-menu-link-redesign">
+                    {item.display}
+                  </Link>
+                  {item.hasDropdown && item.dropdownItems.length > 0 && (
+                    <ul className="mobile-submenu-redesign">
+                      {item.dropdownItems.map((dropdownItem, dropdownIndex) => (
+                        <li
+                          key={dropdownIndex}
+                          className="mobile-submenu-item-redesign"
+                        >
+                          <Link
+                            to={dropdownItem.path}
+                            className="mobile-submenu-link-redesign"
+                          >
+                            {dropdownItem.display}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
       </div>
     </header>
   );
