@@ -100,6 +100,72 @@ export const getAllTours = async (req, res) => {
     res.status(500).json({ success: false, message: "Failed to fetch tours" });
   }
 };
+// Lấy tour Miền Nam
+export const getSouthernTours = async (req, res) => {
+  try {
+    const southernTours = await Tour.find({
+      categoryId: "686fae979bc976917041ce03",
+    }).populate("categoryId", "name");
+
+    res.status(200).json({ success: true, data: southernTours });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to fetch southern tours" });
+  }
+};
+// Lấy tour Miền Bắc
+export const getNorthernTours = async (req, res) => {
+  try {
+    const northernTours = await Tour.find({
+      categoryId: "686faea99bc976917041ce09",
+    }).populate("categoryId", "name");
+
+    res.status(200).json({ success: true, data: northernTours });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to fetch northern tours" });
+  }
+};
+// Lấy combo Tour
+export const getComboTours = async (req, res) => {
+  try {
+    const comboTours = await Tour.find({
+      categoryId: "687000428690d6e000e981f5",
+    }).populate("categoryId", "name");
+
+    res.status(200).json({ success: true, data: comboTours });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to fetch combo tours" });
+  }
+};
+//Lấy chi tiết tour
+export const getTourById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid tour ID" });
+    }
+
+    const tour = await Tour.findById(id).populate("categoryId", "name");
+    if (!tour) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Tour not found" });
+    }
+
+    res.status(200).json({ success: true, data: tour });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to fetch tour details" });
+  }
+};
 
 
 // Cập nhật tour
@@ -234,26 +300,4 @@ export const deleteTour = async (req, res) => {
     res.status(500).json({ success: false, message: "Failed to delete tour" });
   }
 };
-export const getTourById = async (req, res) => {
-  try {
-    const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid tour ID" });
-    }
 
-    const tour = await Tour.findById(id).populate("categoryId", "name");
-    if (!tour) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Tour not found" });
-    }
-
-    res.status(200).json({ success: true, data: tour });
-  } catch (err) {
-    res
-      .status(500)
-      .json({ success: false, message: "Failed to fetch tour details" });
-  }
-};

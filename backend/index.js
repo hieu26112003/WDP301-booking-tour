@@ -14,6 +14,8 @@ import tourRoute from './routes/tour.js'
 import categoryRoute from './routes/category.js'
 import messageRoute from "./routes/messageRoutes.js";
 import Message from "./models/Message.js";
+import guideRoutes from './routes/guideRoutes.js';
+
 
 
 dotenv.config();
@@ -55,6 +57,7 @@ app.use("/api/auth", authRoute);
 app.use("/api/admin", adminRoute);
 app.use('/api/tours', tourRoute)
 app.use('/api/categories', categoryRoute)
+app.use('/api/guides', guideRoutes);
 
 
 app.use("/api/messages", messageRoute);

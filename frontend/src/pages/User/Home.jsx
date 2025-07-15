@@ -1,18 +1,17 @@
 import React from "react";
 import "../../styles/home.css";
-import { Container, Row, Col, CardSubtitle } from "reactstrap";
-
+import { Container, Row, Col } from "reactstrap";
 import Subtitle from "./../../shared/subtitle";
-import SearchBar from "./../../shared/SearchBar";
-import ServiceList from "../../services/ServiceList";
-import FeaturedTourList from "../../components/Featured-tours/FeaturedTourList";
 import CommonSection from "../../shared/CommonSection";
 import ChatWidget from "../../components/Chat/ChatWidget";
+import NorthenrnTourList from "../../components/Northern tours/NorthernTour";
+import SouthTourList from "../../components/South tour/SouthTour";
+import ComboTourList from "../../components/Combo Tour/ComboTours";
 
 const Home = () => {
   return (
     <>
-      <CommonSection title={"Home"} />
+      <CommonSection title="Home" className="slideshow" />
       <section>
         <Container>
           <Row></Row>
@@ -21,10 +20,43 @@ const Home = () => {
       <section>
         <Container>
           <Row>
-            <Col lg="12" className="mb-5">
-              <Subtitle subtitle={"Explore"} />
-              <h2 className="featured__tour-title">Our featured tours</h2>
+            <Col lg="12" className="text-center mb-4">
+              <h2
+                className="section__title text-uppercase"
+                style={{ color: "#ff8000" }}
+              >
+                TOUR MIỀN BẮC
+              </h2>
             </Col>
+            <NorthenrnTourList />
+          </Row>
+        </Container>
+        <section className="mt-5 py-5" style={{ backgroundColor: "#e0e0e0" }}>
+          <Container>
+            <Row>
+              <Col lg="12" className="text-center mb-4">
+                <h2
+                  className="section__title text-uppercase"
+                  style={{ color: "#ff8000" }}
+                >
+                  TOUR MIỀN NAM
+                </h2>
+              </Col>
+              <SouthTourList />
+            </Row>
+          </Container>
+        </section>
+        <Container className="mt-5 py-5">
+          <Row>
+            <Col lg="12" className="text-center mb-4">
+              <h2
+                className="section__title text-uppercase"
+                style={{ color: "#ff8000" }}
+              >
+                COMBO TOUR
+              </h2>
+            </Col>
+            <ComboTourList />
           </Row>
         </Container>
       </section>
