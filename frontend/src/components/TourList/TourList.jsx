@@ -1,25 +1,21 @@
-import React, { useState } from "react";
+import React from "react";
 import { Container, Row, Col } from "reactstrap";
 import TourCard from "../../shared/TourCard";
 import useFetch from "../../hooks/useFetch";
 import { BASE_URL } from "../../utils/config";
 
-const TourList = () => {
+const TourList = ({ selectedCategory }) => {
   const {
     data: categoriesResponse,
     loading: categoriesLoading,
     error: categoriesError,
   } = useFetch(`${BASE_URL}/categories`);
 
-  // Handle both response formats: { success: true, data: [...] } or direct array
   const categories = categoriesResponse?.success
     ? categoriesResponse.data
     : Array.isArray(categoriesResponse)
     ? categoriesResponse
     : null;
-
-  console.log("Categories Response:", categoriesResponse);
-  console.log("Categories:", categories);
 
   return (
     <>
@@ -27,7 +23,7 @@ const TourList = () => {
         <Container>
           <Row>
             <Col lg="12" className="text-center">
-              <h4>Loading categories...</h4>
+              <h4>Đang tải danh mục...</h4>
             </Col>
           </Row>
         </Container>
@@ -36,13 +32,34 @@ const TourList = () => {
         <Container>
           <Row>
             <Col lg="12" className="text-center">
-              <h4>Error: {categoriesError}</h4>
+              <h4>Lỗi: {categoriesError}</h4>
             </Col>
           </Row>
         </Container>
       )}
+      {!categoriesLoading && !categoriesError && selectedCategory && (
+        <section>
+          <Container>
+            <Row>
+              <Col lg="12" className="text-center mb-4">
+                <h2
+                  className="section__title text-uppercase"
+                  style={{ color: "#ff8000" }}
+                >
+                  {selectedCategory.name}
+                </h2>
+              </Col>
+              <CategoryTourList
+                categoryId={selectedCategory.id}
+                categoryName={selectedCategory.name}
+              />
+            </Row>
+          </Container>
+        </section>
+      )}
       {!categoriesLoading &&
         !categoriesError &&
+        !selectedCategory &&
         categories?.length > 0 &&
         categories.map((category, index) => (
           <section
@@ -74,7 +91,7 @@ const TourList = () => {
           <Container>
             <Row>
               <Col lg="12" className="text-center">
-                <h4>No categories available</h4>
+                <h4>Không có danh mục nào</h4>
               </Col>
             </Row>
           </Container>
@@ -84,14 +101,13 @@ const TourList = () => {
 };
 
 const CategoryTourList = ({ categoryId, categoryName }) => {
-  const [page, setPage] = useState(1);
+  const [page, setPage] = React.useState(1);
   const {
     data: tourResponse,
     loading: toursLoading,
     error: toursError,
   } = useFetch(`${BASE_URL}/tours/category/${categoryId}?page=${page}&limit=6`);
 
-  // Handle both response formats
   const tours = tourResponse?.success
     ? tourResponse.data
     : Array.isArray(tourResponse)
@@ -99,25 +115,22 @@ const CategoryTourList = ({ categoryId, categoryName }) => {
     : null;
   const pagination = tourResponse?.pagination;
 
-  console.log(`Tour Response for ${categoryName}:`, tourResponse);
-  console.log(`Tours for ${categoryName}:`, tours);
-
   return (
     <>
       {toursLoading && (
         <Col lg="12" className="text-center">
-          <h4>Loading tours for {categoryName}...</h4>
+          <h4>Đang tải tour cho {categoryName}...</h4>
         </Col>
       )}
       {toursError && (
         <Col lg="12" className="text-center">
-          <h4>Error: {toursError}</h4>
+          <h4>Lỗi: {toursError}</h4>
         </Col>
       )}
       {!toursLoading && !toursError && (!tours || tours.length === 0) && (
         <Col lg="12" className="text-center">
           <h4>
-            {tourResponse?.message || `No tours available for ${categoryName}`}
+            {tourResponse?.message || `Không có tour nào cho ${categoryName}`}
           </h4>
         </Col>
       )}
