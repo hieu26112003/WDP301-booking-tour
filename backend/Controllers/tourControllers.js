@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import Tour from "../models/Tour.js";
 import path from "path";
+import Category from "../models/Category.js";
 
 // Tạo tour mới
 export const createTour = async (req, res) => {
@@ -167,6 +168,60 @@ export const getTourById = async (req, res) => {
   }
 };
 
+export const getTourByCategoryId = async (req, res) => {
+  try {
+    const { categoryId } = req.params;
+    const { page = 1, limit = 10 } = req.query;
+
+    if (!mongoose.Types.ObjectId.isValid(categoryId)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid category ID" });
+    }
+
+    const category = await Category.findById(categoryId);
+    if (!category) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Category not found" });
+    }
+
+    const tours = await Tour.find({ categoryId })
+      .populate("categoryId", "name")
+      .skip((page - 1) * limit)
+      .limit(Number(limit));
+
+    const total = await Tour.countDocuments({ categoryId });
+
+    if (tours.length === 0) {
+      return res.status(200).json({
+        success: true,
+        data: [],
+        pagination: {
+          total,
+          page: Number(page),
+          pages: Math.ceil(total / limit),
+        },
+        message: "No tours found for this category",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: tours,
+      pagination: {
+        total,
+        page: Number(page),
+        pages: Math.ceil(total / limit),
+      },
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: `Failed to fetch tours by category: ${err.message}`,
+    });
+  }
+};
 
 // Cập nhật tour
 export const updateTour = async (req, res) => {
@@ -300,4 +355,3 @@ export const deleteTour = async (req, res) => {
     res.status(500).json({ success: false, message: "Failed to delete tour" });
   }
 };
-
