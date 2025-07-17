@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { Container, Row, Col } from "reactstrap";
 import { Carousel } from "react-bootstrap";
 import "../../styles/home.css";
+import Header from "../../components/Header/Header";
 import TourList from "../../components/TourList/TourList";
 import ChatWidget from "../../components/Chat/ChatWidget";
 
@@ -12,9 +13,17 @@ const sliderImages = [
 ];
 
 const Home = () => {
+  const [selectedCategory, setSelectedCategory] = useState(null);
+
+  const handleCategorySelect = (categoryId, categoryName) => {
+    setSelectedCategory(
+      categoryId ? { id: categoryId, name: categoryName } : null
+    );
+  };
+
   return (
     <>
-      {/* Slider Section */}
+      <Header onCategorySelect={handleCategorySelect} />
       <div style={{ position: "relative" }}>
         <Carousel interval={3000}>
           {sliderImages.map((src, idx) => (
@@ -44,16 +53,14 @@ const Home = () => {
         </h2>
       </div>
 
-      {/* Tour List Section */}
       <section>
         <Container>
           <Row>
-            <TourList />
+            <TourList selectedCategory={selectedCategory} />
           </Row>
         </Container>
       </section>
 
-      {/* Chat Widget */}
       <ChatWidget />
     </>
   );
