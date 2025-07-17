@@ -7,7 +7,7 @@ const TourCard = ({ tour }) => {
   const {
     _id,
     title,
-    image,
+    images = [],
     schedule,
     priceAdult = 0,
     days,
@@ -20,12 +20,12 @@ const TourCard = ({ tour }) => {
       ? num.toLocaleString("vi-VN")
       : Number(num || 0).toLocaleString("vi-VN")
   }
-
+    const firstImage = images.length > 0 ? images[0] : "/placeholder.jpg"
   return (
     <div className="tour__card">
       <Card>
         <div className="tour__img">
-          <img src={image || "/placeholder.jpg"} alt={title} />
+           <img src={firstImage} alt={title} />
         </div>
 
         <CardBody>
