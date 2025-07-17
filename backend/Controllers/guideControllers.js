@@ -4,9 +4,6 @@ import path from "path";
 import slugify from "slugify";
 
 
-const VALID_CATEGORIES = ["kinh-nghiem", "am-thuc", "review", "xu-huong"];
-
-// [GET] /api/guides - Lấy tất cả bài viết
 export const createGuide = async (req, res) => {
   try {
     const { title, content, category } = req.body;
