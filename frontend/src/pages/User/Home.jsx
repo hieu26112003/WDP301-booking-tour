@@ -32,7 +32,7 @@ const Home = () => {
                 className="d-block w-100"
                 src={src}
                 alt={`Slide ${idx + 1}`}
-                style={{ height: "600px", objectFit: "cover" }}
+                style={{ height: "480", objectFit: "cover" }}
               />
             </Carousel.Item>
           ))}
@@ -44,7 +44,7 @@ const Home = () => {
             left: "50%",
             transform: "translate(-50%, -50%)",
             color: "white",
-            fontSize: "3rem",
+            fontSize: "2.5rem",
             fontWeight: "bold",
             textShadow: "2px 2px 8px rgba(0,0,0,0.7)",
           }}
