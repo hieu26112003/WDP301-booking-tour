@@ -39,6 +39,30 @@ export const getAllCategories = async (req, res) => {
       .json({ success: false, message: "Failed to fetch categories" });
   }
 };
+export const getCategoryById = async (req, res) => {
+  try {
+    const { categoryId } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(categoryId)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid category ID" });
+    }
+
+    const category = await Category.findById(categoryId);
+    if (!category) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Category not found" });
+    }
+
+    res.status(200).json({ success: true, data: category });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: `Failed to fetch category: ${err.message}`,
+    });
+  }
+};
 
 // Update
 export const updateCategory = async (req, res) => {

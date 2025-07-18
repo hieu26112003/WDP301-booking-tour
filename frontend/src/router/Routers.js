@@ -7,7 +7,6 @@ import ManagerUser from "../pages/Admin/components/managerAccount";
 
 import ManageStaff from "../pages/Admin/components/ManageStaff"; // Thêm import ManageStaff
 
-
 import AdminLayout from "../components/Layout/AdminLayout";
 import Profile from "../pages/User/Profile";
 import ChangePassword from "../pages/User/ChangePassword";
@@ -21,6 +20,7 @@ import Guide from "../pages/User/Guide";
 import ManageGuide from "../pages/Staff/ManageGuide";
 import AboutUs from "../components/About/About";
 import Contact from "../components/Contact/Contact";
+import TourDetails from "../pages/User/TourDetails";
 
 import TourDetail from "../pages/Admin/components/TourDetail";
 
@@ -30,6 +30,7 @@ const Routers = () => {
       <Route path="/" element={<Navigate to="/home" />} />
       <Route path="/home" element={<Home />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/tours/:id" element={<TourDetails />} />
       <Route path="/register" element={<Register />} />
       <Route path="/profile" element={<Profile />} />
       <Route path="/change-password" element={<ChangePassword />} />
@@ -38,6 +39,7 @@ const Routers = () => {
       <Route path="/Guide" element={<Guide />} />
       <Route path="/about" element={<AboutUs />} />
       <Route path="/contact" element={<Contact />} />
+
       <Route
         path="/admin"
         element={
@@ -123,4 +125,3 @@ const Routers = () => {
 };
 
 export default Routers;
-
