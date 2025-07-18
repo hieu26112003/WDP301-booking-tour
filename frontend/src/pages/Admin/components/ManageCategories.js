@@ -28,6 +28,7 @@ const ManageCategories = () => {
   });
   const [editId, setEditId] = useState(null);
   const [modal, setModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const toggleModal = () => setModal(!modal);
 
@@ -41,24 +42,22 @@ const ManageCategories = () => {
         },
       });
       const result = await res.json();
-      if (!res.ok) throw new Error(result.message);
+      if (!res.ok) throw new Error(result.message || "Không thể tải danh mục");
       setCategories(result.data);
     } catch (err) {
       Swal.fire({
         icon: "error",
         title: "Lỗi",
-        text: "Không thể tải danh mục",
+        text: err.message,
         confirmButtonColor: "#d33",
       });
     }
   };
 
-  // Gọi API khi component mount
   useEffect(() => {
     fetchCategories();
   }, []);
 
-  // Xử lý thay đổi input
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
@@ -67,14 +66,13 @@ const ManageCategories = () => {
     }));
   };
 
-  // Xử lý submit form
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     const accessToken = localStorage.getItem("accessToken");
     try {
       let res;
       if (editId) {
-        // Cập nhật danh mục
         res = await fetch(`${BASE_URL}/categories/${editId}`, {
           method: "PUT",
           headers: {
@@ -84,7 +82,6 @@ const ManageCategories = () => {
           body: JSON.stringify(formData),
         });
       } else {
-        // Tạo danh mục mới
         res = await fetch(`${BASE_URL}/categories`, {
           method: "POST",
           headers: {
@@ -96,7 +93,7 @@ const ManageCategories = () => {
       }
 
       const result = await res.json();
-      if (!res.ok) throw new Error(result.message);
+      if (!res.ok) throw new Error(result.message || "Không thể lưu danh mục");
 
       Swal.fire({
         icon: "success",
@@ -114,13 +111,14 @@ const ManageCategories = () => {
       Swal.fire({
         icon: "error",
         title: "Lỗi",
-        text: err.message || "Không thể lưu danh mục",
+        text: err.message,
         confirmButtonColor: "#d33",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // Xử lý chỉnh sửa
   const handleEdit = (category) => {
     setFormData({
       name: category.name,
@@ -131,7 +129,6 @@ const ManageCategories = () => {
     toggleModal();
   };
 
-  // Xử lý xóa
   const handleDelete = async (id) => {
     const result = await Swal.fire({
       title: "Bạn có chắc?",
@@ -145,6 +142,7 @@ const ManageCategories = () => {
     });
 
     if (result.isConfirmed) {
+      setIsLoading(true);
       try {
         const accessToken = localStorage.getItem("accessToken");
         const res = await fetch(`${BASE_URL}/categories/${id}`, {
@@ -154,7 +152,16 @@ const ManageCategories = () => {
           },
         });
         const result = await res.json();
-        if (!res.ok) throw new Error(result.message);
+        console.log("Delete response:", result); // Debugging log
+
+        if (!res.ok) {
+          const errorMessage =
+            result.message ===
+            "Cannot delete category because it has associated tours"
+              ? "Không thể xóa danh mục vì có các tour liên quan"
+              : result.message || "Không thể xóa danh mục";
+          throw new Error(errorMessage);
+        }
 
         Swal.fire({
           icon: "success",
@@ -168,14 +175,15 @@ const ManageCategories = () => {
         Swal.fire({
           icon: "error",
           title: "Lỗi",
-          text: err.message || "Không thể xóa danh mục",
+          text: err.message,
           confirmButtonColor: "#d33",
         });
+      } finally {
+        setIsLoading(false);
       }
     }
   };
 
-  // Mở modal để thêm danh mục mới
   const handleAddNew = () => {
     setFormData({ name: "", description: "", isActive: true });
     setEditId(null);
@@ -193,6 +201,7 @@ const ManageCategories = () => {
                 color="primary"
                 onClick={handleAddNew}
                 className="icon-btn"
+                disabled={isLoading}
               >
                 <FaPlus />
               </Button>
@@ -214,6 +223,7 @@ const ManageCategories = () => {
                       value={formData.name}
                       onChange={handleChange}
                       required
+                      disabled={isLoading}
                     />
                   </FormGroup>
                   <FormGroup>
@@ -226,6 +236,7 @@ const ManageCategories = () => {
                       value={formData.description}
                       onChange={handleChange}
                       required
+                      disabled={isLoading}
                     />
                   </FormGroup>
                   <FormGroup check>
@@ -236,6 +247,7 @@ const ManageCategories = () => {
                         name="isActive"
                         checked={formData.isActive}
                         onChange={handleChange}
+                        disabled={isLoading}
                       />{" "}
                       Active
                     </Label>
@@ -243,10 +255,18 @@ const ManageCategories = () => {
                 </Form>
               </ModalBody>
               <ModalFooter>
-                <Button color="primary" onClick={handleSubmit}>
+                <Button
+                  color="primary"
+                  onClick={handleSubmit}
+                  disabled={isLoading}
+                >
                   {editId ? "Update" : "Create"}
                 </Button>{" "}
-                <Button color="secondary" onClick={toggleModal}>
+                <Button
+                  color="secondary"
+                  onClick={toggleModal}
+                  disabled={isLoading}
+                >
                   Cancel
                 </Button>
               </ModalFooter>
@@ -280,6 +300,7 @@ const ManageCategories = () => {
                         color="link"
                         className="icon-btn"
                         onClick={() => handleEdit(category)}
+                        disabled={isLoading}
                       >
                         <FaEdit />
                       </Button>
@@ -287,6 +308,7 @@ const ManageCategories = () => {
                         color="link"
                         className="icon-btn"
                         onClick={() => handleDelete(category._id)}
+                        disabled={isLoading}
                       >
                         <FaTrash />
                       </Button>

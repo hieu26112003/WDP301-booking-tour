@@ -1,7 +1,13 @@
 import mongoose from "mongoose";
 import Tour from "../models/Tour.js";
 import path from "path";
+import fs from "fs/promises";
 import Category from "../models/Category.js";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 // Tạo tour mới
 export const createTour = async (req, res) => {
@@ -40,25 +46,21 @@ export const createTour = async (req, res) => {
         .json({ success: false, message: "All fields are required" });
     }
 
-    // Kiểm tra categoryId hợp lệ
     if (!mongoose.Types.ObjectId.isValid(categoryId)) {
       return res
         .status(400)
         .json({ success: false, message: "Invalid category ID" });
     }
 
-    // Kiểm tra ảnh
     if (!req.file) {
       return res
         .status(400)
         .json({ success: false, message: "Image is required" });
     }
 
-    // Tạo ID tăng tự động
     const lastTour = await Tour.findOne().sort({ id: -1 });
     const newId = lastTour ? lastTour.id + 1 : 1;
 
-    // Lưu đường dẫn ảnh tương đối
     const imagePath = `/user_images/${path.basename(req.file.path)}`;
 
     const newTour = new Tour({
@@ -101,6 +103,7 @@ export const getAllTours = async (req, res) => {
     res.status(500).json({ success: false, message: "Failed to fetch tours" });
   }
 };
+
 // Lấy tour Miền Nam
 export const getSouthernTours = async (req, res) => {
   try {
@@ -115,6 +118,7 @@ export const getSouthernTours = async (req, res) => {
       .json({ success: false, message: "Failed to fetch southern tours" });
   }
 };
+
 // Lấy tour Miền Bắc
 export const getNorthernTours = async (req, res) => {
   try {
@@ -129,6 +133,7 @@ export const getNorthernTours = async (req, res) => {
       .json({ success: false, message: "Failed to fetch northern tours" });
   }
 };
+
 // Lấy combo Tour
 export const getComboTours = async (req, res) => {
   try {
@@ -143,7 +148,8 @@ export const getComboTours = async (req, res) => {
       .json({ success: false, message: "Failed to fetch combo tours" });
   }
 };
-//Lấy chi tiết tour
+
+// Lấy chi tiết tour
 export const getTourById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -168,60 +174,7 @@ export const getTourById = async (req, res) => {
   }
 };
 
-// export const getTourByCategoryId = async (req, res) => {
-//   try {
-//     const { categoryId } = req.params;
-//     const { page = 1, limit = 10 } = req.query;
-
-//     if (!mongoose.Types.ObjectId.isValid(categoryId)) {
-//       return res
-//         .status(400)
-//         .json({ success: false, message: "Invalid category ID" });
-//     }
-
-//     const category = await Category.findById(categoryId);
-//     if (!category) {
-//       return res
-//         .status(404)
-//         .json({ success: false, message: "Category not found" });
-//     }
-
-//     const tours = await Tour.find({ categoryId })
-//       .populate("categoryId", "name")
-//       .skip((page - 1) * limit)
-//       .limit(Number(limit));
-
-//     const total = await Tour.countDocuments({ categoryId });
-
-//     if (tours.length === 0) {
-//       return res.status(200).json({
-//         success: true,
-//         data: [],
-//         pagination: {
-//           total,
-//           page: Number(page),
-//           pages: Math.ceil(total / limit),
-//         },
-//         message: "No tours found for this category",
-//       });
-//     }
-
-//     res.status(200).json({
-//       success: true,
-//       data: tours,
-//       pagination: {
-//         total,
-//         page: Number(page),
-//         pages: Math.ceil(total / limit),
-//       },
-//     });
-//   } catch (err) {
-//     res.status(500).json({
-//       success: false,
-//       message: `Failed to fetch tours by category: ${err.message}`,
-//     });
-//   }
-// };
+// Lấy tour theo categoryId
 export const getTourByCategoryId = async (req, res) => {
   try {
     const { categoryId } = req.params;
@@ -242,7 +195,7 @@ export const getTourByCategoryId = async (req, res) => {
 
     const query = { categoryId };
     if (search) {
-      query.title = { $regex: search, $options: "i" }; // Tìm kiếm không phân biệt hoa thường
+      query.title = { $regex: search, $options: "i" };
     }
 
     const tours = await Tour.find(query)
@@ -283,6 +236,7 @@ export const getTourByCategoryId = async (req, res) => {
     });
   }
 };
+
 // Cập nhật tour
 export const updateTour = async (req, res) => {
   try {
@@ -309,7 +263,6 @@ export const updateTour = async (req, res) => {
       featured,
     } = req.body;
 
-    // Kiểm tra dữ liệu
     if (
       !title &&
       !summary &&
@@ -331,7 +284,6 @@ export const updateTour = async (req, res) => {
         .json({ success: false, message: "No valid fields to update" });
     }
 
-    // Kiểm tra categoryId hợp lệ
     if (categoryId && !mongoose.Types.ObjectId.isValid(categoryId)) {
       return res
         .status(400)
@@ -354,7 +306,7 @@ export const updateTour = async (req, res) => {
       featured,
       ...(req.file && {
         image: `/user_images/${path.basename(req.file.path)}`,
-      }), // Cập nhật ảnh nếu có
+      }),
     };
 
     const updated = await Tour.findByIdAndUpdate(
@@ -386,6 +338,8 @@ export const updateTour = async (req, res) => {
 export const deleteTour = async (req, res) => {
   try {
     const { id } = req.params;
+    console.log("Attempting to delete tour with ID:", id);
+
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res
         .status(400)
@@ -394,6 +348,7 @@ export const deleteTour = async (req, res) => {
 
     const deleted = await Tour.findByIdAndDelete(id);
     if (!deleted) {
+      console.log("Tour not found for ID:", id);
       return res
         .status(404)
         .json({ success: false, message: "Tour not found" });
@@ -402,16 +357,26 @@ export const deleteTour = async (req, res) => {
     if (deleted.image) {
       const imagePath = path.join(
         __dirname,
-        "../../frontend/public",
-        deleted.image
+        "../../frontend/public/user_images",
+        path.basename(deleted.image)
       );
-      if (fs.existsSync(imagePath)) {
-        fs.unlinkSync(imagePath);
+      try {
+        await fs.access(imagePath);
+        await fs.unlink(imagePath);
+        console.log("Deleted image:", imagePath);
+      } catch (fileErr) {
+        console.warn(
+          `Failed to delete image at ${imagePath}: ${fileErr.message}`
+        );
       }
     }
 
     res.status(200).json({ success: true, message: "Deleted successfully" });
   } catch (err) {
-    res.status(500).json({ success: false, message: "Failed to delete tour" });
+    console.error("Error in deleteTour:", err);
+    res.status(500).json({
+      success: false,
+      message: `Failed to delete tour: ${err.message}`,
+    });
   }
 };

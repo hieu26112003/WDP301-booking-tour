@@ -53,10 +53,13 @@ const ManageTours = () => {
   const [imageFile, setImageFile] = useState(null);
   const [editId, setEditId] = useState(null);
   const [modal, setModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   // Mở/đóng modal
-  const toggleModal = () => setModal(!modal);
+  const toggleModal = () => {
+    if (!isLoading) setModal(!modal);
+  };
 
   // Lấy danh sách danh mục
   const fetchCategories = async () => {
@@ -67,13 +70,13 @@ const ManageTours = () => {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
       const result = await res.json();
-      if (!res.ok) throw new Error(result.message);
+      if (!res.ok) throw new Error(result.message || "Không thể tải danh mục");
       setCategories(result.data);
     } catch (err) {
       Swal.fire({
         icon: "error",
         title: "Lỗi",
-        text: "Không thể tải danh mục",
+        text: err.message,
         confirmButtonColor: "#d33",
       });
     }
@@ -88,13 +91,13 @@ const ManageTours = () => {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
       const result = await res.json();
-      if (!res.ok) throw new Error(result.message);
+      if (!res.ok) throw new Error(result.message || "Không thể tải tour");
       setTours(result.data);
     } catch (err) {
       Swal.fire({
         icon: "error",
         title: "Lỗi",
-        text: "Không thể tải tour",
+        text: err.message,
         confirmButtonColor: "#d33",
       });
     }
@@ -131,15 +134,14 @@ const ManageTours = () => {
   // Xử lý submit form
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     const accessToken = localStorage.getItem("accessToken");
     const data = new FormData();
 
-    // Thêm các trường formData vào FormData
     Object.keys(formData).forEach((key) => {
       data.append(key, formData[key]);
     });
 
-    // Thêm file ảnh nếu có
     if (imageFile) {
       data.append("image", imageFile);
     }
@@ -147,14 +149,12 @@ const ManageTours = () => {
     try {
       let res;
       if (editId) {
-        // Cập nhật tour
         res = await fetch(`${BASE_URL}/tours/${editId}`, {
           method: "PUT",
           headers: { Authorization: `Bearer ${accessToken}` },
           body: data,
         });
       } else {
-        // Tạo tour mới
         res = await fetch(`${BASE_URL}/tours`, {
           method: "POST",
           headers: { Authorization: `Bearer ${accessToken}` },
@@ -163,7 +163,7 @@ const ManageTours = () => {
       }
 
       const result = await res.json();
-      if (!res.ok) throw new Error(result.message);
+      if (!res.ok) throw new Error(result.message || "Không thể lưu tour");
 
       Swal.fire({
         icon: "success",
@@ -196,9 +196,11 @@ const ManageTours = () => {
       Swal.fire({
         icon: "error",
         title: "Lỗi",
-        text: err.message || "Không thể lưu tour",
+        text: err.message,
         confirmButtonColor: "#d33",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -238,6 +240,7 @@ const ManageTours = () => {
     });
 
     if (result.isConfirmed) {
+      setIsLoading(true);
       try {
         const accessToken = localStorage.getItem("accessToken");
         const res = await fetch(`${BASE_URL}/tours/${id}`, {
@@ -245,7 +248,11 @@ const ManageTours = () => {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
         const result = await res.json();
-        if (!res.ok) throw new Error(result.message);
+        console.log("Delete tour response:", result);
+
+        if (!res.ok) {
+          throw new Error(result.message || "Không thể xóa tour");
+        }
 
         Swal.fire({
           icon: "success",
@@ -259,9 +266,11 @@ const ManageTours = () => {
         Swal.fire({
           icon: "error",
           title: "Lỗi",
-          text: err.message || "Không thể xóa tour",
+          text: err.message,
           confirmButtonColor: "#d33",
         });
+      } finally {
+        setIsLoading(false);
       }
     }
   };
@@ -329,6 +338,7 @@ const ManageTours = () => {
                 color="primary"
                 onClick={handleAddNew}
                 className="icon-btn"
+                disabled={isLoading}
               >
                 <FaPlus />
               </Button>
@@ -350,6 +360,7 @@ const ManageTours = () => {
                       value={formData.title}
                       onChange={handleChange}
                       required
+                      disabled={isLoading}
                     />
                   </FormGroup>
                   <FormGroup>
@@ -362,6 +373,7 @@ const ManageTours = () => {
                       value={formData.summary}
                       onChange={handleChange}
                       required
+                      disabled={isLoading}
                     />
                   </FormGroup>
                   <FormGroup>
@@ -374,6 +386,7 @@ const ManageTours = () => {
                       value={formData.days}
                       onChange={handleChange}
                       required
+                      disabled={isLoading}
                     />
                   </FormGroup>
                   <FormGroup>
@@ -386,6 +399,7 @@ const ManageTours = () => {
                       value={formData.serviceStandards}
                       onChange={handleChange}
                       required
+                      disabled={isLoading}
                     />
                   </FormGroup>
                   <FormGroup>
@@ -398,6 +412,7 @@ const ManageTours = () => {
                       value={formData.priceChild}
                       onChange={handleChange}
                       required
+                      disabled={isLoading}
                     />
                   </FormGroup>
                   <FormGroup>
@@ -410,6 +425,7 @@ const ManageTours = () => {
                       value={formData.priceAdult}
                       onChange={handleChange}
                       required
+                      disabled={isLoading}
                     />
                   </FormGroup>
                   <FormGroup>
@@ -419,6 +435,7 @@ const ManageTours = () => {
                       onChange={handleQuillChange("notes")}
                       modules={quillModules}
                       placeholder="Enter notes (supports HTML formatting)"
+                      readOnly={isLoading}
                     />
                   </FormGroup>
                   <FormGroup>
@@ -428,6 +445,7 @@ const ManageTours = () => {
                       onChange={handleQuillChange("cancellationPolicy")}
                       modules={quillModules}
                       placeholder="Enter cancellation policy (supports HTML formatting)"
+                      readOnly={isLoading}
                     />
                   </FormGroup>
                   <FormGroup>
@@ -440,6 +458,7 @@ const ManageTours = () => {
                       value={formData.schedule}
                       onChange={handleChange}
                       required
+                      disabled={isLoading}
                     />
                   </FormGroup>
                   <FormGroup>
@@ -452,6 +471,7 @@ const ManageTours = () => {
                       value={formData.departureDate}
                       onChange={handleChange}
                       required
+                      disabled={isLoading}
                     />
                   </FormGroup>
                   <FormGroup>
@@ -464,6 +484,7 @@ const ManageTours = () => {
                       value={formData.time}
                       onChange={handleChange}
                       required
+                      disabled={isLoading}
                     />
                   </FormGroup>
                   <FormGroup>
@@ -475,6 +496,7 @@ const ManageTours = () => {
                       value={formData.categoryId}
                       onChange={handleChange}
                       required
+                      disabled={isLoading}
                     >
                       <option value="">Select Category</option>
                       {categories.map((category) => (
@@ -493,6 +515,7 @@ const ManageTours = () => {
                       accept="image/*"
                       onChange={handleImageChange}
                       required={!editId}
+                      disabled={isLoading}
                     />
                   </FormGroup>
                   <FormGroup check>
@@ -503,6 +526,7 @@ const ManageTours = () => {
                         name="featured"
                         checked={formData.featured}
                         onChange={handleChange}
+                        disabled={isLoading}
                       />{" "}
                       Featured
                     </Label>
@@ -510,10 +534,18 @@ const ManageTours = () => {
                 </Form>
               </ModalBody>
               <ModalFooter>
-                <Button color="primary" onClick={handleSubmit}>
+                <Button
+                  color="primary"
+                  onClick={handleSubmit}
+                  disabled={isLoading}
+                >
                   {editId ? "Update" : "Create"}
                 </Button>{" "}
-                <Button color="secondary" onClick={toggleModal}>
+                <Button
+                  color="secondary"
+                  onClick={toggleModal}
+                  disabled={isLoading}
+                >
                   Cancel
                 </Button>
               </ModalFooter>
@@ -527,7 +559,6 @@ const ManageTours = () => {
                   <th>Title</th>
                   <th>Summary</th>
                   <th>Price (Adult)</th>
-                  {/* <th>Days</th> */}
                   <th>Notes</th>
                   <th>Cancellation Policy</th>
                   <th>Category</th>
@@ -553,7 +584,6 @@ const ManageTours = () => {
                     <td>{tour.title}</td>
                     <td>{tour.summary}</td>
                     <td>{tour.priceAdult}</td>
-                    {/* <td>{tour.days}</td> */}
                     <td className="html-content">{truncateText(tour.notes)}</td>
                     <td className="html-content">
                       {truncateText(tour.cancellationPolicy)}
@@ -572,6 +602,7 @@ const ManageTours = () => {
                         className="icon-btn"
                         onClick={() => handleViewDetail(tour)}
                         title="View Details"
+                        disabled={isLoading}
                       >
                         <FaEye />
                       </Button>
@@ -580,6 +611,7 @@ const ManageTours = () => {
                         className="icon-btn"
                         onClick={() => handleEdit(tour)}
                         title="Edit"
+                        disabled={isLoading}
                       >
                         <FaEdit />
                       </Button>
@@ -588,6 +620,7 @@ const ManageTours = () => {
                         className="icon-btn"
                         onClick={() => handleDelete(tour._id)}
                         title="Delete"
+                        disabled={isLoading}
                       >
                         <FaTrash />
                       </Button>
