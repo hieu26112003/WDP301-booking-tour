@@ -2,11 +2,12 @@
 import React, { useEffect, useRef, useContext, useState } from "react";
 import { Container } from "reactstrap";
 import { Link, useNavigate } from "react-router-dom";
-import { Search, Phone, ChevronDown, Menu, User } from "lucide-react";
+import { Search, Phone, ChevronDown, Menu, User, X } from "lucide-react";
 import "./header.css";
 import { AuthContext } from "../../context/AuthContext";
 import Swal from "sweetalert2";
 import { getCategories } from "../../services/categoryService";
+import { BASE_URL } from "../../utils/config";
 
 const Header = ({ onCategorySelect, onSearch }) => {
   const headerRef = useRef(null);
@@ -17,6 +18,7 @@ const Header = ({ onCategorySelect, onSearch }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [menuCategories, setMenuCategories] = useState([]);
 
   // Debounce function
   const debounce = (func, delay) => {
@@ -60,28 +62,27 @@ const Header = ({ onCategorySelect, onSearch }) => {
       dropdownItems:
         categories.length > 0
           ? [
-              {
-                display: "Tất cả danh mục",
-                onClick: () => onCategorySelect(null, "Tất cả danh mục"),
-              },
-              ...categories.map((cat) => ({
-                display: cat.name,
-                onClick: () => onCategorySelect(cat._id, cat.name),
-              })),
-            ]
+            {
+              display: "Tất cả danh mục",
+              onClick: () => onCategorySelect(null, "Tất cả danh mục"),
+            },
+            ...categories.map((cat) => ({
+              display: cat.name,
+              onClick: () => onCategorySelect(cat._id, cat.name),
+            })),
+          ]
           : [],
     },
     {
       path: "/cam-nang",
       display: "CẨM NANG DU LỊCH",
       hasDropdown: true,
-      dropdownItems: [
-        { path: "/cam-nang/kinh-nghiem", display: "Kinh nghiệm" },
-        { path: "/cam-nang/am-thuc", display: "Ẩm thực" },
-        { path: "/cam-nang/review", display: "Review" },
-        { path: "/cam-nang/xu-huong", display: "Xu hướng" },
-      ],
+      dropdownItems: menuCategories.map(cat => ({
+        path: `/cam-nang/${cat.slug}`,
+        display: cat.name
+      }))
     },
+
     { path: "/about", display: "VỀ ASK TRAVEL" },
     { path: "/contact", display: "LIÊN HỆ" },
   ];
@@ -245,9 +246,8 @@ const Header = ({ onCategorySelect, onSearch }) => {
                       />
                     </div>
                     <div
-                      className={`user-dropdown-redesign ${
-                        activeDropdown === "user" ? "show" : ""
-                      }`}
+                      className={`user-dropdown-redesign ${activeDropdown === "user" ? "show" : ""
+                        }`}
                     >
                       <Link
                         to="/profile"
@@ -317,9 +317,8 @@ const Header = ({ onCategorySelect, onSearch }) => {
                         />
                       </Link>
                       <div
-                        className={`dropdown-menu-redesign ${
-                          activeDropdown === index ? "show" : ""
-                        }`}
+                        className={`dropdown-menu-redesign ${activeDropdown === index ? "show" : ""
+                          }`}
                       >
                         <div className="dropdown-content-redesign">
                           {isLoading ? (
