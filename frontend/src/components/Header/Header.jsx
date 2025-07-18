@@ -96,6 +96,8 @@ const Header = ({ onCategorySelect, onSearch }) => {
       cancelButtonColor: "#d33",
       confirmButtonText: "Đăng xuất",
       cancelButtonText: "Hủy",
+      backdrop: true, // Đảm bảo backdrop hiển thị
+      allowOutsideClick: true, // Cho phép click bên ngoài
       customClass: {
         popup: "custom-swal-popup",
         title: "custom-swal-title",
@@ -112,14 +114,18 @@ const Header = ({ onCategorySelect, onSearch }) => {
           title: "Đăng xuất thành công",
           showConfirmButton: false,
           timer: 1500,
-          timerProgressBar: true, // Thêm thanh tiến trình
+          timerProgressBar: true,
+          backdrop: true, // Đảm bảo backdrop
+          allowOutsideClick: true, // Cho phép click bên ngoài
           customClass: {
             popup: "custom-swal-popup",
             title: "custom-swal-title",
             content: "custom-swal-content",
           },
           willClose: () => {
-            console.log("Success message closed"); // Debug để xác nhận đóng
+            console.log("Success message closed"); // Debug
+            // Đảm bảo khôi phục cuộn
+            document.body.style.overflow = "auto";
           },
         });
       }

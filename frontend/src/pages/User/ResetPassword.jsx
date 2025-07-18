@@ -33,6 +33,14 @@ const ResetPassword = () => {
           title: "Lỗi",
           text: result.message,
           confirmButtonColor: "#d33",
+          backdrop: true,
+          allowOutsideClick: true,
+          customClass: {
+            popup: "custom-swal-popup",
+            title: "custom-swal-title",
+            content: "custom-swal-content",
+            confirmButton: "custom-swal-confirm",
+          },
         });
         setIsLoading(false);
         return;
@@ -42,8 +50,20 @@ const ResetPassword = () => {
         icon: "success",
         title: "Thành công",
         text: result.message,
-        confirmButtonColor: "#3085d6",
+        showConfirmButton: false,
         timer: 1500,
+        timerProgressBar: true,
+        backdrop: true,
+        allowOutsideClick: true,
+        customClass: {
+          popup: "custom-swal-popup",
+          title: "custom-swal-title",
+          content: "custom-swal-content",
+        },
+        willClose: () => {
+          console.log("Success message closed");
+          document.body.style.overflow = "auto"; // Khôi phục cuộn
+        },
       }).then(() => {
         setIsLoading(false);
         navigate("/login");
@@ -54,6 +74,14 @@ const ResetPassword = () => {
         title: "Lỗi",
         text: err.message,
         confirmButtonColor: "#d33",
+        backdrop: true,
+        allowOutsideClick: true,
+        customClass: {
+          popup: "custom-swal-popup",
+          title: "custom-swal-title",
+          content: "custom-swal-content",
+          confirmButton: "custom-swal-confirm",
+        },
       });
       setIsLoading(false);
     }

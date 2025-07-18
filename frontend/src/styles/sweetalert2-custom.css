@@ -42,37 +42,37 @@
 }
 
 .custom-swal-popup {
-  background: linear-gradient(135deg, #ffffff, #f8f9fa); /* Gradient nhẹ */
-  border-radius: 20px; /* Giảm từ 28px để nhỏ gọn hơn */
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3); /* Giảm bóng đổ */
+  background: linear-gradient(135deg, #ffffff, #f8f9fa);
+  border-radius: 20px;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
   font-family: var(--font-name);
-  padding: 30px; /* Giảm từ 50px để popup nhỏ hơn */
-  max-width: 500px; /* Giảm từ 750px để nhỏ hơn */
+  padding: 30px;
+  max-width: 500px; /* Giữ nhỏ gọn */
   width: 90%;
-  animation: fadeIn 0.15s ease; /* Giảm từ 0.2s để xuất hiện nhanh hơn */
-  z-index: 10000; /* Đảm bảo ở trên cùng */
+  animation: fadeIn 0.15s ease;
+  z-index: 10000;
 }
 
 .custom-swal-popup.swal2-toast {
-  animation: fadeIn 0.15s ease, fadeOut 0.15s ease 1.35s; /* fadeOut sau 1.35s để khớp timer: 1500 */
+  animation: fadeIn 0.15s ease, fadeOut 0.15s ease 1.35s; /* Khớp timer: 1500 */
 }
 
 .custom-swal-title {
   color: var(--heading-color);
-  font-size: 1.8rem; /* Giảm từ 2.5rem để nhỏ hơn */
+  font-size: 1.8rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1.2px;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
-  margin-bottom: 1.2rem; /* Giảm từ 2rem */
+  margin-bottom: 1.2rem;
 }
 
 .custom-swal-content {
   color: var(--text-color);
-  font-size: 1.1rem; /* Giảm từ 1.5rem */
+  font-size: 1.1rem;
   font-family: var(--font-name);
   line-height: 1.5;
-  margin-bottom: 1.5rem; /* Giảm từ 2.5rem */
+  margin-bottom: 1.5rem;
 }
 
 .custom-swal-confirm {
@@ -84,12 +84,12 @@
   background-size: 200% 200%;
   animation: gradientShift 4s ease infinite;
   color: #fff;
-  font-size: 1rem; /* Giảm từ 1.4rem */
+  font-size: 1rem;
   font-weight: 600;
   border: none;
-  border-radius: 10px; /* Giảm từ 16px */
-  padding: 12px 24px; /* Giảm từ 18px 36px */
-  transition: all 0.3s ease; /* Giảm từ 0.4s */
+  border-radius: 10px;
+  padding: 12px 24px;
+  transition: all 0.3s ease;
   cursor: pointer;
 }
 
@@ -99,14 +99,14 @@
     var(--secondary-color),
     var(--primary-color)
   );
-  transform: translateY(-3px); /* Giảm từ -5px */
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* Giảm bóng đổ */
+  transform: translateY(-3px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
 }
 
 .custom-swal-cancel {
   background: #d33;
   color: #fff;
-  font-size: 1rem; /* Giảm từ 1.4rem */
+  font-size: 1rem;
   font-weight: 600;
   border: none;
   border-radius: 10px;
@@ -122,52 +122,63 @@
 }
 
 .swal2-icon {
-  margin: 0 auto 1.2rem; /* Giảm từ 2rem */
-  transform: scale(1.2); /* Giảm từ 1.5 */
+  margin: 0 auto 1.2rem;
+  transform: scale(1.2);
   transition: transform 0.3s ease;
 }
 
 .swal2-icon:hover {
-  transform: scale(1.3); /* Giảm từ 1.6 */
+  transform: scale(1.3);
 }
 
 .swal2-timer-progress-bar {
   background: var(--primary-color);
-  height: 4px; /* Giảm từ 6px để nhỏ hơn */
+  height: 4px;
   border-radius: 4px;
 }
 
-/* Đảm bảo backdrop ẩn hoàn toàn */
+/* Đảm bảo backdrop ẩn hoàn toàn và không chặn cuộn */
+.swal2-container {
+  z-index: 10000;
+}
+
 .swal2-container.swal2-backdrop-show {
   transition: opacity 0.15s ease;
+  pointer-events: auto;
 }
 
 .swal2-container.swal2-backdrop-hide {
   opacity: 0 !important;
-  pointer-events: none;
+  pointer-events: none !important;
+  display: none !important; /* Ẩn hoàn toàn backdrop */
+}
+
+/* Khôi phục cuộn khi thông báo đóng */
+body.swal2-shown:not(.swal2-no-backdrop):not(.swal2-toast-shown) {
+  overflow: auto !important;
 }
 
 /* Responsive Design */
 @media only screen and (max-width: 768px) {
   .custom-swal-popup {
-    max-width: 400px; /* Giảm từ 600px */
-    padding: 25px; /* Giảm từ 40px */
+    max-width: 400px;
+    padding: 25px;
   }
 
   .custom-swal-title {
-    font-size: 1.6rem; /* Giảm từ 2.3rem */
+    font-size: 1.6rem;
     margin-bottom: 1rem;
   }
 
   .custom-swal-content {
-    font-size: 1rem; /* Giảm từ 1.4rem */
+    font-size: 1rem;
     margin-bottom: 1.2rem;
   }
 
   .custom-swal-confirm,
   .custom-swal-cancel {
-    padding: 10px 20px; /* Giảm từ 16px 32px */
-    font-size: 0.9rem; /* Giảm từ 1.3rem */
+    padding: 10px 20px;
+    font-size: 0.9rem;
   }
 
   .swal2-icon {
@@ -181,23 +192,23 @@
 
 @media only screen and (max-width: 576px) {
   .custom-swal-popup {
-    max-width: 300px; /* Giảm từ 450px */
-    padding: 20px; /* Giảm từ 30px */
+    max-width: 300px;
+    padding: 20px;
   }
 
   .custom-swal-title {
-    font-size: 1.4rem; /* Giảm từ 2.1rem */
+    font-size: 1.4rem;
     margin-bottom: 0.8rem;
   }
 
   .custom-swal-content {
-    font-size: 0.9rem; /* Giảm từ 1.3rem */
+    font-size: 0.9rem;
   }
 
   .custom-swal-confirm,
   .custom-swal-cancel {
-    padding: 8px 16px; /* Giảm từ 14px 28px */
-    font-size: 0.8rem; /* Giảm từ 1.2rem */
+    padding: 8px 16px;
+    font-size: 0.8rem;
   }
 
   .swal2-icon {
