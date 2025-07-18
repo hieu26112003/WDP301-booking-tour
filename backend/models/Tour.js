@@ -57,8 +57,8 @@ const tourSchema = new mongoose.Schema(
       ref: "Category",
       required: true,
     },
-    image: {
-      type: String,
+    images: {
+      type: [String],
       required: true,
     },
   },

@@ -1,26 +1,35 @@
-import React from "react";
+// Home.js
+import React, { useState } from "react";
 import { Container, Row, Col } from "reactstrap";
 import { Carousel } from "react-bootstrap";
 import "../../styles/home.css";
-import Subtitle from "./../../shared/subtitle";
-import CommonSection from "../../shared/CommonSection";
+import Header from "../../components/Header/Header";
+import TourList from "../../components/TourList/TourList";
 import ChatWidget from "../../components/Chat/ChatWidget";
-import NorthenrnTourList from "../../components/Northern tours/NorthernTour";
-import SouthTourList from "../../components/South tour/SouthTour";
-import ComboTourList from "../../components/Combo Tour/ComboTours";
 
-// 🖼️ Ảnh slide
 const sliderImages = [
   "/home_images/banner1.jpg",
   "/home_images/banner2.jpg",
-  "/home_images/banner3.jpg"
+  "/home_images/banner3.jpg",
 ];
 
 const Home = () => {
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleCategorySelect = (categoryId, categoryName) => {
+    setSelectedCategory(
+      categoryId ? { id: categoryId, name: categoryName } : null
+    );
+  };
+
+  const handleSearch = (query) => {
+    setSearchQuery(query);
+  };
+
   return (
     <>
-
-      {/* 🖼️ Slider trước CommonSection */}
+      <Header onCategorySelect={handleCategorySelect} onSearch={handleSearch} />
       <div style={{ position: "relative" }}>
         <Carousel interval={3000}>
           {sliderImages.map((src, idx) => (
@@ -29,12 +38,11 @@ const Home = () => {
                 className="d-block w-100"
                 src={src}
                 alt={`Slide ${idx + 1}`}
-                style={{ height: "600px", objectFit: "cover" }}
+                style={{ height: "480px", objectFit: "cover" }}
               />
             </Carousel.Item>
           ))}
         </Carousel>
-        {/* Tiêu đề nằm trên slide */}
         <h2
           style={{
             position: "absolute",
@@ -42,7 +50,7 @@ const Home = () => {
             left: "50%",
             transform: "translate(-50%, -50%)",
             color: "white",
-            fontSize: "3rem",
+            fontSize: "2.5rem",
             fontWeight: "bold",
             textShadow: "2px 2px 8px rgba(0,0,0,0.7)",
           }}
@@ -51,58 +59,17 @@ const Home = () => {
         </h2>
       </div>
 
-      {/* Nội dung trang */}
-
-      <section>
-        <Container>
-          <Row></Row>
-        </Container>
-      </section>
       <section>
         <Container>
           <Row>
-            <Col lg="12" className="text-center mb-4">
-              <h2
-                className="section__title text-uppercase"
-                style={{ color: "#ff8000" }}
-              >
-                TOUR MIỀN BẮC
-              </h2>
-            </Col>
-            <NorthenrnTourList />
-          </Row>
-        </Container>
-
-        <section className="mt-5 py-5" style={{ backgroundColor: "#e0e0e0" }}>
-          <Container>
-            <Row>
-              <Col lg="12" className="text-center mb-4">
-                <h2
-                  className="section__title text-uppercase"
-                  style={{ color: "#ff8000" }}
-                >
-                  TOUR MIỀN NAM
-                </h2>
-              </Col>
-              <SouthTourList />
-            </Row>
-          </Container>
-        </section>
-
-        <Container className="mt-5 py-5">
-          <Row>
-            <Col lg="12" className="text-center mb-4">
-              <h2
-                className="section__title text-uppercase"
-                style={{ color: "#ff8000" }}
-              >
-                COMBO TOUR
-              </h2>
-            </Col>
-            <ComboTourList />
+            <TourList
+              selectedCategory={selectedCategory}
+              searchQuery={searchQuery}
+            />
           </Row>
         </Container>
       </section>
+
       <ChatWidget />
     </>
   );

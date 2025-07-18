@@ -1,3 +1,4 @@
+// Header.js (với debounce)
 import React, { useEffect, useRef, useContext, useState } from "react";
 import { Container } from "reactstrap";
 import { Link, useNavigate } from "react-router-dom";
@@ -8,7 +9,7 @@ import Swal from "sweetalert2";
 import { getCategories } from "../../services/categoryService";
 import { BASE_URL } from "../../utils/config";
 
-const Header = () => {
+const Header = ({ onCategorySelect, onSearch }) => {
   const headerRef = useRef(null);
   const menuRef = useRef(null);
   const navigate = useNavigate();
@@ -18,23 +19,17 @@ const Header = () => {
   const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const [menuCategories, setMenuCategories] = useState([]);
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const res = await fetch(`${BASE_URL}/guides/categories`);
-        const data = await res.json();
-        if (data.success) {
-          setMenuCategories(data.data);
-        }
-      } catch (err) {
-        console.error("Lỗi load categories:", err);
-      }
+  // Debounce function
+  const debounce = (func, delay) => {
+    let timeoutId;
+    return (...args) => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => func(...args), delay);
     };
+  };
 
-    fetchCategories();
-  }, []);
+  // Debounced search handler
+  const debouncedSearch = debounce(onSearch, 300);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -58,17 +53,23 @@ const Header = () => {
   }, []);
 
   const nav__links = [
-    { path: "/", display: "TRANG CHỦ" },
+    { path: "/home", display: "TRANG CHỦ" },
     {
       path: "/tours",
       display: "TOUR DU LỊCH",
       hasDropdown: true,
       dropdownItems:
         categories.length > 0
-          ? categories.map((cat) => ({
-            path: `/tours/${cat._id}`,
-            display: cat.name,
-          }))
+          ? [
+              {
+                display: "Tất cả danh mục",
+                onClick: () => onCategorySelect(null, "Tất cả danh mục"),
+              },
+              ...categories.map((cat) => ({
+                display: cat.name,
+                onClick: () => onCategorySelect(cat._id, cat.name),
+              })),
+            ]
           : [],
     },
     {
@@ -82,10 +83,10 @@ const Header = () => {
     },
     
     { path: "/about", display: "VỀ ASK TRAVEL" },
-
     { path: "/contact", display: "LIÊN HỆ" },
   ];
 
+  // Header.js (chỉ cập nhật hàm logout)
   const logout = () => {
     Swal.fire({
       title: "Bạn có chắc muốn đăng xuất?",
@@ -95,15 +96,37 @@ const Header = () => {
       cancelButtonColor: "#d33",
       confirmButtonText: "Đăng xuất",
       cancelButtonText: "Hủy",
+      backdrop: true, // Đảm bảo backdrop hiển thị
+      allowOutsideClick: true, // Cho phép click bên ngoài
+      customClass: {
+        popup: "custom-swal-popup",
+        title: "custom-swal-title",
+        content: "custom-swal-content",
+        confirmButton: "custom-swal-confirm",
+        cancelButton: "custom-swal-cancel",
+      },
     }).then((result) => {
       if (result.isConfirmed) {
         dispatch({ type: "LOGOUT" });
-        navigate("/");
+        navigate("/home");
         Swal.fire({
           icon: "success",
           title: "Đăng xuất thành công",
           showConfirmButton: false,
           timer: 1500,
+          timerProgressBar: true,
+          backdrop: true, // Đảm bảo backdrop
+          allowOutsideClick: true, // Cho phép click bên ngoài
+          customClass: {
+            popup: "custom-swal-popup",
+            title: "custom-swal-title",
+            content: "custom-swal-content",
+          },
+          willClose: () => {
+            console.log("Success message closed"); // Debug
+            // Đảm bảo khôi phục cuộn
+            document.body.style.overflow = "auto";
+          },
         });
       }
     });
@@ -135,17 +158,19 @@ const Header = () => {
   const handleDropdownClick = (index) =>
     setActiveDropdown(index === activeDropdown ? null : index);
 
-  const handleSearch = (e) => setSearchQuery(e.target.value);
+  const handleSearch = (e) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+    debouncedSearch(query);
+  };
 
   return (
     <header className="header-redesign" ref={headerRef}>
-      {/* Top Header Section */}
       <div className="top-header-redesign">
         <Container>
           <div className="top-header-wrapper-redesign">
-            {/* Logo */}
             <div className="logo-redesign">
-              <Link to="/" className="logo-link-redesign">
+              <Link to="/home" className="logo-link-redesign">
                 <div className="logo-icon-redesign">
                   <span className="logo-text-redesign">🥥</span>
                 </div>
@@ -158,7 +183,6 @@ const Header = () => {
               </Link>
             </div>
 
-            {/* Search Bar */}
             <div className="search-bar-redesign">
               <div className="search-wrapper-redesign">
                 <Search className="search-icon-redesign" size={14} />
@@ -169,10 +193,20 @@ const Header = () => {
                   value={searchQuery}
                   onChange={handleSearch}
                 />
+                {searchQuery && (
+                  <button
+                    className="clear-search-btn-redesign"
+                    onClick={() => {
+                      setSearchQuery("");
+                      debouncedSearch("");
+                    }}
+                  >
+                    ×
+                  </button>
+                )}
               </div>
             </div>
 
-            {/* Phone & User Section */}
             <div className="header-right-redesign">
               <div className="phone-section-redesign">
                 <Phone className="phone-icon-redesign" size={14} />
@@ -188,7 +222,7 @@ const Header = () => {
                     className="user-menu-redesign"
                     onMouseEnter={() => handleMouseEnter("user")}
                     onMouseLeave={handleMouseLeave}
-                    onClick={() => handleDropdownClick("user")} // Enable click to toggle
+                    onClick={() => handleDropdownClick("user")}
                   >
                     <div className="user-toggle-redesign">
                       <div className="user-avatar-redesign">
@@ -258,7 +292,6 @@ const Header = () => {
         </Container>
       </div>
 
-      {/* Navigation Bar */}
       <div className="navigation-bar-redesign">
         <Container>
           <nav className="navigation-redesign" ref={menuRef}>
@@ -294,13 +327,13 @@ const Header = () => {
                           ) : item.dropdownItems.length > 0 ? (
                             item.dropdownItems.map(
                               (dropdownItem, dropdownIndex) => (
-                                <Link
+                                <div
                                   key={dropdownIndex}
-                                  to={dropdownItem.path}
                                   className="dropdown-item-redesign"
+                                  onClick={dropdownItem.onClick}
                                 >
                                   {dropdownItem.display}
-                                </Link>
+                                </div>
                               )
                             )
                           ) : (
@@ -323,7 +356,6 @@ const Header = () => {
         </Container>
       </div>
 
-      {/* Mobile Menu */}
       <div className="mobile-menu-redesign">
         <div className="mobile-menu-overlay-redesign">
           <div className="mobile-menu-content-redesign">
@@ -349,12 +381,12 @@ const Header = () => {
                           key={dropdownIndex}
                           className="mobile-submenu-item-redesign"
                         >
-                          <Link
-                            to={dropdownItem.path}
+                          <div
                             className="mobile-submenu-link-redesign"
+                            onClick={dropdownItem.onClick}
                           >
                             {dropdownItem.display}
-                          </Link>
+                          </div>
                         </li>
                       ))}
                     </ul>
