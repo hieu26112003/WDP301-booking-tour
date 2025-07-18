@@ -9,6 +9,7 @@ import "slick-carousel/slick/slick-theme.css";
 import "react-quill/dist/quill.snow.css";
 import { BrowserRouter } from "react-router-dom";
 import { AuthContextProvider } from "./context/AuthContext";
+import "./styles/sweetalert2-custom.css";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(

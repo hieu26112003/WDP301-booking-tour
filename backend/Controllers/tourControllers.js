@@ -168,10 +168,64 @@ export const getTourById = async (req, res) => {
   }
 };
 
+// export const getTourByCategoryId = async (req, res) => {
+//   try {
+//     const { categoryId } = req.params;
+//     const { page = 1, limit = 10 } = req.query;
+
+//     if (!mongoose.Types.ObjectId.isValid(categoryId)) {
+//       return res
+//         .status(400)
+//         .json({ success: false, message: "Invalid category ID" });
+//     }
+
+//     const category = await Category.findById(categoryId);
+//     if (!category) {
+//       return res
+//         .status(404)
+//         .json({ success: false, message: "Category not found" });
+//     }
+
+//     const tours = await Tour.find({ categoryId })
+//       .populate("categoryId", "name")
+//       .skip((page - 1) * limit)
+//       .limit(Number(limit));
+
+//     const total = await Tour.countDocuments({ categoryId });
+
+//     if (tours.length === 0) {
+//       return res.status(200).json({
+//         success: true,
+//         data: [],
+//         pagination: {
+//           total,
+//           page: Number(page),
+//           pages: Math.ceil(total / limit),
+//         },
+//         message: "No tours found for this category",
+//       });
+//     }
+
+//     res.status(200).json({
+//       success: true,
+//       data: tours,
+//       pagination: {
+//         total,
+//         page: Number(page),
+//         pages: Math.ceil(total / limit),
+//       },
+//     });
+//   } catch (err) {
+//     res.status(500).json({
+//       success: false,
+//       message: `Failed to fetch tours by category: ${err.message}`,
+//     });
+//   }
+// };
 export const getTourByCategoryId = async (req, res) => {
   try {
     const { categoryId } = req.params;
-    const { page = 1, limit = 10 } = req.query;
+    const { page = 1, limit = 10, search = "" } = req.query;
 
     if (!mongoose.Types.ObjectId.isValid(categoryId)) {
       return res
@@ -186,12 +240,17 @@ export const getTourByCategoryId = async (req, res) => {
         .json({ success: false, message: "Category not found" });
     }
 
-    const tours = await Tour.find({ categoryId })
+    const query = { categoryId };
+    if (search) {
+      query.title = { $regex: search, $options: "i" }; // Tìm kiếm không phân biệt hoa thường
+    }
+
+    const tours = await Tour.find(query)
       .populate("categoryId", "name")
       .skip((page - 1) * limit)
       .limit(Number(limit));
 
-    const total = await Tour.countDocuments({ categoryId });
+    const total = await Tour.countDocuments(query);
 
     if (tours.length === 0) {
       return res.status(200).json({
@@ -202,7 +261,9 @@ export const getTourByCategoryId = async (req, res) => {
           page: Number(page),
           pages: Math.ceil(total / limit),
         },
-        message: "No tours found for this category",
+        message: search
+          ? `No tours found for this category with search term "${search}"`
+          : "No tours found for this category",
       });
     }
 
@@ -222,7 +283,6 @@ export const getTourByCategoryId = async (req, res) => {
     });
   }
 };
-
 // Cập nhật tour
 export const updateTour = async (req, res) => {
   try {

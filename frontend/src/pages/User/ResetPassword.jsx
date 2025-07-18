@@ -1,16 +1,22 @@
+// ResetPassword.js
 import React, { useState } from "react";
 import { Container, Row, Col, Form, FormGroup, Button } from "reactstrap";
-import "../../styles/login.css"; // Reuse login styles
+import "../../styles/reset-password.css"; // Sử dụng CSS riêng
 import { useNavigate } from "react-router-dom";
+import { Mail, Loader2 } from "lucide-react"; // Thêm biểu tượng
+import registerImg from "../../assets/images/login.png";
+import userIcon from "../../assets/images/user.png";
 import Swal from "sweetalert2";
 import { BASE_URL } from "../../utils/config";
 
 const ResetPassword = () => {
   const [email, setEmail] = useState("");
+  const [isLoading, setIsLoading] = useState(false); // Trạng thái loading
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
 
     try {
       const res = await fetch(`${BASE_URL}/auth/reset-password`, {
@@ -28,6 +34,7 @@ const ResetPassword = () => {
           text: result.message,
           confirmButtonColor: "#d33",
         });
+        setIsLoading(false);
         return;
       }
 
@@ -38,6 +45,7 @@ const ResetPassword = () => {
         confirmButtonColor: "#3085d6",
         timer: 1500,
       }).then(() => {
+        setIsLoading(false);
         navigate("/login");
       });
     } catch (err) {
@@ -47,33 +55,51 @@ const ResetPassword = () => {
         text: err.message,
         confirmButtonColor: "#d33",
       });
+      setIsLoading(false);
     }
   };
 
   return (
-    <section>
+    <section className="reset-password__section">
       <Container>
         <Row>
-          <Col lg="8" className="m-auto">
-            <div className="login__container d-flex justify-content-between">
-              <div className="login__form">
-                <h2>Reset Password</h2>
+          <Col lg="10" md="12" className="m-auto">
+            <div className="reset-password__container">
+              <div className="reset-password__img">
+                <img src={registerImg} alt="Reset Password Illustration" />
+              </div>
+              <div className="reset-password__form">
+                <div className="user">
+                  <img src={userIcon} alt="User Icon" />
+                </div>
+                <h2>Đặt Lại Mật Khẩu</h2>
                 <Form onSubmit={handleSubmit}>
-                  <FormGroup>
-                    <input
-                      type="email"
-                      placeholder="Enter your email"
-                      id="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                    />
+                  <FormGroup className="input__group">
+                    <div className="input__wrapper">
+                      <Mail className="input__icon" size={18} />
+                      <input
+                        type="email"
+                        placeholder="Nhập email của bạn"
+                        id="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                      />
+                    </div>
                   </FormGroup>
                   <Button
-                    className="btn secondary__btn auth__btn"
+                    className="btn auth__btn"
                     type="submit"
+                    disabled={isLoading}
                   >
-                    Send Reset Link
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="spinner" size={18} />
+                        Đang gửi...
+                      </>
+                    ) : (
+                      "Gửi Liên Kết Đặt Lại"
+                    )}
                   </Button>
                 </Form>
               </div>
