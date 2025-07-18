@@ -1,4 +1,6 @@
+// categoryController.js
 import Category from "../models/Category.js";
+import Tour from "../models/Tour.js"; // Assuming Tour model exists
 import mongoose from "mongoose";
 
 // Create
@@ -29,6 +31,7 @@ export const createCategory = async (req, res) => {
   }
 };
 
+// Get all categories
 export const getAllCategories = async (req, res) => {
   try {
     const categories = await Category.find();
@@ -39,6 +42,8 @@ export const getAllCategories = async (req, res) => {
       .json({ success: false, message: "Failed to fetch categories" });
   }
 };
+
+// Get category by ID
 export const getCategoryById = async (req, res) => {
   try {
     const { categoryId } = req.params;
@@ -64,6 +69,26 @@ export const getCategoryById = async (req, res) => {
   }
 };
 
+// Get tours by category
+export const getToursByCategory = async (req, res) => {
+  try {
+    const { categoryId } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(categoryId)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid category ID" });
+    }
+
+    const tours = await Tour.find({ category: categoryId });
+    res.status(200).json({ success: true, data: tours });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: `Failed to fetch tours: ${err.message}`,
+    });
+  }
+};
+
 // Update
 export const updateCategory = async (req, res) => {
   try {
@@ -81,7 +106,6 @@ export const updateCategory = async (req, res) => {
         .json({ success: false, message: "No valid fields to update" });
     }
 
-    // Check for duplicate name
     if (name) {
       const existingCategory = await Category.findOne({
         name,
@@ -115,14 +139,37 @@ export const updateCategory = async (req, res) => {
       .json({ success: false, message: "Failed to update category" });
   }
 };
-// Delete
+
 export const deleteCategory = async (req, res) => {
   try {
-    await Category.findByIdAndDelete(req.params.id);
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid category ID" });
+    }
+
+    // Check if category has associated tours
+    const tours = await Tour.find({ categoryId: id }); // Updated to use categoryId
+    if (tours.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Cannot delete category because it has associated tours",
+      });
+    }
+
+    const deleted = await Category.findByIdAndDelete(id);
+    if (!deleted) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Category not found" });
+    }
+
     res.status(200).json({ success: true, message: "Deleted successfully" });
   } catch (err) {
-    res
-      .status(500)
-      .json({ success: false, message: "Failed to delete category" });
+    res.status(500).json({
+      success: false,
+      message: `Failed to delete category: ${err.message}`,
+    });
   }
 };
