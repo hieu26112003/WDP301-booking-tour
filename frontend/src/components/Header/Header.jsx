@@ -18,6 +18,7 @@ const Header = ({ onCategorySelect, onSearch }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [menuCategories, setMenuCategories] = useState([]);
 
   // Debounce function
   const debounce = (func, delay) => {
@@ -61,15 +62,15 @@ const Header = ({ onCategorySelect, onSearch }) => {
       dropdownItems:
         categories.length > 0
           ? [
-              {
-                display: "Tất cả danh mục",
-                onClick: () => onCategorySelect(null, "Tất cả danh mục"),
-              },
-              ...categories.map((cat) => ({
-                display: cat.name,
-                onClick: () => onCategorySelect(cat._id, cat.name),
-              })),
-            ]
+            {
+              display: "Tất cả danh mục",
+              onClick: () => onCategorySelect(null, "Tất cả danh mục"),
+            },
+            ...categories.map((cat) => ({
+              display: cat.name,
+              onClick: () => onCategorySelect(cat._id, cat.name),
+            })),
+          ]
           : [],
     },
     {
@@ -81,7 +82,7 @@ const Header = ({ onCategorySelect, onSearch }) => {
         display: cat.name
       }))
     },
-    
+
     { path: "/about", display: "VỀ ASK TRAVEL" },
     { path: "/contact", display: "LIÊN HỆ" },
   ];
