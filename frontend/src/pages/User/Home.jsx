@@ -1,3 +1,4 @@
+// Home.js
 import React, { useState } from "react";
 import { Container, Row, Col } from "reactstrap";
 import { Carousel } from "react-bootstrap";
@@ -14,6 +15,7 @@ const sliderImages = [
 
 const Home = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const handleCategorySelect = (categoryId, categoryName) => {
     setSelectedCategory(
@@ -21,9 +23,13 @@ const Home = () => {
     );
   };
 
+  const handleSearch = (query) => {
+    setSearchQuery(query);
+  };
+
   return (
     <>
-      <Header onCategorySelect={handleCategorySelect} />
+      <Header onCategorySelect={handleCategorySelect} onSearch={handleSearch} />
       <div style={{ position: "relative" }}>
         <Carousel interval={3000}>
           {sliderImages.map((src, idx) => (
@@ -32,7 +38,7 @@ const Home = () => {
                 className="d-block w-100"
                 src={src}
                 alt={`Slide ${idx + 1}`}
-                style={{ height: "600px", objectFit: "cover" }}
+                style={{ height: "480px", objectFit: "cover" }}
               />
             </Carousel.Item>
           ))}
@@ -44,7 +50,7 @@ const Home = () => {
             left: "50%",
             transform: "translate(-50%, -50%)",
             color: "white",
-            fontSize: "3rem",
+            fontSize: "2.5rem",
             fontWeight: "bold",
             textShadow: "2px 2px 8px rgba(0,0,0,0.7)",
           }}
@@ -56,7 +62,10 @@ const Home = () => {
       <section>
         <Container>
           <Row>
-            <TourList selectedCategory={selectedCategory} />
+            <TourList
+              selectedCategory={selectedCategory}
+              searchQuery={searchQuery}
+            />
           </Row>
         </Container>
       </section>

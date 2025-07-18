@@ -1,3 +1,4 @@
+// Header.js (với debounce)
 import React, { useEffect, useRef, useContext, useState } from "react";
 import { Container } from "reactstrap";
 import { Link, useNavigate } from "react-router-dom";
@@ -7,7 +8,7 @@ import { AuthContext } from "../../context/AuthContext";
 import Swal from "sweetalert2";
 import { getCategories } from "../../services/categoryService";
 
-const Header = ({ onCategorySelect }) => {
+const Header = ({ onCategorySelect, onSearch }) => {
   const headerRef = useRef(null);
   const menuRef = useRef(null);
   const navigate = useNavigate();
@@ -16,6 +17,18 @@ const Header = ({ onCategorySelect }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Debounce function
+  const debounce = (func, delay) => {
+    let timeoutId;
+    return (...args) => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => func(...args), delay);
+    };
+  };
+
+  // Debounced search handler
+  const debouncedSearch = debounce(onSearch, 300);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -73,6 +86,7 @@ const Header = ({ onCategorySelect }) => {
     { path: "/contact", display: "LIÊN HỆ" },
   ];
 
+  // Header.js (chỉ cập nhật hàm logout)
   const logout = () => {
     Swal.fire({
       title: "Bạn có chắc muốn đăng xuất?",
@@ -82,6 +96,13 @@ const Header = ({ onCategorySelect }) => {
       cancelButtonColor: "#d33",
       confirmButtonText: "Đăng xuất",
       cancelButtonText: "Hủy",
+      customClass: {
+        popup: "custom-swal-popup",
+        title: "custom-swal-title",
+        content: "custom-swal-content",
+        confirmButton: "custom-swal-confirm",
+        cancelButton: "custom-swal-cancel",
+      },
     }).then((result) => {
       if (result.isConfirmed) {
         dispatch({ type: "LOGOUT" });
@@ -91,6 +112,15 @@ const Header = ({ onCategorySelect }) => {
           title: "Đăng xuất thành công",
           showConfirmButton: false,
           timer: 1500,
+          timerProgressBar: true, // Thêm thanh tiến trình
+          customClass: {
+            popup: "custom-swal-popup",
+            title: "custom-swal-title",
+            content: "custom-swal-content",
+          },
+          willClose: () => {
+            console.log("Success message closed"); // Debug để xác nhận đóng
+          },
         });
       }
     });
@@ -122,7 +152,11 @@ const Header = ({ onCategorySelect }) => {
   const handleDropdownClick = (index) =>
     setActiveDropdown(index === activeDropdown ? null : index);
 
-  const handleSearch = (e) => setSearchQuery(e.target.value);
+  const handleSearch = (e) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+    debouncedSearch(query);
+  };
 
   return (
     <header className="header-redesign" ref={headerRef}>
@@ -153,6 +187,17 @@ const Header = ({ onCategorySelect }) => {
                   value={searchQuery}
                   onChange={handleSearch}
                 />
+                {searchQuery && (
+                  <button
+                    className="clear-search-btn-redesign"
+                    onClick={() => {
+                      setSearchQuery("");
+                      debouncedSearch("");
+                    }}
+                  >
+                    ×
+                  </button>
+                )}
               </div>
             </div>
 

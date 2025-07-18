@@ -1,17 +1,37 @@
+// ResetPasswordConfirm.js
 import React, { useState } from "react";
 import { Container, Row, Col, Form, FormGroup, Button } from "reactstrap";
-import "../../styles/login.css";
+import "../../styles/reset-password-confirm.css"; // Sử dụng CSS riêng
 import { useNavigate, useParams } from "react-router-dom";
+import { Lock, Eye, EyeOff, Loader2 } from "lucide-react"; // Thêm biểu tượng
+import registerImg from "../../assets/images/login.png";
+import userIcon from "../../assets/images/user.png";
 import Swal from "sweetalert2";
 import { BASE_URL } from "../../utils/config";
 
 const ResetPasswordConfirm = () => {
   const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState(""); // Input xác nhận
+  const [showPassword, setShowPassword] = useState(false); // Trạng thái hiển thị mật khẩu
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false); // Trạng thái hiển thị xác nhận
+  const [isLoading, setIsLoading] = useState(false); // Trạng thái loading
   const { token } = useParams();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
+
+    if (newPassword !== confirmPassword) {
+      Swal.fire({
+        icon: "error",
+        title: "Lỗi",
+        text: "Mật khẩu xác nhận không khớp",
+        confirmButtonColor: "#d33",
+      });
+      setIsLoading(false);
+      return;
+    }
 
     try {
       const res = await fetch(`${BASE_URL}/auth/reset-password/confirm`, {
@@ -29,6 +49,7 @@ const ResetPasswordConfirm = () => {
           text: result.message,
           confirmButtonColor: "#d33",
         });
+        setIsLoading(false);
         return;
       }
 
@@ -39,6 +60,7 @@ const ResetPasswordConfirm = () => {
         confirmButtonColor: "#3085d6",
         timer: 1500,
       }).then(() => {
+        setIsLoading(false);
         navigate("/login");
       });
     } catch (err) {
@@ -48,33 +70,91 @@ const ResetPasswordConfirm = () => {
         text: err.message,
         confirmButtonColor: "#d33",
       });
+      setIsLoading(false);
     }
   };
 
   return (
-    <section>
+    <section className="reset-password-confirm__section">
       <Container>
         <Row>
-          <Col lg="8" className="m-auto">
-            <div className="login__container d-flex justify-content-between">
-              <div className="login__form">
-                <h2>Enter New Password</h2>
+          <Col lg="10" md="12" className="m-auto">
+            <div className="reset-password-confirm__container">
+              <div className="reset-password-confirm__img">
+                <img
+                  src={registerImg}
+                  alt="Reset Password Confirm Illustration"
+                />
+              </div>
+              <div className="reset-password-confirm__form">
+                <div className="user">
+                  <img src={userIcon} alt="User Icon" />
+                </div>
+                <h2>Đặt Mật Khẩu Mới</h2>
                 <Form onSubmit={handleSubmit}>
-                  <FormGroup>
-                    <input
-                      type="password"
-                      placeholder="Enter new password"
-                      id="newPassword"
-                      value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)}
-                      required
-                    />
+                  <FormGroup className="input__group">
+                    <div className="input__wrapper">
+                      <Lock className="input__icon" size={18} />
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Nhập mật khẩu mới"
+                        id="newPassword"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        required
+                      />
+                      <button
+                        type="button"
+                        className="toggle__password"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? (
+                          <EyeOff size={18} />
+                        ) : (
+                          <Eye size={18} />
+                        )}
+                      </button>
+                    </div>
+                  </FormGroup>
+                  <FormGroup className="input__group">
+                    <div className="input__wrapper">
+                      <Lock className="input__icon" size={18} />
+                      <input
+                        type={showConfirmPassword ? "text" : "password"}
+                        placeholder="Xác nhận mật khẩu mới"
+                        id="confirmPassword"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        required
+                      />
+                      <button
+                        type="button"
+                        className="toggle__password"
+                        onClick={() =>
+                          setShowConfirmPassword(!showConfirmPassword)
+                        }
+                      >
+                        {showConfirmPassword ? (
+                          <EyeOff size={18} />
+                        ) : (
+                          <Eye size={18} />
+                        )}
+                      </button>
+                    </div>
                   </FormGroup>
                   <Button
-                    className="btn secondary__btn auth__btn"
+                    className="btn auth__btn"
                     type="submit"
+                    disabled={isLoading}
                   >
-                    Reset Password
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="spinner" size={18} />
+                        Đang đặt lại...
+                      </>
+                    ) : (
+                      "Đặt Lại Mật Khẩu"
+                    )}
                   </Button>
                 </Form>
               </div>

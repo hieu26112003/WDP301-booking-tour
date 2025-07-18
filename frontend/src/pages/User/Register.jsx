@@ -1,7 +1,18 @@
-import React, { useState, useContext } from "react";
+// Register.js
+import React, { useContext, useState } from "react";
 import { Container, Row, Col, Form, FormGroup, Button } from "reactstrap";
-import "../../styles/login.css";
+import "../../styles/register.css"; // Sử dụng register.css
 import { Link, useNavigate } from "react-router-dom";
+import {
+  User,
+  Mail,
+  Lock,
+  Loader2,
+  Eye,
+  EyeOff,
+  MapPin,
+  Phone,
+} from "lucide-react"; // Thêm biểu tượng
 import registerImg from "../../assets/images/login.png";
 import userIcon from "../../assets/images/user.png";
 import { AuthContext } from "../../context/AuthContext";
@@ -18,6 +29,8 @@ const Register = () => {
     password: "",
     avatar: null,
   });
+  const [showPassword, setShowPassword] = useState(false); // Trạng thái hiển thị mật khẩu
+  const [isLoading, setIsLoading] = useState(false); // Trạng thái loading
 
   const { dispatch } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -32,15 +45,8 @@ const Register = () => {
   };
 
   const handleClick = async (e) => {
-    Swal.fire({
-      icon: "success",
-      title: "Đăng ký thành công",
-      showConfirmButton: true,
-      confirmButtonText: "OK",
-      confirmButtonColor: "#3085d6",
-      timer: 1500,
-    });
     e.preventDefault();
+    setIsLoading(true); // Bật loading
 
     const formData = new FormData();
     for (const key in credentials) {
@@ -56,95 +62,172 @@ const Register = () => {
       const result = await res.json();
 
       if (!res.ok) {
-        alert(result.message);
-      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Đăng ký thất bại",
+          text: result.message,
+          confirmButtonColor: "#d33",
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      Swal.fire({
+        icon: "success",
+        title: "Đăng ký thành công",
+        showConfirmButton: true,
+        confirmButtonText: "OK",
+        confirmButtonColor: "#3085d6",
+        timer: 1500,
+      }).then(() => {
         dispatch({ type: "REGISTER_SUCCESS" });
         navigate("/login");
-      }
+        setIsLoading(false);
+      });
     } catch (err) {
-      alert(err.message);
+      Swal.fire({
+        icon: "error",
+        title: "Lỗi đăng ký",
+        text: err.message,
+        confirmButtonColor: "#d33",
+      });
+      setIsLoading(false);
     }
   };
 
   return (
-    <section>
+    <section className="register__section">
       <Container>
         <Row>
-          <Col lg="8" className="m-auto">
-            <div className="login__container d-flex justify-content-between">
-              <div className="login__img">
-                <img src={registerImg} alt="" />
+          <Col lg="10" md="12" className="m-auto">
+            <div className="register__container">
+              <div className="register__img">
+                <img src={registerImg} alt="Register Illustration" />
               </div>
 
-              <div className="login__form">
+              <div className="register__form">
                 <div className="user">
-                  <img src={userIcon} alt="" />
+                  <img src={userIcon} alt="User Icon" />
                 </div>
-                <h2>Register</h2>
+                <h2>Đăng Ký</h2>
 
                 <Form onSubmit={handleClick}>
-                  <FormGroup>
-                    <input
-                      type="text"
-                      placeholder="Username"
-                      id="username"
-                      onChange={handleChange}
-                      required
-                    />
+                  <FormGroup className="input__group">
+                    <div className="input__wrapper">
+                      <User className="input__icon" size={20} />
+                      <input
+                        type="text"
+                        placeholder="Tên đăng nhập"
+                        id="username"
+                        value={credentials.username}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
                   </FormGroup>
-                  <FormGroup>
-                    <input
-                      type="text"
-                      placeholder="Full Name"
-                      id="fullname"
-                      onChange={handleChange}
-                    />
+                  <FormGroup className="input__group">
+                    <div className="input__wrapper">
+                      <User className="input__icon" size={20} />
+                      <input
+                        type="text"
+                        placeholder="Họ và tên"
+                        id="fullname"
+                        value={credentials.fullname}
+                        onChange={handleChange}
+                      />
+                    </div>
                   </FormGroup>
-                  <FormGroup>
-                    <input
-                      type="text"
-                      placeholder="Address"
-                      id="address"
-                      onChange={handleChange}
-                    />
+                  <FormGroup className="input__group">
+                    <div className="input__wrapper">
+                      <MapPin className="input__icon" size={20} />
+                      <input
+                        type="text"
+                        placeholder="Địa chỉ"
+                        id="address"
+                        value={credentials.address}
+                        onChange={handleChange}
+                      />
+                    </div>
                   </FormGroup>
-                  <FormGroup>
-                    <input
-                      type="text"
-                      placeholder="Phone"
-                      id="phone"
-                      onChange={handleChange}
-                    />
+                  <FormGroup className="input__group">
+                    <div className="input__wrapper">
+                      <Phone className="input__icon" size={20} />
+                      <input
+                        type="text"
+                        placeholder="Số điện thoại"
+                        id="phone"
+                        value={credentials.phone}
+                        onChange={handleChange}
+                      />
+                    </div>
                   </FormGroup>
-                  <FormGroup>
-                    <input
-                      type="email"
-                      placeholder="Email"
-                      id="email"
-                      onChange={handleChange}
-                      required
-                    />
+                  <FormGroup className="input__group">
+                    <div className="input__wrapper">
+                      <Mail className="input__icon" size={20} />
+                      <input
+                        type="email"
+                        placeholder="Email"
+                        id="email"
+                        value={credentials.email}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
                   </FormGroup>
-                  <FormGroup>
-                    <input
-                      type="password"
-                      placeholder="Password"
-                      id="password"
-                      onChange={handleChange}
-                      required
-                    />
+                  <FormGroup className="input__group">
+                    <div className="input__wrapper">
+                      <Lock className="input__icon" size={20} />
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Mật khẩu"
+                        id="password"
+                        value={credentials.password}
+                        onChange={handleChange}
+                        required
+                      />
+                      <button
+                        type="button"
+                        className="toggle__password"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? (
+                          <EyeOff size={20} />
+                        ) : (
+                          <Eye size={20} />
+                        )}
+                      </button>
+                    </div>
                   </FormGroup>
-
+                  {/* <FormGroup className="input__group">
+                    <div className="input__wrapper">
+                      <input
+                        type="file"
+                        id="avatar"
+                        accept="image/*"
+                        onChange={handleChange}
+                      />
+                    </div>
+                  </FormGroup> */}
                   <Button
-                    className="btn secondary__btn auth__btn"
+                    className="btn auth__btn"
                     type="submit"
+                    disabled={isLoading}
                   >
-                    Create Account
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="spinner" size={20} />
+                        Đang tạo tài khoản...
+                      </>
+                    ) : (
+                      "Tạo Tài Khoản"
+                    )}
                   </Button>
                 </Form>
-                <p>
-                  Already have an account? <Link to="/login">Login</Link>
-                </p>
+                <div className="register__links">
+                  <p>
+                    Đã có tài khoản? <Link to="/login">Đăng nhập</Link>
+                  </p>
+                </div>
               </div>
             </div>
           </Col>
