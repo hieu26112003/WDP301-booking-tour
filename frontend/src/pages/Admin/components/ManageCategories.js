@@ -30,7 +30,9 @@ const ManageCategories = () => {
   const [modal, setModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const toggleModal = () => setModal(!modal);
+  const toggleModal = () => {
+    if (!isLoading) setModal(!modal);
+  };
 
   const fetchCategories = async () => {
     try {
@@ -50,6 +52,17 @@ const ManageCategories = () => {
         title: "Lỗi",
         text: err.message,
         confirmButtonColor: "#d33",
+        backdrop: true,
+        allowOutsideClick: true,
+        customClass: {
+          popup: "custom-swal-popup",
+          title: "custom-swal-title",
+          content: "custom-swal-content",
+          confirmButton: "custom-swal-confirm",
+        },
+        willClose: () => {
+          document.body.style.overflow = "auto";
+        },
       });
     }
   };
@@ -98,21 +111,42 @@ const ManageCategories = () => {
       Swal.fire({
         icon: "success",
         title: editId ? "Cập nhật thành công" : "Tạo thành công",
-        confirmButtonText: "OK",
-        confirmButtonColor: "#3085d6",
+        showConfirmButton: false,
         timer: 1500,
+        timerProgressBar: true,
+        backdrop: true,
+        allowOutsideClick: true,
+        customClass: {
+          popup: "custom-swal-popup",
+          title: "custom-swal-title",
+          content: "custom-swal-content",
+        },
+        willClose: () => {
+          document.body.style.overflow = "auto";
+        },
+      }).then(() => {
+        setFormData({ name: "", description: "", isActive: true });
+        setEditId(null);
+        toggleModal();
+        fetchCategories();
       });
-
-      setFormData({ name: "", description: "", isActive: true });
-      setEditId(null);
-      toggleModal();
-      fetchCategories();
     } catch (err) {
       Swal.fire({
         icon: "error",
         title: "Lỗi",
         text: err.message,
         confirmButtonColor: "#d33",
+        backdrop: true,
+        allowOutsideClick: true,
+        customClass: {
+          popup: "custom-swal-popup",
+          title: "custom-swal-title",
+          content: "custom-swal-content",
+          confirmButton: "custom-swal-confirm",
+        },
+        willClose: () => {
+          document.body.style.overflow = "auto";
+        },
       });
     } finally {
       setIsLoading(false);
@@ -139,6 +173,15 @@ const ManageCategories = () => {
       cancelButtonColor: "#d33",
       confirmButtonText: "Xóa",
       cancelButtonText: "Hủy",
+      backdrop: true,
+      allowOutsideClick: true,
+      customClass: {
+        popup: "custom-swal-popup",
+        title: "custom-swal-title",
+        content: "custom-swal-content",
+        confirmButton: "custom-swal-confirm",
+        cancelButton: "custom-swal-cancel",
+      },
     });
 
     if (result.isConfirmed) {
@@ -152,7 +195,7 @@ const ManageCategories = () => {
           },
         });
         const result = await res.json();
-        console.log("Delete response:", result); // Debugging log
+        console.log("Delete category response:", result);
 
         if (!res.ok) {
           const errorMessage =
@@ -166,17 +209,39 @@ const ManageCategories = () => {
         Swal.fire({
           icon: "success",
           title: "Xóa thành công",
-          confirmButtonText: "OK",
-          confirmButtonColor: "#3085d6",
+          showConfirmButton: false,
           timer: 1500,
+          timerProgressBar: true,
+          backdrop: true,
+          allowOutsideClick: true,
+          customClass: {
+            popup: "custom-swal-popup",
+            title: "custom-swal-title",
+            content: "custom-swal-content",
+          },
+          willClose: () => {
+            document.body.style.overflow = "auto";
+          },
+        }).then(() => {
+          fetchCategories();
         });
-        fetchCategories();
       } catch (err) {
         Swal.fire({
           icon: "error",
           title: "Lỗi",
           text: err.message,
           confirmButtonColor: "#d33",
+          backdrop: true,
+          allowOutsideClick: true,
+          customClass: {
+            popup: "custom-swal-popup",
+            title: "custom-swal-title",
+            content: "custom-swal-content",
+            confirmButton: "custom-swal-confirm",
+          },
+          willClose: () => {
+            document.body.style.overflow = "auto";
+          },
         });
       } finally {
         setIsLoading(false);

@@ -25,6 +25,7 @@ export const createTour = async (req, res) => {
       departureDate,
       time,
       categoryId,
+      imageUrls, // Array of URLs for subsequent images
     } = req.body;
 
     if (
@@ -52,16 +53,33 @@ export const createTour = async (req, res) => {
         .json({ success: false, message: "Invalid category ID" });
     }
 
-    if (!req.file) {
+    if (!req.file && (!imageUrls || !JSON.parse(imageUrls).length)) {
       return res
         .status(400)
-        .json({ success: false, message: "Image is required" });
+        .json({ success: false, message: "At least one image is required" });
     }
 
     const lastTour = await Tour.findOne().sort({ id: -1 });
     const newId = lastTour ? lastTour.id + 1 : 1;
 
-    const imagePath = `/user_images/${path.basename(req.file.path)}`;
+    const images = [];
+    if (req.file) {
+      images.push(`/user_images/${path.basename(req.file.path)}`);
+    }
+    if (imageUrls) {
+      try {
+        const urls = JSON.parse(imageUrls);
+        if (Array.isArray(urls)) {
+          images.push(
+            ...urls.filter((url) => typeof url === "string" && url.trim())
+          );
+        }
+      } catch (err) {
+        console.warn("Failed to parse imageUrls:", err);
+      }
+    }
+
+    console.log("Created tour image paths:", images); // Debugging log
 
     const newTour = new Tour({
       id: newId,
@@ -77,7 +95,7 @@ export const createTour = async (req, res) => {
       departureDate,
       time,
       categoryId,
-      image: imagePath,
+      images,
     });
 
     const savedTour = await newTour.save();
@@ -85,6 +103,7 @@ export const createTour = async (req, res) => {
       .status(201)
       .json({ success: true, message: "Tour created", data: savedTour });
   } catch (err) {
+    console.error("Error in createTour:", err);
     if (err.code === 11000) {
       return res
         .status(400)
@@ -98,8 +117,13 @@ export const createTour = async (req, res) => {
 export const getAllTours = async (req, res) => {
   try {
     const tours = await Tour.find().populate("categoryId", "name");
+    console.log(
+      "Fetched tours:",
+      tours.map((t) => ({ id: t._id, images: t.images }))
+    ); // Debugging log
     res.status(200).json({ success: true, data: tours });
   } catch (err) {
+    console.error("Error in getAllTours:", err);
     res.status(500).json({ success: false, message: "Failed to fetch tours" });
   }
 };
@@ -110,9 +134,9 @@ export const getSouthernTours = async (req, res) => {
     const southernTours = await Tour.find({
       categoryId: "686fae979bc976917041ce03",
     }).populate("categoryId", "name");
-
     res.status(200).json({ success: true, data: southernTours });
   } catch (err) {
+    console.error("Error in getSouthernTours:", err);
     res
       .status(500)
       .json({ success: false, message: "Failed to fetch southern tours" });
@@ -125,9 +149,9 @@ export const getNorthernTours = async (req, res) => {
     const northernTours = await Tour.find({
       categoryId: "686faea99bc976917041ce09",
     }).populate("categoryId", "name");
-
     res.status(200).json({ success: true, data: northernTours });
   } catch (err) {
+    console.error("Error in getNorthernTours:", err);
     res
       .status(500)
       .json({ success: false, message: "Failed to fetch northern tours" });
@@ -140,9 +164,9 @@ export const getComboTours = async (req, res) => {
     const comboTours = await Tour.find({
       categoryId: "687000428690d6e000e981f5",
     }).populate("categoryId", "name");
-
     res.status(200).json({ success: true, data: comboTours });
   } catch (err) {
+    console.error("Error in getComboTours:", err);
     res
       .status(500)
       .json({ success: false, message: "Failed to fetch combo tours" });
@@ -166,8 +190,10 @@ export const getTourById = async (req, res) => {
         .json({ success: false, message: "Tour not found" });
     }
 
+    console.log("Fetched tour:", { id: tour._id, images: tour.images }); // Debugging log
     res.status(200).json({ success: true, data: tour });
   } catch (err) {
+    console.error("Error in getTourById:", err);
     res
       .status(500)
       .json({ success: false, message: "Failed to fetch tour details" });
@@ -230,6 +256,7 @@ export const getTourByCategoryId = async (req, res) => {
       },
     });
   } catch (err) {
+    console.error("Error in getTourByCategoryId:", err);
     res.status(500).json({
       success: false,
       message: `Failed to fetch tours by category: ${err.message}`,
@@ -261,34 +288,9 @@ export const updateTour = async (req, res) => {
       time,
       categoryId,
       featured,
+      existingImages,
+      imageUrls,
     } = req.body;
-
-    if (
-      !title &&
-      !summary &&
-      !days &&
-      !serviceStandards &&
-      !priceChild &&
-      !priceAdult &&
-      !notes &&
-      !cancellationPolicy &&
-      !schedule &&
-      !departureDate &&
-      !time &&
-      !categoryId &&
-      !req.file &&
-      featured === undefined
-    ) {
-      return res
-        .status(400)
-        .json({ success: false, message: "No valid fields to update" });
-    }
-
-    if (categoryId && !mongoose.Types.ObjectId.isValid(categoryId)) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid category ID" });
-    }
 
     const updateData = {
       title,
@@ -304,10 +306,71 @@ export const updateTour = async (req, res) => {
       time,
       categoryId,
       featured,
-      ...(req.file && {
-        image: `/user_images/${path.basename(req.file.path)}`,
-      }),
     };
+
+    // Handle images: combine existing images, new uploaded file, and new URLs
+    let images = [];
+    if (existingImages) {
+      try {
+        images = JSON.parse(existingImages);
+      } catch (err) {
+        console.warn("Failed to parse existingImages:", err);
+      }
+    }
+    if (req.file) {
+      images.unshift(`/user_images/${path.basename(req.file.path)}`); // Add uploaded image first
+    }
+    if (imageUrls) {
+      try {
+        const urls = JSON.parse(imageUrls);
+        if (Array.isArray(urls)) {
+          images.push(
+            ...urls.filter((url) => typeof url === "string" && url.trim())
+          );
+        }
+      } catch (err) {
+        console.warn("Failed to parse imageUrls:", err);
+      }
+    }
+
+    if (images.length > 0) {
+      updateData.images = images;
+    } else if (!req.file && !existingImages && !imageUrls) {
+      return res
+        .status(400)
+        .json({ success: false, message: "At least one image is required" });
+    }
+
+    console.log("Updated tour image paths:", updateData.images); // Debugging log
+
+    if (
+      !title &&
+      !summary &&
+      !days &&
+      !serviceStandards &&
+      !priceChild &&
+      !priceAdult &&
+      !notes &&
+      !cancellationPolicy &&
+      !schedule &&
+      !departureDate &&
+      !time &&
+      !categoryId &&
+      !req.file &&
+      !existingImages &&
+      !imageUrls &&
+      featured === undefined
+    ) {
+      return res
+        .status(400)
+        .json({ success: false, message: "No valid fields to update" });
+    }
+
+    if (categoryId && !mongoose.Types.ObjectId.isValid(categoryId)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid category ID" });
+    }
 
     const updated = await Tour.findByIdAndUpdate(
       id,
@@ -325,6 +388,7 @@ export const updateTour = async (req, res) => {
       .status(200)
       .json({ success: true, message: "Updated successfully", data: updated });
   } catch (err) {
+    console.error("Error in updateTour:", err);
     if (err.code === 11000) {
       return res
         .status(400)
@@ -354,20 +418,24 @@ export const deleteTour = async (req, res) => {
         .json({ success: false, message: "Tour not found" });
     }
 
-    if (deleted.image) {
-      const imagePath = path.join(
-        __dirname,
-        "../../frontend/public/user_images",
-        path.basename(deleted.image)
-      );
-      try {
-        await fs.access(imagePath);
-        await fs.unlink(imagePath);
-        console.log("Deleted image:", imagePath);
-      } catch (fileErr) {
-        console.warn(
-          `Failed to delete image at ${imagePath}: ${fileErr.message}`
-        );
+    if (deleted.images && deleted.images.length > 0) {
+      for (const image of deleted.images) {
+        if (image.startsWith("/user_images/")) {
+          const imagePath = path.join(
+            __dirname,
+            "../../frontend/public/user_images",
+            path.basename(image)
+          );
+          try {
+            await fs.access(imagePath);
+            await fs.unlink(imagePath);
+            console.log("Deleted image:", imagePath);
+          } catch (fileErr) {
+            console.warn(
+              `Failed to delete image at ${imagePath}: ${fileErr.message}`
+            );
+          }
+        }
       }
     }
 

@@ -50,7 +50,9 @@ const ManageTours = () => {
     categoryId: "",
     featured: false,
   });
-  const [imageFile, setImageFile] = useState(null);
+  const [imageFile, setImageFile] = useState(null); // For first image upload
+  const [imageUrls, setImageUrls] = useState([""]); // Start with one URL input
+  const [existingImages, setExistingImages] = useState([]); // For edit mode
   const [editId, setEditId] = useState(null);
   const [modal, setModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -58,7 +60,14 @@ const ManageTours = () => {
 
   // Mở/đóng modal
   const toggleModal = () => {
-    if (!isLoading) setModal(!modal);
+    if (!isLoading) {
+      setModal(!modal);
+      if (!modal) {
+        setImageFile(null);
+        setImageUrls([""]);
+        setExistingImages([]);
+      }
+    }
   };
 
   // Lấy danh sách danh mục
@@ -78,6 +87,17 @@ const ManageTours = () => {
         title: "Lỗi",
         text: err.message,
         confirmButtonColor: "#d33",
+        backdrop: true,
+        allowOutsideClick: true,
+        customClass: {
+          popup: "custom-swal-popup",
+          title: "custom-swal-title",
+          content: "custom-swal-content",
+          confirmButton: "custom-swal-confirm",
+        },
+        willClose: () => {
+          document.body.style.overflow = "auto";
+        },
       });
     }
   };
@@ -92,6 +112,10 @@ const ManageTours = () => {
       });
       const result = await res.json();
       if (!res.ok) throw new Error(result.message || "Không thể tải tour");
+      console.log(
+        "Fetched tours:",
+        result.data.map((t) => ({ id: t._id, images: t.images }))
+      ); // Debugging log
       setTours(result.data);
     } catch (err) {
       Swal.fire({
@@ -99,6 +123,17 @@ const ManageTours = () => {
         title: "Lỗi",
         text: err.message,
         confirmButtonColor: "#d33",
+        backdrop: true,
+        allowOutsideClick: true,
+        customClass: {
+          popup: "custom-swal-popup",
+          title: "custom-swal-title",
+          content: "custom-swal-content",
+          confirmButton: "custom-swal-confirm",
+        },
+        willClose: () => {
+          document.body.style.overflow = "auto";
+        },
       });
     }
   };
@@ -131,6 +166,25 @@ const ManageTours = () => {
     setImageFile(e.target.files[0]);
   };
 
+  // Xử lý thay đổi URL ảnh
+  const handleImageUrlChange = (index, value) => {
+    const newImageUrls = [...imageUrls];
+    newImageUrls[index] = value;
+    setImageUrls(newImageUrls);
+  };
+
+  // Thêm input URL mới
+  const handleAddImageUrl = () => {
+    if (imageUrls.length < 4) {
+      setImageUrls([...imageUrls, ""]);
+    }
+  };
+
+  // Xóa ảnh hiện có trong edit mode
+  const handleRemoveExistingImage = (index) => {
+    setExistingImages((prev) => prev.filter((_, i) => i !== index));
+  };
+
   // Xử lý submit form
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -143,7 +197,41 @@ const ManageTours = () => {
     });
 
     if (imageFile) {
-      data.append("image", imageFile);
+      data.append("image", imageFile); // First image via file upload
+    }
+
+    // Gửi danh sách URL ảnh
+    const validUrls = imageUrls.filter((url) => url.trim());
+    if (validUrls.length > 0) {
+      data.append("imageUrls", JSON.stringify(validUrls));
+    }
+
+    // Gửi danh sách ảnh hiện có khi cập nhật
+    if (editId && existingImages.length > 0) {
+      data.append("existingImages", JSON.stringify(existingImages));
+    }
+
+    // Kiểm tra xem có ít nhất một ảnh (mới, URL, hoặc hiện có)
+    if (!editId && !imageFile && validUrls.length === 0) {
+      Swal.fire({
+        icon: "error",
+        title: "Lỗi",
+        text: "At least one image is required",
+        confirmButtonColor: "#d33",
+        backdrop: true,
+        allowOutsideClick: true,
+        customClass: {
+          popup: "custom-swal-popup",
+          title: "custom-swal-title",
+          content: "custom-swal-content",
+          confirmButton: "custom-swal-confirm",
+        },
+        willClose: () => {
+          document.body.style.overflow = "auto";
+        },
+      });
+      setIsLoading(false);
+      return;
     }
 
     try {
@@ -168,36 +256,59 @@ const ManageTours = () => {
       Swal.fire({
         icon: "success",
         title: editId ? "Cập nhật thành công" : "Tạo thành công",
-        confirmButtonText: "OK",
-        confirmButtonColor: "#3085d6",
+        showConfirmButton: false,
         timer: 1500,
+        timerProgressBar: true,
+        backdrop: true,
+        allowOutsideClick: true,
+        customClass: {
+          popup: "custom-swal-popup",
+          title: "custom-swal-title",
+          content: "custom-swal-content",
+        },
+        willClose: () => {
+          document.body.style.overflow = "auto";
+        },
+      }).then(() => {
+        setFormData({
+          title: "",
+          summary: "",
+          days: "",
+          serviceStandards: "",
+          priceChild: "",
+          priceAdult: "",
+          notes: "",
+          cancellationPolicy: "",
+          schedule: "",
+          departureDate: "",
+          time: "",
+          categoryId: "",
+          featured: false,
+        });
+        setImageFile(null);
+        setImageUrls([""]);
+        setExistingImages([]);
+        setEditId(null);
+        toggleModal();
+        fetchTours();
       });
-
-      setFormData({
-        title: "",
-        summary: "",
-        days: "",
-        serviceStandards: "",
-        priceChild: "",
-        priceAdult: "",
-        notes: "",
-        cancellationPolicy: "",
-        schedule: "",
-        departureDate: "",
-        time: "",
-        categoryId: "",
-        featured: false,
-      });
-      setImageFile(null);
-      setEditId(null);
-      toggleModal();
-      fetchTours();
     } catch (err) {
       Swal.fire({
         icon: "error",
         title: "Lỗi",
         text: err.message,
         confirmButtonColor: "#d33",
+        backdrop: true,
+        allowOutsideClick: true,
+        customClass: {
+          popup: "custom-swal-popup",
+          title: "custom-swal-title",
+          content: "custom-swal-content",
+          confirmButton: "custom-swal-confirm",
+        },
+        willClose: () => {
+          document.body.style.overflow = "auto";
+        },
       });
     } finally {
       setIsLoading(false);
@@ -222,6 +333,8 @@ const ManageTours = () => {
       featured: tour.featured || false,
     });
     setImageFile(null);
+    setImageUrls([""]);
+    setExistingImages(tour.images || []);
     setEditId(tour._id);
     toggleModal();
   };
@@ -237,6 +350,15 @@ const ManageTours = () => {
       cancelButtonColor: "#d33",
       confirmButtonText: "Xóa",
       cancelButtonText: "Hủy",
+      backdrop: true,
+      allowOutsideClick: true,
+      customClass: {
+        popup: "custom-swal-popup",
+        title: "custom-swal-title",
+        content: "custom-swal-content",
+        confirmButton: "custom-swal-confirm",
+        cancelButton: "custom-swal-cancel",
+      },
     });
 
     if (result.isConfirmed) {
@@ -257,17 +379,39 @@ const ManageTours = () => {
         Swal.fire({
           icon: "success",
           title: "Xóa thành công",
-          confirmButtonText: "OK",
-          confirmButtonColor: "#3085d6",
+          showConfirmButton: false,
           timer: 1500,
+          timerProgressBar: true,
+          backdrop: true,
+          allowOutsideClick: true,
+          customClass: {
+            popup: "custom-swal-popup",
+            title: "custom-swal-title",
+            content: "custom-swal-content",
+          },
+          willClose: () => {
+            document.body.style.overflow = "auto";
+          },
+        }).then(() => {
+          fetchTours();
         });
-        fetchTours();
       } catch (err) {
         Swal.fire({
           icon: "error",
           title: "Lỗi",
           text: err.message,
           confirmButtonColor: "#d33",
+          backdrop: true,
+          allowOutsideClick: true,
+          customClass: {
+            popup: "custom-swal-popup",
+            title: "custom-swal-title",
+            content: "custom-swal-content",
+            confirmButton: "custom-swal-confirm",
+          },
+          willClose: () => {
+            document.body.style.overflow = "auto";
+          },
         });
       } finally {
         setIsLoading(false);
@@ -293,6 +437,8 @@ const ManageTours = () => {
       featured: false,
     });
     setImageFile(null);
+    setImageUrls([""]);
+    setExistingImages([]);
     setEditId(null);
     toggleModal();
   };
@@ -507,17 +653,84 @@ const ManageTours = () => {
                     </Input>
                   </FormGroup>
                   <FormGroup>
-                    <Label for="image">Image</Label>
+                    <Label for="image">First Image (Upload)</Label>
                     <Input
                       type="file"
                       id="image"
                       name="image"
                       accept="image/*"
                       onChange={handleImageChange}
-                      required={!editId}
+                      required={!editId && !imageUrls.some((url) => url.trim())}
                       disabled={isLoading}
                     />
+                    {imageFile && (
+                      <div className="mt-2">
+                        <p>Selected file: {imageFile.name}</p>
+                      </div>
+                    )}
                   </FormGroup>
+                  <FormGroup>
+                    <Label>Additional Images (URLs)</Label>
+                    {imageUrls.map((url, index) => (
+                      <div
+                        key={index}
+                        className="d-flex align-items-center mb-2"
+                      >
+                        <Input
+                          type="text"
+                          placeholder={`Image URL ${index + 1}`}
+                          value={url}
+                          onChange={(e) =>
+                            handleImageUrlChange(index, e.target.value)
+                          }
+                          disabled={isLoading}
+                          className="me-2"
+                        />
+                        {index === imageUrls.length - 1 &&
+                          imageUrls.length < 4 && (
+                            <Button
+                              color="primary"
+                              size="sm"
+                              onClick={handleAddImageUrl}
+                              disabled={isLoading}
+                            >
+                              <FaPlus />
+                            </Button>
+                          )}
+                      </div>
+                    ))}
+                  </FormGroup>
+                  {editId && existingImages.length > 0 && (
+                    <FormGroup>
+                      <Label>Existing Images</Label>
+                      <div className="d-flex flex-wrap">
+                        {existingImages.map((image, index) => (
+                          <div key={index} className="position-relative m-2">
+                            <img
+                              src={image}
+                              alt={`Existing image ${index + 1}`}
+                              style={{ maxWidth: "100px", height: "auto" }}
+                              onError={(e) =>
+                                console.error(
+                                  "Existing image load error:",
+                                  image
+                                )
+                              }
+                            />
+                            <Button
+                              color="danger"
+                              size="sm"
+                              className="position-absolute top-0 end-0"
+                              onClick={() => handleRemoveExistingImage(index)}
+                              disabled={isLoading}
+                            >
+                              <FaTrash />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    </FormGroup>
+                  )}
                   <FormGroup check>
                     <Label check>
                       <Input
@@ -567,66 +780,73 @@ const ManageTours = () => {
                 </tr>
               </thead>
               <tbody>
-                {tours.map((tour, index) => (
-                  <tr key={tour._id}>
-                    <td>{index + 1}</td>
-                    <td className="image-cell">
-                      {tour.image ? (
+                {tours.map((tour, index) => {
+                  const firstImage =
+                    tour.images && tour.images.length > 0
+                      ? tour.images[0]
+                      : "/placeholder.jpg";
+                  return (
+                    <tr key={tour._id}>
+                      <td>{index + 1}</td>
+                      <td className="image-cell">
                         <img
-                          src={tour.image}
+                          src={firstImage}
                           alt={tour.title}
                           className="tour-image"
+                          onError={(e) =>
+                            console.error("Image load error:", firstImage)
+                          }
                         />
-                      ) : (
-                        <span className="no-image">N/A</span>
-                      )}
-                    </td>
-                    <td>{tour.title}</td>
-                    <td>{tour.summary}</td>
-                    <td>{tour.priceAdult}</td>
-                    <td className="html-content">{truncateText(tour.notes)}</td>
-                    <td className="html-content">
-                      {truncateText(tour.cancellationPolicy)}
-                    </td>
-                    <td>{tour.categoryId?.name || "N/A"}</td>
-                    <td>
-                      <FaCheck
-                        className={
-                          tour.featured ? "active-check" : "inactive-check"
-                        }
-                      />
-                    </td>
-                    <td>
-                      <Button
-                        color="link"
-                        className="icon-btn"
-                        onClick={() => handleViewDetail(tour)}
-                        title="View Details"
-                        disabled={isLoading}
-                      >
-                        <FaEye />
-                      </Button>
-                      <Button
-                        color="link"
-                        className="icon-btn"
-                        onClick={() => handleEdit(tour)}
-                        title="Edit"
-                        disabled={isLoading}
-                      >
-                        <FaEdit />
-                      </Button>
-                      <Button
-                        color="link"
-                        className="icon-btn"
-                        onClick={() => handleDelete(tour._id)}
-                        title="Delete"
-                        disabled={isLoading}
-                      >
-                        <FaTrash />
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
+                      </td>
+                      <td>{tour.title}</td>
+                      <td>{tour.summary}</td>
+                      <td>{tour.priceAdult}</td>
+                      <td className="html-content">
+                        {truncateText(tour.notes)}
+                      </td>
+                      <td className="html-content">
+                        {truncateText(tour.cancellationPolicy)}
+                      </td>
+                      <td>{tour.categoryId?.name || "N/A"}</td>
+                      <td>
+                        <FaCheck
+                          className={
+                            tour.featured ? "active-check" : "inactive-check"
+                          }
+                        />
+                      </td>
+                      <td>
+                        <Button
+                          color="link"
+                          className="icon-btn"
+                          onClick={() => handleViewDetail(tour)}
+                          title="View Details"
+                          disabled={isLoading}
+                        >
+                          <FaEye />
+                        </Button>
+                        <Button
+                          color="link"
+                          className="icon-btn"
+                          onClick={() => handleEdit(tour)}
+                          title="Edit"
+                          disabled={isLoading}
+                        >
+                          <FaEdit />
+                        </Button>
+                        <Button
+                          color="link"
+                          className="icon-btn"
+                          onClick={() => handleDelete(tour._id)}
+                          title="Delete"
+                          disabled={isLoading}
+                        >
+                          <FaTrash />
+                        </Button>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </Table>
           </Col>
