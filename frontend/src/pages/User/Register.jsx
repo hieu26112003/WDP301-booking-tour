@@ -67,6 +67,14 @@ const Register = () => {
           title: "Đăng ký thất bại",
           text: result.message,
           confirmButtonColor: "#d33",
+          backdrop: true,
+          allowOutsideClick: true,
+          customClass: {
+            popup: "custom-swal-popup",
+            title: "custom-swal-title",
+            content: "custom-swal-content",
+            confirmButton: "custom-swal-confirm",
+          },
         });
         setIsLoading(false);
         return;
@@ -75,10 +83,20 @@ const Register = () => {
       Swal.fire({
         icon: "success",
         title: "Đăng ký thành công",
-        showConfirmButton: true,
-        confirmButtonText: "OK",
-        confirmButtonColor: "#3085d6",
+        showConfirmButton: false,
         timer: 1500,
+        timerProgressBar: true,
+        backdrop: true,
+        allowOutsideClick: true,
+        customClass: {
+          popup: "custom-swal-popup",
+          title: "custom-swal-title",
+          content: "custom-swal-content",
+        },
+        willClose: () => {
+          console.log("Success message closed");
+          document.body.style.overflow = "auto"; // Khôi phục cuộn
+        },
       }).then(() => {
         dispatch({ type: "REGISTER_SUCCESS" });
         navigate("/login");
@@ -90,6 +108,14 @@ const Register = () => {
         title: "Lỗi đăng ký",
         text: err.message,
         confirmButtonColor: "#d33",
+        backdrop: true,
+        allowOutsideClick: true,
+        customClass: {
+          popup: "custom-swal-popup",
+          title: "custom-swal-title",
+          content: "custom-swal-content",
+          confirmButton: "custom-swal-confirm",
+        },
       });
       setIsLoading(false);
     }

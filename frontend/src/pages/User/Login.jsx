@@ -95,10 +95,20 @@ const Login = () => {
       Swal.fire({
         icon: "success",
         title: "Đăng nhập thành công",
-        showConfirmButton: true,
-        confirmButtonText: "OK",
-        confirmButtonColor: "#3085d6",
+        showConfirmButton: false, // Tự đóng
         timer: 1500,
+        timerProgressBar: true,
+        backdrop: true,
+        allowOutsideClick: true,
+        customClass: {
+          popup: "custom-swal-popup",
+          title: "custom-swal-title",
+          content: "custom-swal-content",
+        },
+        willClose: () => {
+          console.log("Success message closed");
+          document.body.style.overflow = "auto"; // Khôi phục cuộn
+        },
       }).then(() => {
         setIsLoading(false);
         if (result.data.role === "admin") {
@@ -117,6 +127,14 @@ const Login = () => {
         title: "Lỗi đăng nhập",
         text: err.message,
         confirmButtonColor: "#d33",
+        backdrop: true,
+        allowOutsideClick: true,
+        customClass: {
+          popup: "custom-swal-popup",
+          title: "custom-swal-title",
+          content: "custom-swal-content",
+          confirmButton: "custom-swal-confirm",
+        },
       });
       setIsLoading(false);
     }

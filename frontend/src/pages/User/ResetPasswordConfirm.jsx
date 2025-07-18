@@ -1,9 +1,9 @@
 // ResetPasswordConfirm.js
 import React, { useState } from "react";
 import { Container, Row, Col, Form, FormGroup, Button } from "reactstrap";
-import "../../styles/reset-password-confirm.css"; // Sử dụng CSS riêng
+import "../../styles/reset-password-confirm.css";
 import { useNavigate, useParams } from "react-router-dom";
-import { Lock, Eye, EyeOff, Loader2 } from "lucide-react"; // Thêm biểu tượng
+import { Lock, Eye, EyeOff, Loader2 } from "lucide-react";
 import registerImg from "../../assets/images/login.png";
 import userIcon from "../../assets/images/user.png";
 import Swal from "sweetalert2";
@@ -11,10 +11,10 @@ import { BASE_URL } from "../../utils/config";
 
 const ResetPasswordConfirm = () => {
   const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState(""); // Input xác nhận
-  const [showPassword, setShowPassword] = useState(false); // Trạng thái hiển thị mật khẩu
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false); // Trạng thái hiển thị xác nhận
-  const [isLoading, setIsLoading] = useState(false); // Trạng thái loading
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const { token } = useParams();
   const navigate = useNavigate();
 
@@ -28,6 +28,14 @@ const ResetPasswordConfirm = () => {
         title: "Lỗi",
         text: "Mật khẩu xác nhận không khớp",
         confirmButtonColor: "#d33",
+        backdrop: true,
+        allowOutsideClick: true,
+        customClass: {
+          popup: "custom-swal-popup",
+          title: "custom-swal-title",
+          content: "custom-swal-content",
+          confirmButton: "custom-swal-confirm",
+        },
       });
       setIsLoading(false);
       return;
@@ -48,6 +56,14 @@ const ResetPasswordConfirm = () => {
           title: "Lỗi",
           text: result.message,
           confirmButtonColor: "#d33",
+          backdrop: true,
+          allowOutsideClick: true,
+          customClass: {
+            popup: "custom-swal-popup",
+            title: "custom-swal-title",
+            content: "custom-swal-content",
+            confirmButton: "custom-swal-confirm",
+          },
         });
         setIsLoading(false);
         return;
@@ -57,8 +73,20 @@ const ResetPasswordConfirm = () => {
         icon: "success",
         title: "Thành công",
         text: result.message,
-        confirmButtonColor: "#3085d6",
+        showConfirmButton: false,
         timer: 1500,
+        timerProgressBar: true,
+        backdrop: true,
+        allowOutsideClick: true,
+        customClass: {
+          popup: "custom-swal-popup",
+          title: "custom-swal-title",
+          content: "custom-swal-content",
+        },
+        willClose: () => {
+          console.log("Success message closed");
+          document.body.style.overflow = "auto"; // Khôi phục cuộn
+        },
       }).then(() => {
         setIsLoading(false);
         navigate("/login");
@@ -69,6 +97,14 @@ const ResetPasswordConfirm = () => {
         title: "Lỗi",
         text: err.message,
         confirmButtonColor: "#d33",
+        backdrop: true,
+        allowOutsideClick: true,
+        customClass: {
+          popup: "custom-swal-popup",
+          title: "custom-swal-title",
+          content: "custom-swal-content",
+          confirmButton: "custom-swal-confirm",
+        },
       });
       setIsLoading(false);
     }
