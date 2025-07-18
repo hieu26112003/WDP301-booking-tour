@@ -37,25 +37,71 @@ const quillModules = {
   },
 };
 
-const CATEGORY_OPTIONS = [
-  { value: "kinh-nghiem", label: "Kinh nghiệm" },
-  { value: "am-thuc", label: "Ẩm thực" },
-  { value: "review", label: "Review" },
-  { value: "xu-huong", label: "Xu hướng" },
-];
-
 const ManageGuide = () => {
   const [guides, setGuides] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [catLoading, setCatLoading] = useState(false); // NEW
+
   const [formData, setFormData] = useState({
     title: "",
     content: "",
-    category: "",
+    category: "", // sẽ lưu ObjectId
   });
+
   const [imageFile, setImageFile] = useState(null);
   const [modal, setModal] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [editId, setEditId] = useState(null);
 
+  /* -------------------- FETCH CATEGORIES -------------------- */
+  // NEW: gọi API lấy category (theo route bạn nói: /guides/categories)
+  const fetchCategories = async () => {
+    setCatLoading(true);
+    try {
+      const res = await fetch(`${BASE_URL}/guides/categories`);
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.message);
+      setCategories(result.data || []);
+    } catch (err) {
+      console.error("Fetch categories error:", err);
+      Swal.fire("Lỗi", err.message || "Không thể tải loại cẩm nang", "error");
+    } finally {
+      setCatLoading(false);
+    }
+  };
+
+  /* -------------------- FETCH GUIDES -------------------- */
+  const fetchGuides = async () => {
+    try {
+      const res = await fetch(`${BASE_URL}/guides`);
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.message);
+      setGuides(result.data || []);
+    } catch (err) {
+      Swal.fire("Lỗi", err.message || "Không thể tải guides", "error");
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories(); // NEW
+    fetchGuides();
+  }, []);
+
+  /* -------------------- FORM HANDLERS -------------------- */
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleQuillChange = (value) => {
+    setFormData((prev) => ({ ...prev, content: value }));
+  };
+
+  const handleImageChange = (e) => {
+    setImageFile(e.target.files[0]);
+  };
+
+  /* -------------------- MODAL CONTROL -------------------- */
   const openCreateModal = () => {
     setIsEdit(false);
     setEditId(null);
@@ -70,42 +116,18 @@ const ManageGuide = () => {
     setFormData({
       title: guide.title || "",
       content: guide.content || "",
-      category: guide.category || "",
+      category:
+        typeof guide.category === "object" && guide.category !== null
+          ? guide.category._id
+          : guide.category || "",
     });
-    setImageFile(null); // user chọn ảnh mới nếu muốn đổi
+    setImageFile(null);
     setModal(true);
   };
 
   const closeModal = () => setModal(false);
 
-  const fetchGuides = async () => {
-    try {
-      const res = await fetch(`${BASE_URL}/guides`);
-      const result = await res.json();
-      if (!res.ok) throw new Error(result.message);
-      setGuides(result.data);
-    } catch (err) {
-      Swal.fire("Lỗi", err.message || "Không thể tải guides", "error");
-    }
-  };
-
-  useEffect(() => {
-    fetchGuides();
-  }, []);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleQuillChange = (value) => {
-    setFormData((prev) => ({ ...prev, content: value }));
-  };
-
-  const handleImageChange = (e) => {
-    setImageFile(e.target.files[0]);
-  };
-
+  /* -------------------- SUBMIT (CREATE / UPDATE) -------------------- */
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -123,14 +145,24 @@ const ManageGuide = () => {
       const result = await res.json();
       if (!res.ok) throw new Error(result.message);
 
-      Swal.fire("Thành công", isEdit ? "Đã cập nhật bài viết" : "Đã tạo bài viết", "success");
+      Swal.fire(
+        "Thành công",
+        isEdit ? "Đã cập nhật bài viết" : "Đã tạo bài viết",
+        "success"
+      );
       closeModal();
       fetchGuides();
     } catch (err) {
-      Swal.fire("Lỗi", err.message || (isEdit ? "Không thể cập nhật bài viết" : "Không thể tạo bài viết"), "error");
+      Swal.fire(
+        "Lỗi",
+        err.message ||
+          (isEdit ? "Không thể cập nhật bài viết" : "Không thể tạo bài viết"),
+        "error"
+      );
     }
   };
 
+  /* -------------------- DELETE -------------------- */
   const handleDelete = async (id) => {
     const result = await Swal.fire({
       title: "Xác nhận xóa?",
@@ -141,22 +173,26 @@ const ManageGuide = () => {
       cancelButtonText: "Hủy",
     });
 
-    if (result.isConfirmed) {
-      try {
-        const res = await fetch(`${BASE_URL}/guides/${id}`, { method: "DELETE" });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.message);
-        Swal.fire("Đã xóa", "Bài viết đã được xóa", "success");
-        fetchGuides();
-      } catch (err) {
-        Swal.fire("Lỗi", err.message || "Không thể xóa", "error");
-      }
+    if (!result.isConfirmed) return;
+
+    try {
+      const res = await fetch(`${BASE_URL}/guides/${id}`, { method: "DELETE" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+      Swal.fire("Đã xóa", "Bài viết đã được xóa", "success");
+      fetchGuides();
+    } catch (err) {
+      Swal.fire("Lỗi", err.message || "Không thể xóa", "error");
     }
   };
 
-  const renderCategory = (value) => {
-    const found = CATEGORY_OPTIONS.find((opt) => opt.value === value);
-    return found ? found.label : value || "-";
+  /* -------------------- RENDER CATEGORY LABEL -------------------- */
+  const renderCategory = (cat) => {
+    if (cat && typeof cat === "object") {
+      return cat.name || cat.slug || "(Không tên)";
+    }
+    const found = categories.find((c) => c._id === cat);
+    return found ? found.name : "-";
   };
 
   return (
@@ -196,24 +232,29 @@ const ManageGuide = () => {
                     value={formData.category}
                     onChange={handleChange}
                     required
+                    disabled={catLoading} // NEW
                   >
-                    <option value="">-- Chọn loại --</option>
-                    {CATEGORY_OPTIONS.map((opt) => (
-                      <option key={opt.value} value={opt.value}>
-                        {opt.label}
+                    <option value="">
+                      {catLoading ? "Đang tải..." : "-- Chọn loại --"}
+                    </option>
+                    {categories.map((opt) => (
+                      <option key={opt._id} value={opt._id}>
+                        {opt.name}
                       </option>
                     ))}
                   </Input>
                 </FormGroup>
 
                 <FormGroup>
-                  <Label for="image">Ảnh {isEdit && <small>(để trống nếu giữ ảnh cũ)</small>}</Label>
+                  <Label for="image">
+                    Ảnh {isEdit && <small>(để trống nếu giữ ảnh cũ)</small>}
+                  </Label>
                   <Input
                     type="file"
                     name="image"
                     accept="image/*"
                     onChange={handleImageChange}
-                    required={!isEdit} // tạo mới bắt buộc, update thì không
+                    required={!isEdit}
                   />
                 </FormGroup>
 
@@ -289,6 +330,13 @@ const ManageGuide = () => {
                   </td>
                 </tr>
               ))}
+              {guides.length === 0 && (
+                <tr>
+                  <td colSpan="5" className="text-center">
+                    Chưa có bài viết.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </Table>
         </Col>

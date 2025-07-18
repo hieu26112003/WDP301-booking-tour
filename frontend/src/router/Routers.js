@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import Home from "../pages/User/Home";
 import Login from "../pages/User/Login";
 import Register from "../pages/User/Register";
+import CamNang from "../pages/User/CamNang";
 import ManagerUser from "../pages/Admin/components/managerAccount";
 
 import ManageStaff from "../pages/Admin/components/ManageStaff"; // Thêm import ManageStaff
@@ -31,6 +32,8 @@ const Routers = () => {
     <Routes>
       <Route path="/" element={<Navigate to="/home" />} />
       <Route path="/home" element={<Home />} />
+      <Route path="/cam-nang" element={<CamNang />} />
+      <Route path="/cam-nang/:slug" element={<CamNang />} />
       <Route path="/login" element={<Login />} />
       <Route path="/tours/:id" element={<TourDetails/>} />
       <Route path="/register" element={<Register />} />

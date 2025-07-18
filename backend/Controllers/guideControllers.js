@@ -1,9 +1,13 @@
 import Guide from '../models/Guide.js';
+import CategoryGuide from '../models/CategoryGuides.js';
 import mongoose from "mongoose";
 import path from "path";
 import slugify from "slugify";
 
 
+const VALID_CATEGORIES = ["kinh-nghiem", "am-thuc", "review", "xu-huong"];
+
+// [GET] /api/guides - Lấy tất cả bài viết
 export const createGuide = async (req, res) => {
   try {
     const { title, content, category } = req.body;
@@ -56,13 +60,47 @@ export const createGuide = async (req, res) => {
 
 export const getAllGuides = async (req, res) => {
   try {
-    const guides = await Guide.find().sort({ createdAt: -1 });
-    res.status(200).json({ success: true, data: guides });
+    const { category } = req.query; // Lấy category từ query param
+    let filter = {};
+
+    if (category) {
+      // Tìm category theo slug
+      const catDoc = await CategoryGuide.findOne({ slug: category });
+      if (catDoc) {
+        filter.category = catDoc._id; // Lọc guide theo categoryId
+      } else {
+        return res.status(404).json({
+          success: false,
+          message: 'Không tìm thấy loại cẩm nang!',
+        });
+      }
+    }
+
+    const guides = await Guide.find(filter)
+      .populate('category', 'name slug') // chỉ lấy name và slug
+      .sort({ createdAt: -1 });
+
+    if (!guides || guides.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Không có bài viết nào!',
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      count: guides.length,
+      data: guides,
+    });
   } catch (err) {
-    res.status(500).json({ success: false, message: "Failed to fetch guides" });
+    console.error('❌ Lỗi lấy danh sách Guides:', err);
+    res.status(500).json({
+      success: false,
+      message: 'Lấy danh sách bài viết thất bại',
+      error: err.message,
+    });
   }
 };
-
 export const deleteGuide = async (req, res) => {
   try {
     const { id } = req.params;
@@ -119,6 +157,8 @@ export const deleteGuide = async (req, res) => {
 export const updateGuide = async (req, res) => {
   try {
     const { id } = req.params;
+
+    // Kiểm tra ID hợp lệ
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res
         .status(400)
@@ -127,47 +167,72 @@ export const updateGuide = async (req, res) => {
 
     const { title, content, category } = req.body;
 
-    // Kiểm tra dữ liệu
-    if (!title && !content && !category && !req.file) {
+    if (!title || !content || !category) {
       return res
         .status(400)
-        .json({ success: false, message: "No valid fields to update" });
+        .json({ success: false, message: "All fields are required" });
     }
 
-    const updateData = {
-      title,
-      content,
-      category,
-      ...(req.file && {
-        image: `/user_images/${path.basename(req.file.path)}`,
-      }), // Cập nhật ảnh nếu có
-    };
-
-    const updated = await Guide.findByIdAndUpdate(
-      id,
-      { $set: updateData },
-      { new: true, runValidators: true }
-    );
-
-    if (!updated) {
+    const guide = await Guide.findById(id);
+    if (!guide) {
       return res
         .status(404)
         .json({ success: false, message: "Guide not found" });
     }
 
+    // Cập nhật các trường cơ bản
+    guide.title = title;
+    guide.content = content;
+    guide.category = category;
+
+    // Nếu có ảnh mới, xóa ảnh cũ và cập nhật ảnh mới
+    if (req.file) {
+      // Xóa ảnh cũ
+      if (guide.image) {
+        const oldRelativePath = guide.image.startsWith("/")
+          ? guide.image.slice(1)
+          : guide.image;
+        const oldImagePath = path.join(process.cwd(), "frontend", "public", oldRelativePath);
+
+        try {
+          if (fs.existsSync(oldImagePath)) {
+            await fs.promises.unlink(oldImagePath);
+            console.log(`✅ Đã xóa ảnh cũ: ${oldImagePath}`);
+          }
+        } catch (err) {
+          console.warn(`⚠ Lỗi khi xóa ảnh cũ: ${err.message}`);
+        }
+      }
+
+      // Gán ảnh mới
+      guide.image = `/user_image/${path.basename(req.file.path)}`;
+    }
+
+    const updatedGuide = await guide.save();
+
     res.status(200).json({
       success: true,
-      message: "Updated successfully",
-      data: updated,
+      message: "Guide updated successfully",
+      data: updatedGuide,
     });
   } catch (err) {
-    if (err.code === 11000) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Guide title already exists" });
-    }
-    res
-      .status(500)
-      .json({ success: false, message: "Failed to update guide" });
+    console.error("❌ Update guide error:", err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to update guide",
+    });
+  }
+};
+
+export const getAllCategoryGuides = async (req, res) => {
+  try {
+    const categories = await CategoryGuide.find().sort({ name: 1 });
+    res.status(200).json({ success: true, data: categories });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Lấy danh sách loại cẩm nang thất bại",
+      error: err.message,
+    });
   }
 };

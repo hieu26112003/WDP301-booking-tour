@@ -1,6 +1,6 @@
 import express from "express";
 import upload from "../middleware/upload.js"; // Để xử lý ảnh
-import { createGuide, getAllGuides, deleteGuide, updateGuide } from "../Controllers/guideControllers.js";
+import { createGuide, getAllGuides, deleteGuide, updateGuide, getAllCategoryGuides } from "../Controllers/guideControllers.js";
 
 const router = express.Router();
 
@@ -9,4 +9,5 @@ router.post("/", upload.single("image"), createGuide);
 router.get("/", getAllGuides);
 router.delete("/:id", deleteGuide);
 router.put("/:id", upload.single("image"), updateGuide);
+router.get("/categories", getAllCategoryGuides);
 export default router;

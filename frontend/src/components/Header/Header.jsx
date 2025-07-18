@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useContext, useState } from "react";
 import { Container } from "reactstrap";
 import { Link, useNavigate } from "react-router-dom";
-import { Search, Phone, ChevronDown, Menu, User } from "lucide-react";
+import { Search, Phone, ChevronDown, Menu, User, X } from "lucide-react";
 import "./header.css";
 import { AuthContext } from "../../context/AuthContext";
 import Swal from "sweetalert2";
 import { getCategories } from "../../services/categoryService";
+import { BASE_URL } from "../../utils/config";
 
 const Header = () => {
   const headerRef = useRef(null);
@@ -16,6 +17,24 @@ const Header = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+
+  const [menuCategories, setMenuCategories] = useState([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch(`${BASE_URL}/guides/categories`);
+        const data = await res.json();
+        if (data.success) {
+          setMenuCategories(data.data);
+        }
+      } catch (err) {
+        console.error("Lỗi load categories:", err);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -47,22 +66,21 @@ const Header = () => {
       dropdownItems:
         categories.length > 0
           ? categories.map((cat) => ({
-              path: `/tours/${cat._id}`,
-              display: cat.name,
-            }))
+            path: `/tours/${cat._id}`,
+            display: cat.name,
+          }))
           : [],
     },
     {
       path: "/cam-nang",
       display: "CẨM NANG DU LỊCH",
       hasDropdown: true,
-      dropdownItems: [
-        { path: "/cam-nang/kinh-nghiem", display: "Kinh nghiệm" },
-        { path: "/cam-nang/am-thuc", display: "Ẩm thực" },
-        { path: "/cam-nang/review", display: "Review" },
-        { path: "/cam-nang/xu-huong", display: "Xu hướng" },
-      ],
+      dropdownItems: menuCategories.map(cat => ({
+        path: `/cam-nang/${cat.slug}`,
+        display: cat.name
+      }))
     },
+    
     { path: "/about", display: "VỀ ASK TRAVEL" },
 
     { path: "/contact", display: "LIÊN HỆ" },
@@ -193,9 +211,8 @@ const Header = () => {
                       />
                     </div>
                     <div
-                      className={`user-dropdown-redesign ${
-                        activeDropdown === "user" ? "show" : ""
-                      }`}
+                      className={`user-dropdown-redesign ${activeDropdown === "user" ? "show" : ""
+                        }`}
                     >
                       <Link
                         to="/profile"
@@ -266,9 +283,8 @@ const Header = () => {
                         />
                       </Link>
                       <div
-                        className={`dropdown-menu-redesign ${
-                          activeDropdown === index ? "show" : ""
-                        }`}
+                        className={`dropdown-menu-redesign ${activeDropdown === index ? "show" : ""
+                          }`}
                       >
                         <div className="dropdown-content-redesign">
                           {isLoading ? (
