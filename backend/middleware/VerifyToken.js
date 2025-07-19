@@ -46,3 +46,15 @@ export const verifyAdmin = (req, res, next) => {
     }
   });
 };
+
+export const verifyStaff = (req, res, next) => {
+  verifyToken(req, res, () => {
+    if (req.user.role === "staff") {
+      next();
+    } else {
+      return res
+        .status(403)
+        .json({ success: false, message: "Chỉ nhân viên mới được phép!" });
+    }
+  });
+};

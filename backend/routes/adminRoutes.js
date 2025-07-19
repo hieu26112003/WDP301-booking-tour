@@ -10,20 +10,40 @@ import {
   demoteFromStaff,
 } from "../Controllers/adminControllers.js";
 
-import { verifyAdmin } from "../middleware/VerifyToken.js";
+import { verifyAdmin, verifyStaff, verifyToken } from "../middleware/VerifyToken.js";
 
 const router = express.Router();
 
 // Áp dụng verifyAdmin cho tất cả route dưới đây
-router.use(verifyAdmin);
+// router.use(verifyAdmin);
 
-router.get("/users", getAllUsers);
-router.get("/users/:id", getUserById);
-router.post("/users", createUser);
-router.put("/users/:id", updateUser);
-router.delete("/users/:id", deleteUser);
-router.patch("/users/:id/toggle-status", toggleUserStatus);
-router.patch("/users/:id/promote", promoteToStaff);
-router.patch("/users/:id/demote", demoteFromStaff);
+// router.get("/users", getAllUsers);
+// router.get("/users/:id", getUserById);
+// router.post("/users", createUser);
+// router.put("/users/:id", updateUser);
+// router.delete("/users/:id", deleteUser);
+// router.patch("/users/:id/toggle-status", toggleUserStatus);
+// router.patch("/users/:id/promote", promoteToStaff);
+// router.patch("/users/:id/demote", demoteFromStaff);
 
+// Route chỉ admin được quyền
+router.get("/users", verifyAdmin, getAllUsers);
+router.post("/users", verifyAdmin, createUser);
+router.put("/users/:id", verifyAdmin, updateUser);
+router.delete("/users/:id", verifyAdmin, deleteUser);
+router.patch("/users/:id/toggle-status", verifyAdmin, toggleUserStatus);
+router.patch("/users/:id/promote", verifyAdmin, promoteToStaff);
+router.patch("/users/:id/demote", verifyAdmin, demoteFromStaff);
+
+
+// Cả admin và staff được quyền
+router.get("/users/:id", verifyToken, (req, res, next) => {
+  if (req.user.role === "admin" || req.user.role === "staff") {
+    next();
+  } else {
+    return res
+      .status(403)
+      .json({ success: false, message: "Chỉ admin hoặc staff mới được phép!" });
+  }
+}, getUserById);
 export default router;
