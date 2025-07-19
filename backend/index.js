@@ -5,19 +5,17 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import { Server } from "socket.io";
 import http from "http";
-import callRequestRoute from './routes/callRequest.js'
+import callRequestRoute from "./routes/callRequest.js";
 
 import User from "./models/User.js";
 
 import authRoute from "./routes/auth.js";
-import adminRoute from "./routes/adminRoutes.js"
-import tourRoute from './routes/tour.js'
-import categoryRoute from './routes/category.js'
+import adminRoute from "./routes/adminRoutes.js";
+import tourRoute from "./routes/tour.js";
+import categoryRoute from "./routes/category.js";
 import messageRoute from "./routes/messageRoutes.js";
 import Message from "./models/Message.js";
-import guideRoutes from './routes/guideRoutes.js';
-
-
+import guideRoutes from "./routes/guideRoutes.js";
 
 dotenv.config();
 const app = express();
@@ -56,11 +54,10 @@ app.use(cookieParser());
 // Routes
 app.use("/api/auth", authRoute);
 app.use("/api/admin", adminRoute);
-app.use('/api/tours', tourRoute)
-app.use('/api/categories', categoryRoute)
-app.use('/api/guides', guideRoutes);
-app.use('/api/call-request', callRequestRoute)
-
+app.use("/api/tours", tourRoute);
+app.use("/api/categories", categoryRoute);
+app.use("/api/guides", guideRoutes);
+app.use("/api/call-request", callRequestRoute);
 
 app.use("/api/messages", messageRoute);
 
@@ -92,7 +89,6 @@ io.on("connection", (socket) => {
 
         // Chỉ lưu tin nhắn không có receiverId
         newMessage = new Message({ senderId, message });
-
       } else if (sender.role === "staff" && receiverId) {
         // Gửi lại cho user
         io.to(receiverId).emit("receiveMessage", {
@@ -112,9 +108,6 @@ io.on("connection", (socket) => {
       console.error("❌ Lỗi khi xử lý gửi tin nhắn:", err);
     }
   });
-
-
-
 
   socket.on("disconnect", () => {
     console.log("❌ A user disconnected:", socket.id);

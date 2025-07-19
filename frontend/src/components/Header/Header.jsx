@@ -18,6 +18,7 @@ const Header = ({ onCategorySelect, onSearch }) => {
   const [categories, setCategories] = useState([]);
   const [menuCategories, setMenuCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+ 
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -75,15 +76,15 @@ const Header = ({ onCategorySelect, onSearch }) => {
       dropdownItems:
         categories.length > 0
           ? [
-              {
-                display: "Tất cả danh mục",
-                onClick: () => onCategorySelect(null, "Tất cả danh mục"),
-              },
-              ...categories.map((cat) => ({
-                display: cat.name,
-                onClick: () => onCategorySelect(cat._id, cat.name),
-              })),
-            ]
+            {
+              display: "Tất cả danh mục",
+              onClick: () => onCategorySelect(null, "Tất cả danh mục"),
+            },
+            ...categories.map((cat) => ({
+              display: cat.name,
+              onClick: () => onCategorySelect(cat._id, cat.name),
+            })),
+          ]
           : [],
     },
     {

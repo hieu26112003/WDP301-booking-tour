@@ -5,6 +5,7 @@ import {
   updateCategory,
   deleteCategory,
   getCategoryById,
+  getToursByCategory,
 } from "../Controllers/categoryController.js";
 import { verifyAdmin } from "../middleware/VerifyToken.js";
 
@@ -15,5 +16,6 @@ router.get("/", getAllCategories);
 router.put("/:id", verifyAdmin, updateCategory);
 router.delete("/:id", verifyAdmin, deleteCategory);
 router.get("/:categoryId", getCategoryById);
+router.get("/:id/tours", getToursByCategory);
 
 export default router;
