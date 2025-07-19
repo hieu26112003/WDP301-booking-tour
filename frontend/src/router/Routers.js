@@ -22,7 +22,7 @@ import ManageGuide from "../pages/Staff/ManageGuide";
 import AboutUs from "../components/About/About";
 import Contact from "../components/Contact/Contact";
 import TourDetails from "../pages/User/TourDetails";
-
+import ListTour from "../pages/User/ListTour";
 import TourDetail from "../pages/Admin/components/TourDetail";
 
 const Routers = () => {
@@ -42,6 +42,8 @@ const Routers = () => {
       <Route path="/Guide" element={<Guide />} />
       <Route path="/about" element={<AboutUs />} />
       <Route path="/contact" element={<Contact />} />
+      <Route path="/tours/" element={<ListTour />} />
+      <Route path="/tours/filter/:slug" element={<ListTour />} />
 
       <Route
         path="/admin"

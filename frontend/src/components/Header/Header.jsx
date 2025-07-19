@@ -5,7 +5,7 @@ import { Search, Phone, ChevronDown, Menu, User } from "lucide-react";
 import "./header.css";
 import { AuthContext } from "../../context/AuthContext";
 import Swal from "sweetalert2";
-import { getCategories } from "../../services/categoryService";
+
 import { BASE_URL } from "../../utils/config";
 
 const Header = ({ onCategorySelect, onSearch }) => {
@@ -15,15 +15,30 @@ const Header = ({ onCategorySelect, onSearch }) => {
   const { user, dispatch } = useContext(AuthContext);
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [categories, setCategories] = useState([]);
-  const [menuCategories, setMenuCategories] = useState([]);
+
+  const [menuCategoriesGuide, setMenuCategoriesGuide] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
- 
+  const [menuCategories, setMenuCategories] = useState([]);
+
+  useEffect(() => {
+    const fetchCategoriesGuide = async () => {
+      try {
+        const res = await fetch(`${BASE_URL}/guides/categories`);
+        const data = await res.json();
+        if (data.success) {
+          setMenuCategoriesGuide(data.data);
+        }
+      } catch (err) {
+        console.error("Lỗi load categories:", err);
+      }
+    };
+    fetchCategoriesGuide();
+  }, []);
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await fetch(`${BASE_URL}/guides/categories`);
+        const res = await fetch(`${BASE_URL}/categories`);
         const data = await res.json();
         if (data.success) {
           setMenuCategories(data.data);
@@ -46,26 +61,7 @@ const Header = ({ onCategorySelect, onSearch }) => {
 
   const debouncedSearch = debounce(onSearch, 300);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      try {
-        const res = await getCategories();
-        setCategories(res.data?.data || []);
-      } catch (error) {
-        console.error("Failed to fetch categories", error);
-        Swal.fire({
-          icon: "error",
-          title: "Lỗi",
-          text: "Không thể tải danh mục",
-          confirmButtonColor: "#d33",
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
+
 
   const nav__links = [
     { path: "/home", display: "TRANG CHỦ" },
@@ -73,25 +69,16 @@ const Header = ({ onCategorySelect, onSearch }) => {
       path: "/tours",
       display: "TOUR DU LỊCH",
       hasDropdown: true,
-      dropdownItems:
-        categories.length > 0
-          ? [
-            {
-              display: "Tất cả danh mục",
-              onClick: () => onCategorySelect(null, "Tất cả danh mục"),
-            },
-            ...categories.map((cat) => ({
-              display: cat.name,
-              onClick: () => onCategorySelect(cat._id, cat.name),
-            })),
-          ]
-          : [],
+      dropdownItems: menuCategories.map((ca) => ({
+        path: `/tours/filter/${ca.slug}`,
+        display: ca.name,
+      })),
     },
     {
       path: "/cam-nang",
       display: "CẨM NANG DU LỊCH",
       hasDropdown: true,
-      dropdownItems: menuCategories.map((cat) => ({
+      dropdownItems: menuCategoriesGuide.map((cat) => ({
         path: `/cam-nang/${cat.slug}`,
         display: cat.name,
       })),
@@ -221,9 +208,8 @@ const Header = ({ onCategorySelect, onSearch }) => {
                       />
                     </div>
                     <div
-                      className={`user-dropdown-redesign ${
-                        activeDropdown === "user" ? "show" : ""
-                      }`}
+                      className={`user-dropdown-redesign ${activeDropdown === "user" ? "show" : ""
+                        }`}
                     >
                       <Link
                         to="/profile"
@@ -294,9 +280,8 @@ const Header = ({ onCategorySelect, onSearch }) => {
                         />
                       </Link>
                       <div
-                        className={`dropdown-menu-redesign ${
-                          activeDropdown === index ? "show" : ""
-                        }`}
+                        className={`dropdown-menu-redesign ${activeDropdown === index ? "show" : ""
+                          }`}
                       >
                         <div className="dropdown-content-redesign">
                           {isLoading ? (
@@ -318,17 +303,14 @@ const Header = ({ onCategorySelect, onSearch }) => {
                                   </Link>
                                 ) : (
                                   // ✅ TOUR DU LỊCH -> div + onClick
-                                  <div
+                                  <Link
                                     key={dropdownIndex}
+                                    to={dropdownItem.path}
                                     className="dropdown-item-redesign"
-                                    onClick={() => {
-                                      if (dropdownItem.onClick)
-                                        dropdownItem.onClick();
-                                      setActiveDropdown(null);
-                                    }}
+                                    onClick={() => setActiveDropdown(null)}
                                   >
                                     {dropdownItem.display}
-                                  </div>
+                                  </Link>
                                 )
                             )
                           ) : (
