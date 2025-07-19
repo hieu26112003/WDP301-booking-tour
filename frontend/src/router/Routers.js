@@ -20,7 +20,7 @@ import StaffChatPage from "../pages/Staff/StaffChatPage";
 import Guide from "../pages/User/Guide";
 import ManageGuide from "../pages/Staff/ManageGuide";
 import AboutUs from "../components/About/About";
-import Contact from "../components/Contact/Contact";
+import Contact from "../components/Contact/ContactPage";
 import TourDetails from "../pages/User/TourDetails";
 import ListTour from "../pages/User/ListTour";
 import TourDetail from "../pages/Admin/components/TourDetail";
