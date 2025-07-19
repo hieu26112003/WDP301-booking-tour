@@ -1,3 +1,6 @@
+/* ===================
+   TOUR CARD STYLING
+=================== */
 .tour__card {
   border-radius: 8px;
   overflow: hidden;
@@ -10,11 +13,12 @@
   transform: translateY(-5px);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
-
+  
+/* Image */
 .tour__img {
   position: relative;
   width: 100%;
-  height: 200px; /* Chiều cao cố định cho ảnh */
+  height: 200px; /* fixed height */
   overflow: hidden;
 }
 
@@ -31,19 +35,20 @@
   left: 50%;
   transform: translateX(-50%);
   background: rgba(0, 0, 0, 0.6);
-  color: #ffffff;
-  padding: 8px 15px;
+  color: #fff;
+  padding: 6px 14px;
   border-radius: 5px;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 600;
   text-align: center;
   white-space: nowrap;
   text-transform: uppercase;
 }
 
+/* Card content */
 .tour__card .card-body {
   padding: 15px;
-  background-color: #e6f0ff; /* Màu nền xanh nhạt cho phần content */
+  background-color: #f7faff; /* nhẹ hơn xanh nhạt */
   border-radius: 0 0 8px 8px;
 }
 
@@ -52,7 +57,7 @@
   font-weight: 700;
   color: var(--heading-color);
   margin-bottom: 10px;
-  min-height: 50px; /* Đảm bảo chiều cao cố định cho tiêu đề */
+  min-height: 50px; /* giữ chiều cao đều */
 }
 
 .tour__title a {
@@ -65,52 +70,58 @@
   color: var(--primary-color);
 }
 
+/* Details */
 .card__details {
   margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .tour__duration,
 .tour__location {
-  font-size: 14px;
-  color: var(--text-color);
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  line-height: 2;
-  margin: 0;
+  font-size: 14px;
+  color: var(--text-color);
+  line-height: 1.4;
+  gap: 6px; /* khoảng cách icon-text */
 }
 
 .tour__duration i,
 .tour__location i {
   font-size: 16px;
   color: var(--primary-color);
-   line-height: 1;
-  margin-top: 1px;
-  margin-right: 4px
+  display: inline-flex;
+  align-items: center;
 }
 
+/* Footer */
 .card__bottom {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin-top: 10px;
 }
 
 .tour__price {
   font-size: 20px;
   font-weight: 700;
   color: var(--primary-color);
-  margin-bottom: 0;
+  
 }
 
 .tour__price span {
-  font-size: 14px;
+  font-size: 18px;
   font-weight: 500;
   color: var(--text-color);
+  font-weight: bold;
+  gap: 4px;
 }
 
 .booking__btn {
   background-color: var(--primary-color);
-  color: #ffffff;
+  color: #fff;
   padding: 8px 18px;
   border-radius: 5px;
   border: none;
@@ -125,8 +136,8 @@
   transform: translateY(-2px);
 }
 
-/* Responsive adjustments */
-@media only screen and (max-width: 768px) {
+/* Responsive */
+@media (max-width: 768px) {
   .tour__img {
     height: 180px;
   }
@@ -147,13 +158,13 @@
   }
 }
 
-@media only screen and (max-width: 576px) {
+@media (max-width: 576px) {
   .tour__img {
     height: 160px;
   }
   .destination__overlay {
-    font-size: 14px;
-    padding: 6px 10px;
+    font-size: 13px;
+    padding: 5px 10px;
   }
   .tour__title {
     font-size: 15px;
@@ -163,4 +174,3 @@
     font-size: 16px;
   }
 }
-

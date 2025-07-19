@@ -34,11 +34,11 @@ const TourCard = ({ tour }) => {
           </h5>
 
           <div className="card__details mt-2">
-            <span className="tour__duration d-flex align-items-center">
+            <span className="tour__duration ">
               <i className="ri-time-line"></i> {time || `${days} ngày`}
             </span>
 
-            <span className="tour__location d-flex align-items-center mt-1">
+            <span className="tour__location">
               <i className="ri-map-pin-line"></i> {schedule}
             </span>
           </div>
