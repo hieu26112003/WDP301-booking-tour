@@ -12,6 +12,15 @@ const StaffChat = ({ staffId }) => {
     const [message, setMessage] = useState("");
     const chatBodyRef = useRef(null);
 
+    const getAuthConfig = () => {
+        const token = localStorage.getItem("accessToken");
+        return {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        };
+    };
+
     useEffect(() => {
         if (!staffId) return;
 
@@ -31,12 +40,14 @@ const StaffChat = ({ staffId }) => {
     useEffect(() => {
         const fetchUsers = async () => {
             try {
-                const res = await axios.get("http://localhost:8000/api/messages/users");
+                const config = getAuthConfig();
+
+                const res = await axios.get("http://localhost:8000/api/messages/users", config);
                 const userIds = res.data;
 
                 const userDetails = await Promise.all(
                     userIds.map((id) =>
-                        axios.get(`http://localhost:8000/api/admin/users/${id}`).then((res) => res.data)
+                        axios.get(`http://localhost:8000/api/admin/users/${id}`, config).then((res) => res.data)
                     )
                 );
 
@@ -56,8 +67,11 @@ const StaffChat = ({ staffId }) => {
         setChat([]);
 
         try {
+            const config = getAuthConfig();
+
             const res = await axios.get(
-                `http://localhost:8000/api/messages/${user._id}/${staffId}`
+                `http://localhost:8000/api/messages/${user._id}/${staffId}`,
+                config
             );
 
             const formatted = res.data.map((msg) => ({
@@ -95,7 +109,7 @@ const StaffChat = ({ staffId }) => {
             <div className="support-user-list">
                 <h4>Khách hàng</h4>
                 {users
-                    .filter((user) => String(user._id) !== String(staffId)) // ✅ Ẩn chính staff
+                    .filter((user) => String(user._id) !== String(staffId))
                     .map((user) => (
                         <div
                             key={user._id}
@@ -105,7 +119,6 @@ const StaffChat = ({ staffId }) => {
                             {user.username}
                         </div>
                     ))}
-
             </div>
 
             <div className="support-chat-box">

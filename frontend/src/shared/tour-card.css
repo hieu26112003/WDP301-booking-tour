@@ -1,166 +1,115 @@
+/* tour-card.css */
+
+/* Card tổng thể */
 .tour__card {
-  border-radius: 8px;
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  background-color: #ffffff;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  background-color: #fff;
 }
 
 .tour__card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  transform: translateY(-6px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
 }
 
+/* Ảnh tour */
 .tour__img {
-  position: relative;
   width: 100%;
-  height: 200px; /* Chiều cao cố định cho ảnh */
+  height: 220px;
   overflow: hidden;
+  position: relative;
 }
 
 .tour__img img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 8px 8px 0 0;
+  transition: transform 0.3s ease;
 }
 
-.destination__overlay {
-  position: absolute;
-  bottom: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.6);
-  color: #ffffff;
-  padding: 8px 15px;
-  border-radius: 5px;
-  font-size: 16px;
-  font-weight: 600;
-  text-align: center;
-  white-space: nowrap;
-  text-transform: uppercase;
+.tour__card:hover .tour__img img {
+  transform: scale(1.05);
 }
 
-.tour__card .card-body {
-  padding: 15px;
-  background-color: #e6f0ff; /* Màu nền xanh nhạt cho phần content */
-  border-radius: 0 0 8px 8px;
-}
-
+/* Tiêu đề */
 .tour__title {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--heading-color);
+  font-size: 1.1rem;
+  font-weight: 600;
   margin-bottom: 10px;
-  min-height: 50px; /* Đảm bảo chiều cao cố định cho tiêu đề */
+  color: #333;
+  line-height: 1.4;
 }
 
 .tour__title a {
-  text-decoration: none;
   color: inherit;
-  transition: color 0.3s ease;
+  text-decoration: none;
 }
 
 .tour__title a:hover {
-  color: var(--primary-color);
+  color: #007bff;
+  text-decoration: underline;
 }
 
+/* Chi tiết card */
 .card__details {
-  margin-bottom: 15px;
+  font-size: 0.9rem;
+  color: #666;
+  display: flex;
+  flex-direction: column; /* THÊM DÒNG NÀY */
+  gap: 4px; /* thêm khoảng cách giữa các dòng */
+  margin-bottom: 10px;
 }
 
-.tour__duration,
-.tour__location {
-  font-size: 14px;
-  color: var(--text-color);
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  line-height: 2;
+
+.card__details i {
+  color: #007bff;
+  margin-right: 5px;
+}
+
+/* Giá tour */
+.tour__price {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #28a745;
   margin: 0;
 }
 
-.tour__duration i,
-.tour__location i {
-  font-size: 16px;
-  color: var(--primary-color);
-   line-height: 1;
-  margin-top: 1px;
-  margin-right: 4px
-}
-
-.card__bottom {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.tour__price {
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--primary-color);
-  margin-bottom: 0;
-}
-
 .tour__price span {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text-color);
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: #555;
 }
 
+/* Nút xem chi tiết */
 .booking__btn {
-  background-color: var(--primary-color);
-  color: #ffffff;
-  padding: 8px 18px;
-  border-radius: 5px;
+  padding: 8px 16px;
   border: none;
-  font-size: 14px;
-  font-weight: 500;
-  transition: background-color 0.3s ease, transform 0.2s ease;
+  background: linear-gradient(135deg, #007bff, #0056d2);
+  color: #fff;
+  font-size: 0.9rem;
+  border-radius: 6px;
   cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
 }
 
 .booking__btn:hover {
-  background-color: var(--secondary-color);
-  transform: translateY(-2px);
+  background: linear-gradient(135deg, #0056d2, #0040a5);
+  transform: scale(1.05);
 }
 
-/* Responsive adjustments */
-@media only screen and (max-width: 768px) {
+/* Responsive */
+@media (max-width: 768px) {
   .tour__img {
     height: 180px;
   }
+
   .tour__title {
-    font-size: 16px;
-    min-height: 45px;
+    font-size: 1rem;
   }
-  .tour__duration,
-  .tour__location {
-    font-size: 13px;
-  }
+
   .tour__price {
-    font-size: 18px;
-  }
-  .booking__btn {
-    padding: 6px 15px;
-    font-size: 13px;
+    font-size: 1rem;
   }
 }
-
-@media only screen and (max-width: 576px) {
-  .tour__img {
-    height: 160px;
-  }
-  .destination__overlay {
-    font-size: 14px;
-    padding: 6px 10px;
-  }
-  .tour__title {
-    font-size: 15px;
-    min-height: 40px;
-  }
-  .tour__price {
-    font-size: 16px;
-  }
-}
-

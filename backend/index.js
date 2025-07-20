@@ -16,6 +16,7 @@ import categoryRoute from "./routes/category.js";
 import messageRoute from "./routes/messageRoutes.js";
 import Message from "./models/Message.js";
 import guideRoutes from "./routes/guideRoutes.js";
+import contactRoutes from "./routes/contactRoutes.js"
 import bookingRoute from "./routes/booking.js";
 
 dotenv.config();
@@ -61,6 +62,8 @@ app.use("/api/guides", guideRoutes);
 app.use("/api/call-request", callRequestRoute);
 app.use("/api/bookings", bookingRoute);
 app.use("/api/messages", messageRoute);
+
+app.use('/api/contact', contactRoutes);
 
 // --- Socket.IO Logic ---
 io.on("connection", (socket) => {
