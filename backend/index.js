@@ -64,6 +64,8 @@ app.use("/api/bookings", bookingRoute);
 app.use("/api/messages", messageRoute);
 
 app.use('/api/contact', contactRoutes);
+app.use('/api/contact/feedbacks', contactRoutes);
+app.use('/api/contact/callbacks', contactRoutes);
 
 // --- Socket.IO Logic ---
 io.on("connection", (socket) => {

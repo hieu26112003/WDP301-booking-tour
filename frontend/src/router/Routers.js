@@ -26,6 +26,8 @@ import ListTour from "../pages/User/ListTour";
 import TourDetail from "../pages/Admin/components/TourDetail";
 import MyBookings from "../pages/User/MyBookings";
 import StaffBookings from "../pages/Staff/StaffBooking";
+import CallbackList from "../pages/Staff/CallbackList";
+import FeedbackList from "../pages/Staff/FeedbackList";
 
 const Routers = () => {
   return (
@@ -134,6 +136,24 @@ const Routers = () => {
         element={
           <StaffLayout>
             <StaffBookings />
+          </StaffLayout>
+        }
+      />
+
+      <Route
+        path="/staff/feedbacks"
+        element={
+          <StaffLayout>
+            <FeedbackList />
+          </StaffLayout>
+        }
+      />
+
+      <Route
+        path="/staff/callbacks"
+        element={
+          <StaffLayout>
+            <CallbackList />
           </StaffLayout>
         }
       />

@@ -40,6 +40,16 @@ const Sidebar = () => {
           icon={<FaBook />}
           label="Manage Tour Bookings"
         />
+        <SidebarItem
+          to="/staff/feedbacks"
+          icon={<FaBook />}
+          label="Feedbacks"
+        />
+        <SidebarItem
+          to="/staff/callbacks"
+          icon={<FaBook />}
+          label="Callbacks"
+        />
         {/* <SidebarItem
           to="/admin/tours"
           icon={<FaMapMarkedAlt />}
