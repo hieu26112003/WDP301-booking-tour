@@ -20,6 +20,7 @@ const Header = ({ onCategorySelect, onSearch }) => {
   const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [menuCategories, setMenuCategories] = useState([]);
+  const [menuCategoriesGuide, setMenuCategoriesGuide] = useState([]);
 
   // Debounce function
   const debounce = (func, delay) => {
@@ -29,6 +30,36 @@ const Header = ({ onCategorySelect, onSearch }) => {
       timeoutId = setTimeout(() => func(...args), delay);
     };
   };
+
+   useEffect(() => {
+    const fetchCategoriesGuide = async () => {
+      try {
+        const res = await fetch(`${BASE_URL}/guides/categories`);
+        const data = await res.json();
+        if (data.success) {
+          setMenuCategoriesGuide(data.data);
+        }
+      } catch (err) {
+        console.error("Lỗi load categories:", err);
+      }
+    };
+    fetchCategoriesGuide();
+  }, []);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch(`${BASE_URL}/categories`);
+        const data = await res.json();
+        if (data.success) {
+          setMenuCategories(data.data);
+        }
+      } catch (err) {
+        console.error("Lỗi load categories:", err);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   // Debounced search handler
   const debouncedSearch = debounce(onSearch, 300);
@@ -60,25 +91,17 @@ const Header = ({ onCategorySelect, onSearch }) => {
       path: "/tours",
       display: "TOUR DU LỊCH",
       hasDropdown: true,
-      dropdownItems:
-        categories.length > 0
-          ? [
-              {
-                display: "Tất cả danh mục",
-                onClick: () => onCategorySelect(null, "Tất cả danh mục"),
-              },
-              ...categories.map((cat) => ({
-                display: cat.name,
-                onClick: () => onCategorySelect(cat._id, cat.name),
-              })),
-            ]
-          : [],
+      dropdownItems: menuCategories.map((ca) => ({
+        path: `/tours/filter/${ca.slug}`,
+        display: ca.name,
+      })),
     },
+
     {
       path: "/cam-nang",
       display: "CẨM NANG DU LỊCH",
       hasDropdown: true,
-      dropdownItems: menuCategories.map((cat) => ({
+      dropdownItems: menuCategoriesGuide.map((cat) => ({
         path: `/cam-nang/${cat.slug}`,
         display: cat.name,
       })),
@@ -342,15 +365,28 @@ const Header = ({ onCategorySelect, onSearch }) => {
                             </div>
                           ) : item.dropdownItems.length > 0 ? (
                             item.dropdownItems.map(
-                              (dropdownItem, dropdownIndex) => (
-                                <div
-                                  key={dropdownIndex}
-                                  className="dropdown-item-redesign"
-                                  onClick={dropdownItem.onClick}
-                                >
-                                  {dropdownItem.display}
-                                </div>
-                              )
+                              (dropdownItem, dropdownIndex) =>
+                                item.path === "/cam-nang" ? (
+                                  // ✅ CẨM NANG DU LỊCH -> Link
+                                  <Link
+                                    key={dropdownIndex}
+                                    to={dropdownItem.path}
+                                    className="dropdown-item-redesign"
+                                    onClick={() => setActiveDropdown(null)}
+                                  >
+                                    {dropdownItem.display}
+                                  </Link>
+                                ) : (
+                                  // ✅ TOUR DU LỊCH -> div + onClick
+                                  <Link
+                                    key={dropdownIndex}
+                                    to={dropdownItem.path}
+                                    className="dropdown-item-redesign"
+                                    onClick={() => setActiveDropdown(null)}
+                                  >
+                                    {dropdownItem.display}
+                                  </Link>
+                                )
                             )
                           ) : (
                             <div className="dropdown-empty-redesign">

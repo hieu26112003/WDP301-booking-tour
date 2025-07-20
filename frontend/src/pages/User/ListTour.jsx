@@ -43,7 +43,7 @@ const ListTour = () => {
     <div className="listtour-page">
       <Container>
         <h2 className="listtour-heading">
-          {slug ? `Tour: ${slug.replace("-", " ")}` : "Danh sách Tour"}
+           Danh sách Tour
         </h2>
 
         {loading && <div className="listtour-loading">Đang tải...</div>}

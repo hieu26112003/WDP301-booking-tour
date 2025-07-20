@@ -17,6 +17,7 @@ import ManageTours from "../pages/Admin/components/ManageTours";
 import ManageCategories from "../pages/Admin/components/ManageCategories";
 import StaffLayout from "../components/Layout/StaffLayout";
 import StaffChatPage from "../pages/Staff/StaffChatPage";
+import StaffComment from "../pages/Staff/StaffComment";
 import Guide from "../pages/User/Guide";
 import ManageGuide from "../pages/Staff/ManageGuide";
 import AboutUs from "../components/About/About";
@@ -26,14 +27,17 @@ import ListTour from "../pages/User/ListTour";
 import TourDetail from "../pages/Admin/components/TourDetail";
 import MyBookings from "../pages/User/MyBookings";
 import StaffBookings from "../pages/Staff/StaffBooking";
+import GuideDetail from "../pages/User/GuideDetail";
 
 const Routers = () => {
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/home" />} />
       <Route path="/home" element={<Home />} />
-      <Route path="/cam-nang" element={<CamNang />} />
+      <Route path="/cam-nang/guide/:id" element={<GuideDetail />} />
       <Route path="/cam-nang/:slug" element={<CamNang />} />
+      <Route path="/cam-nang" element={<CamNang />} />
+      
       <Route path="/login" element={<Login />} />
       <Route path="/tours/:id" element={<TourDetails />} />
       <Route path="/register" element={<Register />} />
@@ -45,6 +49,7 @@ const Routers = () => {
       <Route path="/about" element={<AboutUs />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/tours/" element={<ListTour />} />
+      
       <Route path="/tours/filter/:slug" element={<ListTour />} />
 
       <Route path="/my-bookings" element={<MyBookings />} />
@@ -101,6 +106,14 @@ const Routers = () => {
         element={
           <StaffLayout>
             <ManageGuide />
+          </StaffLayout>
+        }
+      />
+      <Route
+        path="/staff/comment"
+        element={
+          <StaffLayout>
+            <StaffComment />
           </StaffLayout>
         }
       />

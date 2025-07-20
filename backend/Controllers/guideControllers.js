@@ -236,3 +236,24 @@ export const getAllCategoryGuides = async (req, res) => {
     });
   }
 };
+
+export const getGuideById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ success: false, message: "Invalid guide ID" });
+    }
+
+    const guide = await Guide.findById(id).populate("category", "name");
+    if (!guide) {
+      return res.status(404).json({ success: false, message: "Guide not found" });
+    }
+
+    res.status(200).json({ success: true, data: guide });
+  } catch (err) {
+    console.error("Error in getGuideById:", err);
+    res.status(500).json({ success: false, message: "Failed to fetch guide details" });
+  }
+};
+

@@ -9,6 +9,14 @@ export const getAllUsers = async (req, res) => {
         res.status(500).json({ error: "Failed to fetch users" });
     }
 };
+export const getAllStaff = async (req, res) => {
+    try {
+        const users = await User.find({ role: "staff" }).select("-password"); // ẩn password
+        res.json(users);
+    } catch (err) {
+        res.status(500).json({ error: "Failed to fetch users" });
+    }
+};
 
 // GET /admin/users/:id
 export const getUserById = async (req, res) => {
