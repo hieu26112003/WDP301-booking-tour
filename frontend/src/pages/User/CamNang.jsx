@@ -54,7 +54,7 @@ const CamNang = () => {
         <ul className="camnang-list">
           {guides.map((guide) => (
             <li key={guide._id} className="camnang-item">
-              <Link to={`/cam-nang/${guide._id}`} className="camnang-card">
+              <Link to={`/cam-nang/guide/${guide._id}`} className="camnang-card">
                 <div className="camnang-card-imgwrap">
                   <img
                     src={guide.image}

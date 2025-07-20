@@ -25,7 +25,7 @@ const ManageStaff = () => {
 
   const fetchStaffs = useCallback(async () => {
     try {
-      const res = await axios.get("http://localhost:8000/api/admin/users", {
+      const res = await axios.get("http://localhost:8000/api/admin/staff", {
         headers: { Authorization: `Bearer ${token}` },
       });
       const staffList = res.data.filter((user) => user.role === "staff");

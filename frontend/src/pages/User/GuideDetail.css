@@ -1,0 +1,40 @@
+.guide-detail-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+.guide-detail-content {
+  line-height: 1.8;
+  font-size: 16px;
+  color: #333;
+}
+
+.guide-detail-content h1,
+.guide-detail-content h2,
+.guide-detail-content h3 {
+  margin: 20px 0 10px;
+  color: #222;
+  font-weight: bold;
+}
+
+.guide-detail-content p {
+  margin-bottom: 16px;
+}
+
+.guide-detail-content img {
+  display: block;
+  max-width: 100%;
+  margin: 20px auto;
+  border-radius: 6px;
+}
+
+.loading-text,
+.error-text {
+  text-align: center;
+  color: #555;
+  font-size: 18px;
+}
