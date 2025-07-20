@@ -56,6 +56,8 @@ const ManageTours = () => {
   const [editId, setEditId] = useState(null);
   const [modal, setModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
   const navigate = useNavigate();
 
   const toggleModal = () => {
@@ -179,13 +181,37 @@ const ManageTours = () => {
     e.preventDefault();
     setIsLoading(true);
 
+    // Client-side validation for departureDate
     if (formData.departureDate) {
       const parsedDate = new Date(formData.departureDate);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Reset time to midnight for comparison
       if (isNaN(parsedDate.getTime())) {
         Swal.fire({
           icon: "error",
           title: "Lỗi",
           text: "Invalid departure date format",
+          confirmButtonColor: "#d33",
+          backdrop: true,
+          allowOutsideClick: true,
+          customClass: {
+            popup: "custom-swal-popup",
+            title: "custom-swal-title",
+            content: "custom-swal-content",
+            confirmButton: "custom-swal-confirm",
+          },
+          willClose: () => {
+            document.body.style.overflow = "auto";
+          },
+        });
+        setIsLoading(false);
+        return;
+      }
+      if (parsedDate < today) {
+        Swal.fire({
+          icon: "error",
+          title: "Lỗi",
+          text: "Departure date cannot be earlier than today",
           confirmButtonColor: "#d33",
           backdrop: true,
           allowOutsideClick: true,
@@ -459,6 +485,26 @@ const ManageTours = () => {
     navigate(`/tour-detail/${tour._id}`, { state: { tour } });
   };
 
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  const handleCategoryChange = (e) => {
+    setSelectedCategory(e.target.value);
+  };
+
+  // Filter tours based on search term and selected category
+  const filteredTours = tours.filter((tour) => {
+    const matchesSearch = tour.title
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedCategory
+      ? tour.categoryId?._id === selectedCategory ||
+        tour.categoryId === selectedCategory
+      : true;
+    return matchesSearch && matchesCategory;
+  });
+
   const quillModules = {
     toolbar: [
       [{ size: ["12px", "14px", "16px", "18px", "20px"] }],
@@ -488,15 +534,43 @@ const ManageTours = () => {
         <Row>
           <Col lg="12">
             <div className="d-flex justify-content-between align-items-center mb-4">
-              <h2>Manage Tours</h2>
-              <Button
-                color="primary"
-                onClick={handleAddNew}
-                className="icon-btn"
-                disabled={isLoading}
-              >
-                <FaPlus />
-              </Button>
+              <div className="w-100">
+                <h2>Manage Tours</h2>
+                <div className="d-flex align-items-center mt-2">
+                  <FormGroup className="me-3" style={{ minWidth: "200px" }}>
+                    <Input
+                      type="select"
+                      value={selectedCategory}
+                      onChange={handleCategoryChange}
+                      disabled={isLoading}
+                    >
+                      <option value="">All Categories</option>
+                      {categories.map((category) => (
+                        <option key={category._id} value={category._id}>
+                          {category.name}
+                        </option>
+                      ))}
+                    </Input>
+                  </FormGroup>
+                  <FormGroup className="me-3" style={{ flex: 1 }}>
+                    <Input
+                      type="text"
+                      placeholder="Search by tour title..."
+                      value={searchTerm}
+                      onChange={handleSearchChange}
+                      disabled={isLoading}
+                    />
+                  </FormGroup>
+                  <Button
+                    color="primary"
+                    onClick={handleAddNew}
+                    className="icon-btn"
+                    disabled={isLoading}
+                  >
+                    <FaPlus />
+                  </Button>
+                </div>
+              </div>
             </div>
 
             <Modal isOpen={modal} toggle={toggleModal} size="lg">
@@ -672,7 +746,11 @@ const ManageTours = () => {
                       name="image"
                       accept="image/*"
                       onChange={handleImageChange}
-                      required={!editId && !imageUrls.some((url) => url.trim())}
+                      required={
+                        !editId &&
+                        !imageUrls.some((url) => url.trim()) &&
+                        !existingImages.length
+                      }
                       disabled={isLoading}
                     />
                     {imageFile && (
@@ -722,12 +800,13 @@ const ManageTours = () => {
                               src={image}
                               alt={`Existing image ${index + 1}`}
                               style={{ maxWidth: "100px", height: "auto" }}
-                              onError={(e) =>
+                              onError={(e) => {
                                 console.error(
                                   "Existing image load error:",
                                   image
-                                )
-                              }
+                                );
+                                e.target.src = "/placeholder.jpg";
+                              }}
                             />
                             <Button
                               color="danger"
@@ -793,83 +872,92 @@ const ManageTours = () => {
                 </tr>
               </thead>
               <tbody>
-                {tours.map((tour, index) => {
-                  const firstImage =
-                    tour.images && tour.images.length > 0
-                      ? tour.images[0]
-                      : "/placeholder.jpg";
-                  return (
-                    <tr key={tour._id}>
-                      <td>{index + 1}</td>
-                      <td className="image-cell">
-                        <img
-                          src={firstImage}
-                          alt={tour.title}
-                          className="tour-image"
-                          onError={(e) =>
-                            console.error("Image load error:", firstImage)
-                          }
-                        />
-                      </td>
-                      <td>{tour.title}</td>
-                      <td>{tour.summary}</td>
-                      <td>{tour.priceAdult}</td>
-                      <td className="html-content">
-                        {truncateText(tour.notes)}
-                      </td>
-                      <td className="html-content">
-                        {truncateText(tour.cancellationPolicy)}
-                      </td>
-                      <td>{tour.categoryId?.name || "N/A"}</td>
-                      <td>
-                        {new Date(tour.departureDate).toLocaleDateString(
-                          "vi-VN",
-                          {
-                            day: "2-digit",
-                            month: "2-digit",
-                            year: "numeric",
-                          }
-                        )}
-                      </td>
-                      <td>
-                        <FaCheck
-                          className={
-                            tour.featured ? "active-check" : "inactive-check"
-                          }
-                        />
-                      </td>
-                      <td>
-                        <Button
-                          color="link"
-                          className="icon-btn"
-                          onClick={() => handleViewDetail(tour)}
-                          title="View Details"
-                          disabled={isLoading}
-                        >
-                          <FaEye />
-                        </Button>
-                        <Button
-                          color="link"
-                          className="icon-btn"
-                          onClick={() => handleEdit(tour)}
-                          title="Edit"
-                          disabled={isLoading}
-                        >
-                          <FaEdit />
-                        </Button>
-                        <Button
-                          color="link"
-                          className="icon-btn"
-                          onClick={() => handleDelete(tour._id)}
-                          title="Delete"
-                          disabled={isLoading}
-                        >
-                          <FaTrash />
-                        </Button>
-                      </td>
-                    </tr>
-                  );
-                })}
+                {filteredTours.length > 0 ? (
+                  filteredTours.map((tour, index) => {
+                    const firstImage =
+                      tour.images && tour.images.length > 0
+                        ? tour.images[0]
+                        : "/placeholder.jpg";
+                    return (
+                      <tr key={tour._id}>
+                        <td>{index + 1}</td>
+                        <td className="image-cell">
+                          <img
+                            src={firstImage}
+                            alt={tour.title}
+                            className="tour-image"
+                            onError={(e) => {
+                              console.error("Image load error:", firstImage);
+                              e.target.src = "/placeholder.jpg";
+                            }}
+                          />
+                        </td>
+                        <td>{tour.title}</td>
+                        <td>{tour.summary}</td>
+                        <td>{tour.priceAdult}</td>
+                        <td className="html-content">
+                          {truncateText(tour.notes)}
+                        </td>
+                        <td className="html-content">
+                          {truncateText(tour.cancellationPolicy)}
+                        </td>
+                        <td>{tour.categoryId?.name || "N/A"}</td>
+                        <td>
+                          {new Date(tour.departureDate).toLocaleDateString(
+                            "vi-VN",
+                            {
+                              day: "2-digit",
+                              month: "2-digit",
+                              year: "numeric",
+                            }
+                          )}
+                        </td>
+                        <td>
+                          <FaCheck
+                            className={
+                              tour.featured ? "active-check" : "inactive-check"
+                            }
+                          />
+                        </td>
+                        <td>
+                          <Button
+                            color="link"
+                            className="icon-btn"
+                            onClick={() => handleViewDetail(tour)}
+                            title="View Details"
+                            disabled={isLoading}
+                          >
+                            <FaEye />
+                          </Button>
+                          <Button
+                            color="link"
+                            className="icon-btn"
+                            onClick={() => handleEdit(tour)}
+                            title="Edit"
+                            disabled={isLoading}
+                          >
+                            <FaEdit />
+                          </Button>
+                          <Button
+                            color="link"
+                            className="icon-btn"
+                            onClick={() => handleDelete(tour._id)}
+                            title="Delete"
+                            disabled={isLoading}
+                          >
+                            <FaTrash />
+                          </Button>
+                        </td>
+                      </tr>
+                    );
+                  })
+                ) : (
+                  <tr>
+                    <td colSpan="11" className="text-center">
+                      No tours found
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </Table>
           </Col>

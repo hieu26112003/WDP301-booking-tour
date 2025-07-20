@@ -29,6 +29,7 @@ const ManageStaff = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       const staffList = res.data.filter((user) => user.role === "staff");
+
       setStaffs(staffList);
     } catch (err) {
       console.error("Lỗi khi fetch staffs:", err);
@@ -93,7 +94,11 @@ const ManageStaff = () => {
         fetchStaffs();
         fetchUsers();
       } catch (err) {
-        Swal.fire("Lỗi", err.response?.data?.message || "Thêm thất bại", "error");
+        Swal.fire(
+          "Lỗi",
+          err.response?.data?.message || "Thêm thất bại",
+          "error"
+        );
       }
     }
   };
@@ -162,7 +167,11 @@ const ManageStaff = () => {
             </Table>
 
             {/* User List Modal */}
-            <Modal isOpen={showUserList} toggle={() => setShowUserList(false)} size="lg">
+            <Modal
+              isOpen={showUserList}
+              toggle={() => setShowUserList(false)}
+              size="lg"
+            >
               <ModalHeader toggle={() => setShowUserList(false)}>
                 Danh sách User để thăng lên Staff
               </ModalHeader>
