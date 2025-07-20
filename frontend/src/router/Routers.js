@@ -24,6 +24,8 @@ import Contact from "../components/Contact/Contact";
 import TourDetails from "../pages/User/TourDetails";
 
 import TourDetail from "../pages/Admin/components/TourDetail";
+import MyBookings from "../pages/User/MyBookings";
+import StaffBookings from "../pages/Staff/StaffBooking";
 
 const Routers = () => {
   return (
@@ -42,7 +44,7 @@ const Routers = () => {
       <Route path="/Guide" element={<Guide />} />
       <Route path="/about" element={<AboutUs />} />
       <Route path="/contact" element={<Contact />} />
-
+      <Route path="/my-bookings" element={<MyBookings />} />
       <Route
         path="/admin"
         element={
@@ -120,6 +122,15 @@ const Routers = () => {
         element={
           <StaffLayout>
             <StaffChatPage />
+          </StaffLayout>
+        }
+      />
+
+      <Route
+        path="/staff/bookings"
+        element={
+          <StaffLayout>
+            <StaffBookings />
           </StaffLayout>
         }
       />

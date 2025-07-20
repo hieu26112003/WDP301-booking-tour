@@ -1,4 +1,5 @@
-// Header.js (với debounce)
+"use client";
+
 import React, { useEffect, useRef, useContext, useState } from "react";
 import { Container } from "reactstrap";
 import { Link, useNavigate } from "react-router-dom";
@@ -62,32 +63,30 @@ const Header = ({ onCategorySelect, onSearch }) => {
       dropdownItems:
         categories.length > 0
           ? [
-            {
-              display: "Tất cả danh mục",
-              onClick: () => onCategorySelect(null, "Tất cả danh mục"),
-            },
-            ...categories.map((cat) => ({
-              display: cat.name,
-              onClick: () => onCategorySelect(cat._id, cat.name),
-            })),
-          ]
+              {
+                display: "Tất cả danh mục",
+                onClick: () => onCategorySelect(null, "Tất cả danh mục"),
+              },
+              ...categories.map((cat) => ({
+                display: cat.name,
+                onClick: () => onCategorySelect(cat._id, cat.name),
+              })),
+            ]
           : [],
     },
     {
       path: "/cam-nang",
       display: "CẨM NANG DU LỊCH",
       hasDropdown: true,
-      dropdownItems: menuCategories.map(cat => ({
+      dropdownItems: menuCategories.map((cat) => ({
         path: `/cam-nang/${cat.slug}`,
-        display: cat.name
-      }))
+        display: cat.name,
+      })),
     },
-
     { path: "/about", display: "VỀ ASK TRAVEL" },
     { path: "/contact", display: "LIÊN HỆ" },
   ];
 
-  // Header.js (chỉ cập nhật hàm logout)
   const logout = () => {
     Swal.fire({
       title: "Bạn có chắc muốn đăng xuất?",
@@ -97,8 +96,8 @@ const Header = ({ onCategorySelect, onSearch }) => {
       cancelButtonColor: "#d33",
       confirmButtonText: "Đăng xuất",
       cancelButtonText: "Hủy",
-      backdrop: true, // Đảm bảo backdrop hiển thị
-      allowOutsideClick: true, // Cho phép click bên ngoài
+      backdrop: true,
+      allowOutsideClick: true,
       customClass: {
         popup: "custom-swal-popup",
         title: "custom-swal-title",
@@ -116,16 +115,15 @@ const Header = ({ onCategorySelect, onSearch }) => {
           showConfirmButton: false,
           timer: 1500,
           timerProgressBar: true,
-          backdrop: true, // Đảm bảo backdrop
-          allowOutsideClick: true, // Cho phép click bên ngoài
+          backdrop: true,
+          allowOutsideClick: true,
           customClass: {
             popup: "custom-swal-popup",
             title: "custom-swal-title",
             content: "custom-swal-content",
           },
           willClose: () => {
-            console.log("Success message closed"); // Debug
-            // Đảm bảo khôi phục cuộn
+            console.log("Success message closed");
             document.body.style.overflow = "auto";
           },
         });
@@ -164,6 +162,18 @@ const Header = ({ onCategorySelect, onSearch }) => {
     setSearchQuery(query);
     debouncedSearch(query);
   };
+
+  // Dropdown items dựa trên vai trò người dùng
+  const userDropdownItems = [
+    { path: "/profile", display: "Hồ sơ" },
+    { path: "/change-password", display: "Đổi mật khẩu" },
+    ...(user?.role === "admin"
+      ? [{ path: "/admin", display: "Admin Dashboard" }]
+      : user?.role === "staff"
+      ? [{ path: "/staff", display: "Staff Dashboard" }]
+      : [{ path: "/my-bookings", display: "Danh Sách Tour Đã Đặt" }]),
+    { display: "Đăng xuất", onClick: logout },
+  ];
 
   return (
     <header className="header-redesign" ref={headerRef}>
@@ -246,28 +256,32 @@ const Header = ({ onCategorySelect, onSearch }) => {
                       />
                     </div>
                     <div
-                      className={`user-dropdown-redesign ${activeDropdown === "user" ? "show" : ""
-                        }`}
+                      className={`user-dropdown-redesign ${
+                        activeDropdown === "user" ? "show" : ""
+                      }`}
                     >
-                      <Link
-                        to="/profile"
-                        className="user-dropdown-item-redesign"
-                      >
-                        Hồ sơ
-                      </Link>
-                      <Link
-                        to="/change-password"
-                        className="user-dropdown-item-redesign"
-                      >
-                        Đổi mật khẩu
-                      </Link>
-                      <div className="user-dropdown-divider-redesign"></div>
-                      <button
-                        onClick={logout}
-                        className="user-dropdown-item-redesign"
-                      >
-                        Đăng xuất
-                      </button>
+                      {userDropdownItems.map((item, index) => (
+                        <div
+                          key={index}
+                          className="user-dropdown-item-redesign"
+                        >
+                          {item.onClick ? (
+                            <button
+                              onClick={item.onClick}
+                              className="user-dropdown-button-redesign"
+                            >
+                              {item.display}
+                            </button>
+                          ) : (
+                            <Link
+                              to={item.path}
+                              className="user-dropdown-link-redesign"
+                            >
+                              {item.display}
+                            </Link>
+                          )}
+                        </div>
+                      ))}
                     </div>
                   </div>
                 ) : (
@@ -317,8 +331,9 @@ const Header = ({ onCategorySelect, onSearch }) => {
                         />
                       </Link>
                       <div
-                        className={`dropdown-menu-redesign ${activeDropdown === index ? "show" : ""
-                          }`}
+                        className={`dropdown-menu-redesign ${
+                          activeDropdown === index ? "show" : ""
+                        }`}
                       >
                         <div className="dropdown-content-redesign">
                           {isLoading ? (

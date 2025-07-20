@@ -45,7 +45,7 @@ const tourSchema = new mongoose.Schema(
       required: true,
     },
     departureDate: {
-      type: String,
+      type: Date,
       required: true,
     },
     time: {

@@ -25,9 +25,10 @@ export const createTour = async (req, res) => {
       departureDate,
       time,
       categoryId,
-      imageUrls, // Array of URLs for subsequent images
+      imageUrls,
     } = req.body;
 
+    // Validate required fields
     if (
       !title ||
       !summary ||
@@ -47,12 +48,22 @@ export const createTour = async (req, res) => {
         .json({ success: false, message: "All fields are required" });
     }
 
+    // Validate categoryId
     if (!mongoose.Types.ObjectId.isValid(categoryId)) {
       return res
         .status(400)
         .json({ success: false, message: "Invalid category ID" });
     }
 
+    // Validate departureDate
+    const parsedDate = new Date(departureDate);
+    if (isNaN(parsedDate.getTime())) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid departure date format" });
+    }
+
+    // Validate image requirements
     if (!req.file && (!imageUrls || !JSON.parse(imageUrls).length)) {
       return res
         .status(400)
@@ -79,7 +90,7 @@ export const createTour = async (req, res) => {
       }
     }
 
-    console.log("Created tour image paths:", images); // Debugging log
+    console.log("Created tour image paths:", images);
 
     const newTour = new Tour({
       id: newId,
@@ -92,7 +103,7 @@ export const createTour = async (req, res) => {
       notes,
       cancellationPolicy,
       schedule,
-      departureDate,
+      departureDate: parsedDate,
       time,
       categoryId,
       images,
@@ -112,7 +123,6 @@ export const createTour = async (req, res) => {
     res.status(500).json({ success: false, message: "Failed to create tour" });
   }
 };
-
 // Lấy tất cả tour
 export const getAllTours = async (req, res) => {
   try {
@@ -302,13 +312,21 @@ export const updateTour = async (req, res) => {
       notes,
       cancellationPolicy,
       schedule,
-      departureDate,
       time,
       categoryId,
       featured,
     };
 
-    // Handle images: combine existing images, new uploaded file, and new URLs
+    if (departureDate) {
+      const parsedDate = new Date(departureDate);
+      if (isNaN(parsedDate.getTime())) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Invalid departure date format" });
+      }
+      updateData.departureDate = parsedDate;
+    }
+
     let images = [];
     if (existingImages) {
       try {
@@ -318,7 +336,7 @@ export const updateTour = async (req, res) => {
       }
     }
     if (req.file) {
-      images.unshift(`/user_images/${path.basename(req.file.path)}`); // Add uploaded image first
+      images.unshift(`/user_images/${path.basename(req.file.path)}`);
     }
     if (imageUrls) {
       try {
@@ -341,7 +359,7 @@ export const updateTour = async (req, res) => {
         .json({ success: false, message: "At least one image is required" });
     }
 
-    console.log("Updated tour image paths:", updateData.images); // Debugging log
+    console.log("Updated tour image paths:", updateData.images);
 
     if (
       !title &&
