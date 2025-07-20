@@ -1,0 +1,153 @@
+/* MyBookings Section */
+.my-bookings-section {
+  padding: 40px 0;
+  background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+  min-height: 100vh;
+}
+
+/* Header */
+.my-bookings-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 1.5rem;
+  letter-spacing: 0.5px;
+  text-align: center;
+}
+
+/* Table */
+.my-bookings-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.my-bookings-table th,
+.my-bookings-table td {
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+  vertical-align: middle;
+  text-align: center;
+}
+
+.my-bookings-table th {
+  background: #f1f5f9;
+  color: #1e293b;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+}
+
+.my-bookings-table td {
+  border-top: 1px solid #e2e8f0;
+  color: #1e293b;
+}
+
+.my-bookings-table tbody tr {
+  transition: background 0.3s;
+}
+
+.my-bookings-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+/* Buttons */
+.my-bookings-table .btn {
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.my-bookings-table .btn-danger {
+  background-color: #dc2626;
+  border-color: #dc2626;
+}
+
+.my-bookings-table .btn-danger:hover {
+  background-color: #b91c1c;
+  border-color: #b91c1c;
+  transform: translateY(-2px);
+}
+
+.my-bookings-table .btn-primary {
+  background-color: #2563eb;
+  border-color: #2563eb;
+}
+
+.my-bookings-table .btn-primary:hover {
+  background-color: #1e40af;
+  border-color: #1e40af;
+  transform: translateY(-2px);
+}
+
+/* No Bookings Message */
+.no-bookings-message {
+  font-size: 1rem;
+  color: #1e293b;
+  text-align: center;
+  margin-top: 2rem;
+}
+
+/* Table Column Widths */
+.my-bookings-table th:nth-child(1),
+.my-bookings-table td:nth-child(1) {
+  width: 25%; /* Tên Tour */
+}
+
+.my-bookings-table th:nth-child(2),
+.my-bookings-table td:nth-child(2) {
+  width: 15%; /* Số Người Lớn */
+}
+
+.my-bookings-table th:nth-child(3),
+.my-bookings-table td:nth-child(3) {
+  width: 15%; /* Số Trẻ Em */
+}
+
+.my-bookings-table th:nth-child(4),
+.my-bookings-table td:nth-child(4) {
+  width: 15%; /* Tổng Tiền */
+}
+
+.my-bookings-table th:nth-child(5),
+.my-bookings-table td:nth-child(5) {
+  width: 15%; /* Trạng Thái */
+}
+
+.my-bookings-table th:nth-child(6),
+.my-bookings-table td:nth-child(6) {
+  width: 15%; /* Ngày Đặt */
+}
+
+.my-bookings-table th:nth-child(7),
+.my-bookings-table td:nth-child(7) {
+  width: 10%; /* Hành Động */
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .my-bookings-title {
+    font-size: 1.75rem;
+  }
+
+  .my-bookings-table th,
+  .my-bookings-table td {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+  }
+
+  .no-bookings-message {
+    font-size: 0.9rem;
+  }
+
+  .my-bookings-table .btn {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+  }
+}

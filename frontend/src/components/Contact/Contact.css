@@ -1,0 +1,9 @@
+.tour-hot h5 {
+    font-weight: bold;
+    color: #ff6600;
+}
+
+.contact-page .card {
+    border: none;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+}

@@ -1,11 +1,13 @@
+"use client";
+
 import React, { useEffect, useRef, useContext, useState } from "react";
 import { Container } from "reactstrap";
 import { Link, useNavigate } from "react-router-dom";
-import { Search, Phone, ChevronDown, Menu, User } from "lucide-react";
+import { Search, Phone, ChevronDown, Menu, User, X } from "lucide-react";
 import "./header.css";
 import { AuthContext } from "../../context/AuthContext";
 import Swal from "sweetalert2";
-
+import { getCategories } from "../../services/categoryService";
 import { BASE_URL } from "../../utils/config";
 
 const Header = ({ onCategorySelect, onSearch }) => {
@@ -15,40 +17,9 @@ const Header = ({ onCategorySelect, onSearch }) => {
   const { user, dispatch } = useContext(AuthContext);
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
-
-  const [menuCategoriesGuide, setMenuCategoriesGuide] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [menuCategories, setMenuCategories] = useState([]);
-
-  useEffect(() => {
-    const fetchCategoriesGuide = async () => {
-      try {
-        const res = await fetch(`${BASE_URL}/guides/categories`);
-        const data = await res.json();
-        if (data.success) {
-          setMenuCategoriesGuide(data.data);
-        }
-      } catch (err) {
-        console.error("Lỗi load categories:", err);
-      }
-    };
-    fetchCategoriesGuide();
-  }, []);
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const res = await fetch(`${BASE_URL}/categories`);
-        const data = await res.json();
-        if (data.success) {
-          setMenuCategories(data.data);
-        }
-      } catch (err) {
-        console.error("Lỗi load categories:", err);
-      }
-    };
-    fetchCategories();
-  }, []);
 
   // Debounce function
   const debounce = (func, delay) => {
@@ -59,9 +30,29 @@ const Header = ({ onCategorySelect, onSearch }) => {
     };
   };
 
+  // Debounced search handler
   const debouncedSearch = debounce(onSearch, 300);
 
-
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const res = await getCategories();
+        setCategories(res.data?.data || []);
+      } catch (error) {
+        console.error("Failed to fetch categories", error);
+        Swal.fire({
+          icon: "error",
+          title: "Lỗi",
+          text: "Không thể tải danh mục",
+          confirmButtonColor: "#d33",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   const nav__links = [
     { path: "/home", display: "TRANG CHỦ" },
@@ -69,16 +60,25 @@ const Header = ({ onCategorySelect, onSearch }) => {
       path: "/tours",
       display: "TOUR DU LỊCH",
       hasDropdown: true,
-      dropdownItems: menuCategories.map((ca) => ({
-        path: `/tours/filter/${ca.slug}`,
-        display: ca.name,
-      })),
+      dropdownItems:
+        categories.length > 0
+          ? [
+              {
+                display: "Tất cả danh mục",
+                onClick: () => onCategorySelect(null, "Tất cả danh mục"),
+              },
+              ...categories.map((cat) => ({
+                display: cat.name,
+                onClick: () => onCategorySelect(cat._id, cat.name),
+              })),
+            ]
+          : [],
     },
     {
       path: "/cam-nang",
       display: "CẨM NANG DU LỊCH",
       hasDropdown: true,
-      dropdownItems: menuCategoriesGuide.map((cat) => ({
+      dropdownItems: menuCategories.map((cat) => ({
         path: `/cam-nang/${cat.slug}`,
         display: cat.name,
       })),
@@ -96,6 +96,15 @@ const Header = ({ onCategorySelect, onSearch }) => {
       cancelButtonColor: "#d33",
       confirmButtonText: "Đăng xuất",
       cancelButtonText: "Hủy",
+      backdrop: true,
+      allowOutsideClick: true,
+      customClass: {
+        popup: "custom-swal-popup",
+        title: "custom-swal-title",
+        content: "custom-swal-content",
+        confirmButton: "custom-swal-confirm",
+        cancelButton: "custom-swal-cancel",
+      },
     }).then((result) => {
       if (result.isConfirmed) {
         dispatch({ type: "LOGOUT" });
@@ -105,16 +114,37 @@ const Header = ({ onCategorySelect, onSearch }) => {
           title: "Đăng xuất thành công",
           showConfirmButton: false,
           timer: 1500,
+          timerProgressBar: true,
+          backdrop: true,
+          allowOutsideClick: true,
+          customClass: {
+            popup: "custom-swal-popup",
+            title: "custom-swal-title",
+            content: "custom-swal-content",
+          },
+          willClose: () => {
+            console.log("Success message closed");
+            document.body.style.overflow = "auto";
+          },
         });
       }
     });
   };
 
-  const handleSearch = (e) => {
-    const query = e.target.value;
-    setSearchQuery(query);
-    debouncedSearch(query);
-  };
+  useEffect(() => {
+    const handleScroll = () => {
+      if (
+        document.body.scrollTop > 50 ||
+        document.documentElement.scrollTop > 50
+      ) {
+        headerRef.current.classList.add("sticky__header");
+      } else {
+        headerRef.current.classList.remove("sticky__header");
+      }
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const toggleMenu = () => {
     if (menuRef.current) {
@@ -126,6 +156,24 @@ const Header = ({ onCategorySelect, onSearch }) => {
   const handleMouseLeave = () => setActiveDropdown(null);
   const handleDropdownClick = (index) =>
     setActiveDropdown(index === activeDropdown ? null : index);
+
+  const handleSearch = (e) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+    debouncedSearch(query);
+  };
+
+  // Dropdown items dựa trên vai trò người dùng
+  const userDropdownItems = [
+    { path: "/profile", display: "Hồ sơ" },
+    { path: "/change-password", display: "Đổi mật khẩu" },
+    ...(user?.role === "admin"
+      ? [{ path: "/admin", display: "Admin Dashboard" }]
+      : user?.role === "staff"
+      ? [{ path: "/staff", display: "Staff Dashboard" }]
+      : [{ path: "/my-bookings", display: "Danh Sách Tour Đã Đặt" }]),
+    { display: "Đăng xuất", onClick: logout },
+  ];
 
   return (
     <header className="header-redesign" ref={headerRef}>
@@ -208,28 +256,32 @@ const Header = ({ onCategorySelect, onSearch }) => {
                       />
                     </div>
                     <div
-                      className={`user-dropdown-redesign ${activeDropdown === "user" ? "show" : ""
-                        }`}
+                      className={`user-dropdown-redesign ${
+                        activeDropdown === "user" ? "show" : ""
+                      }`}
                     >
-                      <Link
-                        to="/profile"
-                        className="user-dropdown-item-redesign"
-                      >
-                        Hồ sơ
-                      </Link>
-                      <Link
-                        to="/change-password"
-                        className="user-dropdown-item-redesign"
-                      >
-                        Đổi mật khẩu
-                      </Link>
-                      <div className="user-dropdown-divider-redesign"></div>
-                      <button
-                        onClick={logout}
-                        className="user-dropdown-item-redesign"
-                      >
-                        Đăng xuất
-                      </button>
+                      {userDropdownItems.map((item, index) => (
+                        <div
+                          key={index}
+                          className="user-dropdown-item-redesign"
+                        >
+                          {item.onClick ? (
+                            <button
+                              onClick={item.onClick}
+                              className="user-dropdown-button-redesign"
+                            >
+                              {item.display}
+                            </button>
+                          ) : (
+                            <Link
+                              to={item.path}
+                              className="user-dropdown-link-redesign"
+                            >
+                              {item.display}
+                            </Link>
+                          )}
+                        </div>
+                      ))}
                     </div>
                   </div>
                 ) : (
@@ -255,7 +307,6 @@ const Header = ({ onCategorySelect, onSearch }) => {
         </Container>
       </div>
 
-      {/* Navigation */}
       <div className="navigation-bar-redesign">
         <Container>
           <nav className="navigation-redesign" ref={menuRef}>
@@ -280,8 +331,9 @@ const Header = ({ onCategorySelect, onSearch }) => {
                         />
                       </Link>
                       <div
-                        className={`dropdown-menu-redesign ${activeDropdown === index ? "show" : ""
-                          }`}
+                        className={`dropdown-menu-redesign ${
+                          activeDropdown === index ? "show" : ""
+                        }`}
                       >
                         <div className="dropdown-content-redesign">
                           {isLoading ? (
@@ -290,28 +342,15 @@ const Header = ({ onCategorySelect, onSearch }) => {
                             </div>
                           ) : item.dropdownItems.length > 0 ? (
                             item.dropdownItems.map(
-                              (dropdownItem, dropdownIndex) =>
-                                item.path === "/cam-nang" ? (
-                                  // ✅ CẨM NANG DU LỊCH -> Link
-                                  <Link
-                                    key={dropdownIndex}
-                                    to={dropdownItem.path}
-                                    className="dropdown-item-redesign"
-                                    onClick={() => setActiveDropdown(null)}
-                                  >
-                                    {dropdownItem.display}
-                                  </Link>
-                                ) : (
-                                  // ✅ TOUR DU LỊCH -> div + onClick
-                                  <Link
-                                    key={dropdownIndex}
-                                    to={dropdownItem.path}
-                                    className="dropdown-item-redesign"
-                                    onClick={() => setActiveDropdown(null)}
-                                  >
-                                    {dropdownItem.display}
-                                  </Link>
-                                )
+                              (dropdownItem, dropdownIndex) => (
+                                <div
+                                  key={dropdownIndex}
+                                  className="dropdown-item-redesign"
+                                  onClick={dropdownItem.onClick}
+                                >
+                                  {dropdownItem.display}
+                                </div>
+                              )
                             )
                           ) : (
                             <div className="dropdown-empty-redesign">
@@ -331,6 +370,48 @@ const Header = ({ onCategorySelect, onSearch }) => {
             </ul>
           </nav>
         </Container>
+      </div>
+
+      <div className="mobile-menu-redesign">
+        <div className="mobile-menu-overlay-redesign">
+          <div className="mobile-menu-content-redesign">
+            <div className="mobile-menu-header-redesign">
+              <div className="mobile-menu-title-redesign">Menu</div>
+              <button
+                onClick={toggleMenu}
+                className="mobile-menu-close-redesign"
+              >
+                ×
+              </button>
+            </div>
+            <ul className="mobile-menu-list-redesign">
+              {nav__links.map((item, index) => (
+                <li key={index} className="mobile-menu-item-redesign">
+                  <Link to={item.path} className="mobile-menu-link-redesign">
+                    {item.display}
+                  </Link>
+                  {item.hasDropdown && item.dropdownItems.length > 0 && (
+                    <ul className="mobile-submenu-redesign">
+                      {item.dropdownItems.map((dropdownItem, dropdownIndex) => (
+                        <li
+                          key={dropdownIndex}
+                          className="mobile-submenu-item-redesign"
+                        >
+                          <div
+                            className="mobile-submenu-link-redesign"
+                            onClick={dropdownItem.onClick}
+                          >
+                            {dropdownItem.display}
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
       </div>
     </header>
   );

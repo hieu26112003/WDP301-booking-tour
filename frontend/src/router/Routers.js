@@ -20,10 +20,12 @@ import StaffChatPage from "../pages/Staff/StaffChatPage";
 import Guide from "../pages/User/Guide";
 import ManageGuide from "../pages/Staff/ManageGuide";
 import AboutUs from "../components/About/About";
-import Contact from "../components/Contact/Contact";
+import Contact from "../components/Contact/ContactPage";
 import TourDetails from "../pages/User/TourDetails";
 import ListTour from "../pages/User/ListTour";
 import TourDetail from "../pages/Admin/components/TourDetail";
+import MyBookings from "../pages/User/MyBookings";
+import StaffBookings from "../pages/Staff/StaffBooking";
 
 const Routers = () => {
   return (
@@ -45,6 +47,7 @@ const Routers = () => {
       <Route path="/tours/" element={<ListTour />} />
       <Route path="/tours/filter/:slug" element={<ListTour />} />
 
+      <Route path="/my-bookings" element={<MyBookings />} />
       <Route
         path="/admin"
         element={
@@ -122,6 +125,15 @@ const Routers = () => {
         element={
           <StaffLayout>
             <StaffChatPage />
+          </StaffLayout>
+        }
+      />
+
+      <Route
+        path="/staff/bookings"
+        element={
+          <StaffLayout>
+            <StaffBookings />
           </StaffLayout>
         }
       />

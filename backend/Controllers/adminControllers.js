@@ -3,7 +3,7 @@ import User from "../models/User.js";
 // GET /admin/users
 export const getAllUsers = async (req, res) => {
     try {
-        const users = await User.find().select("-password"); // ẩn password
+        const users = await User.find({ role: "user" }).select("-password"); // ẩn password
         res.json(users);
     } catch (err) {
         res.status(500).json({ error: "Failed to fetch users" });
@@ -85,7 +85,7 @@ export const promoteToStaff = async (req, res) => {
         const user = await User.findById(req.params.id);
         if (!user) return res.status(404).json({ error: "User not found" });
 
-        if(user.role === "staff") {
+        if (user.role === "staff") {
             return res.status(400).json({ error: "User is already staff" });
         }
 
@@ -103,7 +103,7 @@ export const demoteFromStaff = async (req, res) => {
         const user = await User.findById(req.params.id);
         if (!user) return res.status(404).json({ error: "User not found" });
 
-        if(user.role !== "staff") {
+        if (user.role !== "staff") {
             return res.status(400).json({ error: "User is not staff" });
         }
 

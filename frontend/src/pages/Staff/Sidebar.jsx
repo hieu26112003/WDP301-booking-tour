@@ -14,32 +14,33 @@ import { FaBook } from "react-icons/fa";
 // export default Sidebar;
 import { Link } from "react-router-dom";
 import {
-    FaTachometerAlt,
-    FaTags,
-    FaUsers,
-    FaCommentDots,
-    FaMapMarkedAlt,
+  FaTachometerAlt,
+  FaTags,
+  FaUsers,
+  FaCommentDots,
+  FaMapMarkedAlt,
 } from "react-icons/fa";
 import "../Admin/components/index.css";
 
 const Sidebar = () => {
-    return (
-        <div className="sidebar">
-            <div className="logo">Staff Panel</div>
+  return (
+    <div className="sidebar">
+      <div className="logo">Staff Panel</div>
 
-            <ul>
-                <SidebarItem to="/staff" icon={<FaTachometerAlt />} label="Dashboard" />
-                <SidebarItem
-                    to="/staff/chat"
-                    icon={<FaCommentDots />}
-                    label="Inbox"
-                />
-                <SidebarItem
-                    to="/staff/guides"
-                    icon={<FaBook />}
-                    label="Manage Guide"
-                />
-                {/* <SidebarItem
+      <ul>
+        <SidebarItem to="/staff" icon={<FaTachometerAlt />} label="Dashboard" />
+        <SidebarItem to="/staff/chat" icon={<FaCommentDots />} label="Inbox" />
+        <SidebarItem
+          to="/staff/guides"
+          icon={<FaBook />}
+          label="Manage Guide"
+        />
+        <SidebarItem
+          to="/staff/bookings"
+          icon={<FaBook />}
+          label="Manage Tour Bookings"
+        />
+        {/* <SidebarItem
           to="/admin/tours"
           icon={<FaMapMarkedAlt />}
           label="Manage Tours"
@@ -49,22 +50,22 @@ const Sidebar = () => {
           icon={<FaTags />}
           label="Manage Categories"
         /> */}
-            </ul>
+      </ul>
 
-            <div className="footer">© 2025 Admin Dashboard</div>
-        </div>
-    );
+      <div className="footer">© 2025 Staff Dashboard</div>
+    </div>
+  );
 };
 
 const SidebarItem = ({ to, icon, label }) => {
-    return (
-        <li>
-            <Link to={to}>
-                <span>{icon}</span>
-                {label}
-            </Link>
-        </li>
-    );
+  return (
+    <li>
+      <Link to={to}>
+        <span>{icon}</span>
+        {label}
+      </Link>
+    </li>
+  );
 };
 
 export default Sidebar;
