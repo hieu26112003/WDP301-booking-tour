@@ -63,6 +63,16 @@ export const createTour = async (req, res) => {
         .json({ success: false, message: "Invalid departure date format" });
     }
 
+    // Ensure departureDate is not earlier than today
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Reset time to midnight for comparison
+    if (parsedDate < today) {
+      return res.status(400).json({
+        success: false,
+        message: "Departure date cannot be earlier than today",
+      });
+    }
+
     // Validate image requirements
     if (!req.file && (!imageUrls || !JSON.parse(imageUrls).length)) {
       return res
@@ -324,6 +334,15 @@ export const updateTour = async (req, res) => {
           .status(400)
           .json({ success: false, message: "Invalid departure date format" });
       }
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (parsedDate < today) {
+        return res.status(400).json({
+          success: false,
+          message: "Departure date cannot be earlier than today",
+        });
+      }
       updateData.departureDate = parsedDate;
     }
 
@@ -472,14 +491,20 @@ export const getToursByCategorySlug = async (req, res) => {
     const { slug } = req.params;
     const category = await Category.findOne({ slug });
     if (!category) {
-      return res.status(404).json({ success: false, message: "Category not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Category not found" });
     }
 
-    const tours = await Tour.find({ categoryId: category._id })
-      .populate("categoryId", "name");
+    const tours = await Tour.find({ categoryId: category._id }).populate(
+      "categoryId",
+      "name"
+    );
 
     res.status(200).json({ success: true, data: tours });
   } catch (err) {
-    res.status(500).json({ success: false, message: "Failed to fetch tours by slug" });
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to fetch tours by slug" });
   }
 };
