@@ -50,15 +50,14 @@ const ManageTours = () => {
     categoryId: "",
     featured: false,
   });
-  const [imageFile, setImageFile] = useState(null); // For first image upload
-  const [imageUrls, setImageUrls] = useState([""]); // Start with one URL input
-  const [existingImages, setExistingImages] = useState([]); // For edit mode
+  const [imageFile, setImageFile] = useState(null);
+  const [imageUrls, setImageUrls] = useState([""]);
+  const [existingImages, setExistingImages] = useState([]);
   const [editId, setEditId] = useState(null);
   const [modal, setModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Mở/đóng modal
   const toggleModal = () => {
     if (!isLoading) {
       setModal(!modal);
@@ -70,7 +69,6 @@ const ManageTours = () => {
     }
   };
 
-  // Lấy danh sách danh mục
   const fetchCategories = async () => {
     try {
       const accessToken = localStorage.getItem("accessToken");
@@ -102,7 +100,6 @@ const ManageTours = () => {
     }
   };
 
-  // Lấy danh sách tour
   const fetchTours = async () => {
     try {
       const accessToken = localStorage.getItem("accessToken");
@@ -115,7 +112,7 @@ const ManageTours = () => {
       console.log(
         "Fetched tours:",
         result.data.map((t) => ({ id: t._id, images: t.images }))
-      ); // Debugging log
+      );
       setTours(result.data);
     } catch (err) {
       Swal.fire({
@@ -138,13 +135,11 @@ const ManageTours = () => {
     }
   };
 
-  // Gọi API khi component mount
   useEffect(() => {
     fetchCategories();
     fetchTours();
   }, []);
 
-  // Xử lý thay đổi input
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
@@ -153,7 +148,6 @@ const ManageTours = () => {
     }));
   };
 
-  // Xử lý thay đổi ReactQuill
   const handleQuillChange = (name) => (value) => {
     setFormData((prev) => ({
       ...prev,
@@ -161,34 +155,55 @@ const ManageTours = () => {
     }));
   };
 
-  // Xử lý chọn file ảnh
   const handleImageChange = (e) => {
     setImageFile(e.target.files[0]);
   };
 
-  // Xử lý thay đổi URL ảnh
   const handleImageUrlChange = (index, value) => {
     const newImageUrls = [...imageUrls];
     newImageUrls[index] = value;
     setImageUrls(newImageUrls);
   };
 
-  // Thêm input URL mới
   const handleAddImageUrl = () => {
     if (imageUrls.length < 4) {
       setImageUrls([...imageUrls, ""]);
     }
   };
 
-  // Xóa ảnh hiện có trong edit mode
   const handleRemoveExistingImage = (index) => {
     setExistingImages((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // Xử lý submit form
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+
+    if (formData.departureDate) {
+      const parsedDate = new Date(formData.departureDate);
+      if (isNaN(parsedDate.getTime())) {
+        Swal.fire({
+          icon: "error",
+          title: "Lỗi",
+          text: "Invalid departure date format",
+          confirmButtonColor: "#d33",
+          backdrop: true,
+          allowOutsideClick: true,
+          customClass: {
+            popup: "custom-swal-popup",
+            title: "custom-swal-title",
+            content: "custom-swal-content",
+            confirmButton: "custom-swal-confirm",
+          },
+          willClose: () => {
+            document.body.style.overflow = "auto";
+          },
+        });
+        setIsLoading(false);
+        return;
+      }
+    }
+
     const accessToken = localStorage.getItem("accessToken");
     const data = new FormData();
 
@@ -197,21 +212,18 @@ const ManageTours = () => {
     });
 
     if (imageFile) {
-      data.append("image", imageFile); // First image via file upload
+      data.append("image", imageFile);
     }
 
-    // Gửi danh sách URL ảnh
     const validUrls = imageUrls.filter((url) => url.trim());
     if (validUrls.length > 0) {
       data.append("imageUrls", JSON.stringify(validUrls));
     }
 
-    // Gửi danh sách ảnh hiện có khi cập nhật
     if (editId && existingImages.length > 0) {
       data.append("existingImages", JSON.stringify(existingImages));
     }
 
-    // Kiểm tra xem có ít nhất một ảnh (mới, URL, hoặc hiện có)
     if (!editId && !imageFile && validUrls.length === 0) {
       Swal.fire({
         icon: "error",
@@ -315,8 +327,10 @@ const ManageTours = () => {
     }
   };
 
-  // Xử lý chỉnh sửa
   const handleEdit = (tour) => {
+    const formattedDate = tour.departureDate
+      ? new Date(tour.departureDate).toISOString().split("T")[0]
+      : "";
     setFormData({
       title: tour.title,
       summary: tour.summary,
@@ -327,7 +341,7 @@ const ManageTours = () => {
       notes: tour.notes,
       cancellationPolicy: tour.cancellationPolicy,
       schedule: tour.schedule,
-      departureDate: tour.departureDate,
+      departureDate: formattedDate,
       time: tour.time,
       categoryId: tour.categoryId?._id || tour.categoryId,
       featured: tour.featured || false,
@@ -339,7 +353,6 @@ const ManageTours = () => {
     toggleModal();
   };
 
-  // Xử lý xóa
   const handleDelete = async (id) => {
     const result = await Swal.fire({
       title: "Bạn có chắc?",
@@ -419,7 +432,6 @@ const ManageTours = () => {
     }
   };
 
-  // Mở modal để thêm tour mới
   const handleAddNew = () => {
     setFormData({
       title: "",
@@ -443,12 +455,10 @@ const ManageTours = () => {
     toggleModal();
   };
 
-  // Xem chi tiết tour
   const handleViewDetail = (tour) => {
     navigate(`/tour-detail/${tour._id}`, { state: { tour } });
   };
 
-  // Cấu hình module cho ReactQuill
   const quillModules = {
     toolbar: [
       [{ size: ["12px", "14px", "16px", "18px", "20px"] }],
@@ -463,7 +473,6 @@ const ManageTours = () => {
     },
   };
 
-  // Hàm trích xuất text thuần túy từ HTML và cắt chuỗi
   const truncateText = (html, maxLength = 100) => {
     const tempDiv = document.createElement("div");
     tempDiv.innerHTML = html;
@@ -610,11 +619,14 @@ const ManageTours = () => {
                   <FormGroup>
                     <Label for="departureDate">Departure Date</Label>
                     <Input
-                      type="text"
+                      type="date"
                       id="departureDate"
                       name="departureDate"
-                      placeholder="Departure Date (e.g., 2025-08-01)"
-                      value={formData.departureDate}
+                      value={
+                        formData.departureDate
+                          ? formData.departureDate.split("T")[0]
+                          : ""
+                      }
                       onChange={handleChange}
                       required
                       disabled={isLoading}
@@ -775,6 +787,7 @@ const ManageTours = () => {
                   <th>Notes</th>
                   <th>Cancellation Policy</th>
                   <th>Category</th>
+                  <th>Departure Date</th>
                   <th>Featured</th>
                   <th>Actions</th>
                 </tr>
@@ -808,6 +821,16 @@ const ManageTours = () => {
                         {truncateText(tour.cancellationPolicy)}
                       </td>
                       <td>{tour.categoryId?.name || "N/A"}</td>
+                      <td>
+                        {new Date(tour.departureDate).toLocaleDateString(
+                          "vi-VN",
+                          {
+                            day: "2-digit",
+                            month: "2-digit",
+                            year: "numeric",
+                          }
+                        )}
+                      </td>
                       <td>
                         <FaCheck
                           className={

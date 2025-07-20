@@ -235,17 +235,17 @@
   position: absolute;
   top: 100%;
   right: 0;
-  margin-top: 4px;
-  width: 130px;
-  background: white;
-  border-radius: 6px;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  margin-top: 6px;
+  width: 200px; /* Tăng chiều rộng */
+  background: linear-gradient(135deg, #ffffff, #f8f9fa); /* Gradient nhẹ */
+  border-radius: 10px; /* Bo góc mềm mại hơn */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
   border: 1px solid #e5e7eb;
-  padding: 6px 0;
+  padding: 10px 0;
   opacity: 0;
   visibility: hidden;
   transform: translateY(-6px);
-  transition: all 0.3s ease;
+  transition: all 0.4s ease; /* Chuyển đổi mượt hơn */
   z-index: 1200;
 }
 
@@ -257,29 +257,51 @@
 }
 
 .user-dropdown-item-redesign {
-  display: block;
-  padding: 7px 12px;
-  color: #374151;
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  color: #1e293b; /* Màu chữ đậm hơn */
   text-decoration: none;
-  font-size: 12px;
+  font-size: 14px; /* Tăng font-size */
   font-family: var(--font-name);
+  font-weight: 500;
+  letter-spacing: 0.5px; /* Tăng khoảng cách chữ */
   background: none;
   border: none;
   width: 100%;
   text-align: left;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.4s ease; /* Hiệu ứng mượt hơn */
+}
+
+/* Biểu tượng và style cho các mục đặc biệt */
+.user-dropdown-item-redesign:nth-child(3)::before {
+  content: "★";
+  margin-right: 8px;
+  color: var(--primary-color);
+  font-size: 12px;
+}
+
+/* Style cho mục Đăng xuất */
+.user-dropdown-item-redesign:last-child {
+  color: #dc2626;
+  font-weight: 600;
 }
 
 .user-dropdown-item-redesign:hover {
-  background-color: #f3f4f6;
+  background: linear-gradient(
+    90deg,
+    #e5e7eb,
+    #d1d5db
+  ); /* Gradient hover hiện đại */
   color: var(--primary-color);
+  transform: translateX(4px); /* Hiệu ứng dịch chuyển nhẹ */
 }
 
 .user-dropdown-divider-redesign {
   height: 1px;
-  background: #e5e7eb;
-  margin: 4px 0;
+  background: #d1d5db;
+  margin: 8px 0; /* Tăng khoảng cách */
 }
 
 /* Auth Buttons */
@@ -439,7 +461,7 @@
   font-size: 11px;
   font-family: var(--font-name);
   transition: all 0.2s ease;
-  cursor: pointer; /* Thêm để hiển thị bàn tay khi chọn danh mục */
+  cursor: pointer;
 }
 
 .dropdown-item-redesign:hover {
@@ -548,7 +570,7 @@
   font-family: var(--font-name);
   border-radius: 4px;
   transition: all 0.2s ease;
-  cursor: pointer; /* Thêm để hiển thị bàn tay khi chọn danh mục trên mobile */
+  cursor: pointer;
 }
 
 .mobile-submenu-link-redesign:hover {
@@ -653,6 +675,21 @@
   .logo-text-redesign {
     font-size: 14px;
   }
+
+  /* Dropdown người dùng trên mobile */
+  .user-dropdown-redesign {
+    width: 160px;
+  }
+
+  .user-dropdown-item-redesign {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
+  .user-dropdown-item-redesign:nth-child(3)::before {
+    margin-right: 6px;
+    font-size: 11px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -685,5 +722,14 @@
 
   .mobile-menu-icon-redesign {
     font-size: 16px;
+  }
+
+  .user-dropdown-redesign {
+    width: 140px;
+  }
+
+  .user-dropdown-item-redesign {
+    padding: 6px 10px;
+    font-size: 12px;
   }
 }

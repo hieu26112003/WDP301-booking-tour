@@ -17,6 +17,7 @@ import messageRoute from "./routes/messageRoutes.js";
 import Message from "./models/Message.js";
 import guideRoutes from "./routes/guideRoutes.js";
 import contactRoutes from "./routes/contactRoutes.js"
+import bookingRoute from "./routes/booking.js";
 
 dotenv.config();
 const app = express();
@@ -59,7 +60,7 @@ app.use("/api/tours", tourRoute);
 app.use("/api/categories", categoryRoute);
 app.use("/api/guides", guideRoutes);
 app.use("/api/call-request", callRequestRoute);
-
+app.use("/api/bookings", bookingRoute);
 app.use("/api/messages", messageRoute);
 
 app.use('/api/contact', contactRoutes);
