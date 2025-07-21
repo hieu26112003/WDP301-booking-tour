@@ -19,4 +19,24 @@ router.post('/', async (req, res) => {
     }
 });
 
+// ✅ API: Lấy tất cả feedbacks
+router.get('/feedbacks', async (req, res) => {
+    try {
+        const feedbacks = await Contact.find({ type: 'feedback' }).sort({ createdAt: -1 });
+        res.json(feedbacks);
+    } catch (err) {
+        res.status(500).json({ error: 'Lỗi khi lấy danh sách feedbacks' });
+    }
+});
+
+// ✅ API: Lấy tất cả callback requests
+router.get('/callbacks', async (req, res) => {
+    try {
+        const callbacks = await Contact.find({ type: 'callback' }).sort({ createdAt: -1 });
+        res.json(callbacks);
+    } catch (err) {
+        res.status(500).json({ error: 'Lỗi khi lấy danh sách callbacks' });
+    }
+});
+
 export default router;

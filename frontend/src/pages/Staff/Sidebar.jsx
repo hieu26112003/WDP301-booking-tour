@@ -19,6 +19,7 @@ import {
   FaUsers,
   FaCommentDots,
   FaMapMarkedAlt,
+  FaComments
 } from "react-icons/fa";
 import "../Admin/components/index.css";
 
@@ -40,6 +41,23 @@ const Sidebar = () => {
           icon={<FaBook />}
           label="Manage Tour Bookings"
         />
+        <SidebarItem
+          to="/staff/feedbacks"
+          icon={<FaBook />}
+          label="Feedbacks"
+        />
+        <SidebarItem
+          to="/staff/callbacks"
+          icon={<FaBook />}
+          label="Callbacks"
+ />
+        <SidebarItem
+          to="/staff/comment"
+          icon={<FaComments />}
+          label="Manage Comment"
+        />
+
+        
         {/* <SidebarItem
           to="/admin/tours"
           icon={<FaMapMarkedAlt />}

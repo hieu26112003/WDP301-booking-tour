@@ -8,6 +8,7 @@ import {
   toggleUserStatus,
   promoteToStaff, // ⬅️ cần thêm
   demoteFromStaff,
+  getAllStaff,
 } from "../Controllers/adminControllers.js";
 
 import {
@@ -20,6 +21,7 @@ const router = express.Router();
 
 // Route chỉ admin được quyền
 router.get("/users", verifyAdmin, getAllUsers);
+router.get("/staff", verifyAdmin, getAllStaff);
 router.post("/users", verifyAdmin, createUser);
 router.put("/users/:id", verifyAdmin, updateUser);
 router.delete("/users/:id", verifyAdmin, deleteUser);

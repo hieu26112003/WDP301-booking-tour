@@ -179,7 +179,7 @@ export const cancelBooking = async (req, res) => {
           "vi-VN"
         )} đồng</p>
         <p>Chúng tôi sẽ liên hệ nếu cần thêm thông tin. Vui lòng gọi <strong>1900 1234</strong> nếu có thắc mắc.</p>
-        <p>Trân trọng,<br/>Đội ngũ du lịch</p>
+        <p>Trân trọng,<br/>Đội ngũ du lịch VIET TRAVEL</p>
       `,
     });
 
@@ -252,7 +252,7 @@ export const updateBookingStatus = async (req, res) => {
             "vi-VN"
           )} đồng</p>
           <p>Cảm ơn bạn đã chọn chúng tôi! Nếu có thắc mắc, vui lòng gọi <strong>1900 1234</strong>.</p>
-          <p>Trân trọng,<br/>Đội ngũ du lịch</p>
+          <p>Trân trọng,<br/>Đội ngũ du lịch VIET TRAVEL</p>
         `,
       });
     }

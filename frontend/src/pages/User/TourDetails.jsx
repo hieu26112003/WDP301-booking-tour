@@ -40,6 +40,7 @@ const formatDate = (dateString) => {
   });
 };
 
+
 const TourDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -51,6 +52,8 @@ const TourDetails = () => {
   const [showMore, setShowMore] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState("");
   const [modal, setModal] = useState(false);
+  const [comments, setComments] = useState([]);
+  const [commentText, setCommentText] = useState("");
   const [bookingData, setBookingData] = useState({
     numberOfAdults: 1,
     numberOfChildren: 0,
@@ -94,6 +97,34 @@ const TourDetails = () => {
       />
     );
   };
+
+  const handleCommentSubmit = async (e) => {
+  e.preventDefault();
+  if (!user || !user._id) {
+    Swal.fire("Lỗi", "Bạn cần đăng nhập để bình luận", "error");
+    return;
+  }
+
+  try {
+    const res = await axios.post(
+      `${BASE_URL}/comment`,
+      { content: commentText, tourId: id }, // gửi đúng dữ liệu backend yêu cầu
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      }
+    );
+    if (res.data.success) {
+      setComments([...comments, res.data.data]); // backend trả về data: comment
+      setCommentText("");
+    }
+  } catch (err) {
+    Swal.fire("Lỗi", err.message, "error");
+  }
+};
+
+
 
   const settingsMain = {
     asNavFor: nav2,
@@ -149,9 +180,28 @@ const TourDetails = () => {
         console.error("Error fetching bookings:", err);
       }
     };
+    const fetchComments = async () => {
+  try {
+    const res = await axios.get(`${BASE_URL}/comment/tour/${id}`);
+    console.log("COMMENTS API RESPONSE:", res.data);
+    // Nếu API trả thẳng mảng:
+    if (Array.isArray(res.data)) {
+      setComments(res.data);
+    } else if (res.data?.data) {
+      setComments(res.data.data);
+    }
+  } catch (err) { 
+    console.error("Error fetching comments:", err);
+  }
+};
     fetchBookings();
+    fetchComments();
     window.scrollTo(0, 0);
-  }, [tour, user, title]);
+  }, [tour, user, title, id]);
+
+
+
+
 
   useEffect(() => {
     if (slider2.current) slider2.current.slickGoTo(activeIndex);
@@ -455,52 +505,41 @@ const TourDetails = () => {
                 )}
 
                 {activeTab === "reviews" && (
-                  <div className="tour__reviews mt-4">
-                    <h5>Đánh giá</h5>
-                    {safeReviews.length === 0 && (
-                      <p className="text-muted">Chưa có đánh giá nào.</p>
-                    )}
-                    {safeReviews.map((r, i) => (
-                      <div key={i} className="review mb-3">
-                        <strong>{r.username}</strong>
-                        <p className="mb-1">Đánh giá: {r.rating} sao</p>
-                        <p>{r.reviewText}</p>
-                      </div>
-                    ))}
-                    <hr />
-                    <Form onSubmit={submitHandler} className="mt-4">
-                      <h6>Hãy là người đầu tiên nhận xét “{title}”</h6>
-                      <FormGroup>
-                        <Label>Đánh giá của bạn *</Label>
-                        <div className="d-flex gap-2">
-                          {[1, 2, 3, 4, 5].map((s) => (
-                            <Button
-                              key={s}
-                              type="button"
-                              color={tourRating >= s ? "warning" : "secondary"}
-                              onClick={() => setTourRating(s)}
-                            >
-                              {s} <FaStar className="mb-1" />
-                            </Button>
-                          ))}
+                  <div className="tour__comments mt-4">
+                    <h5>Bình luận</h5>
+                    {comments.length === 0 ? (
+                      <p className="text-muted">Chưa có bình luận nào.</p>
+                    ) : (
+                      comments.map((c) => (
+                        <div key={c._id} className="comment-item mb-3 p-2 border rounded">
+                          <p>{c.content}</p>
+                          <small className="text-muted">
+                            {new Date(c.createdAt).toLocaleString("vi-VN")}
+                          </small>
                         </div>
-                      </FormGroup>
+                      ))
+                    )}
+
+                    {/* Form gửi bình luận */}
+                    <Form onSubmit={handleCommentSubmit} className="mt-3">
                       <FormGroup>
-                        <Label for="review">Nhận xét của bạn *</Label>
+                        <Label for="comment">Bình luận của bạn *</Label>
                         <Input
-                          id="review"
+                          id="comment"
                           type="textarea"
-                          rows="3"
-                          innerRef={reviewMsgRef}
+                          rows="2"
+                          value={commentText}
+                          onChange={(e) => setCommentText(e.target.value)}
                           required
                         />
                       </FormGroup>
                       <Button color="primary" type="submit">
-                        Gửi đi
+                        Gửi bình luận
                       </Button>
                     </Form>
                   </div>
                 )}
+                1
               </div>
             </div>
           </Col>

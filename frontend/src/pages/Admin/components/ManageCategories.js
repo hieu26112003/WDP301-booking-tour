@@ -24,6 +24,7 @@ const ManageCategories = () => {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
+    slug: "", // Added slug to formData
     isActive: true,
   });
   const [editId, setEditId] = useState(null);
@@ -125,7 +126,7 @@ const ManageCategories = () => {
           document.body.style.overflow = "auto";
         },
       }).then(() => {
-        setFormData({ name: "", description: "", isActive: true });
+        setFormData({ name: "", description: "", slug: "", isActive: true }); // Reset slug in formData
         setEditId(null);
         toggleModal();
         fetchCategories();
@@ -157,6 +158,7 @@ const ManageCategories = () => {
     setFormData({
       name: category.name,
       description: category.description,
+      slug: category.slug, // Include slug when editing
       isActive: category.isActive,
     });
     setEditId(category._id);
@@ -250,7 +252,7 @@ const ManageCategories = () => {
   };
 
   const handleAddNew = () => {
-    setFormData({ name: "", description: "", isActive: true });
+    setFormData({ name: "", description: "", slug: "", isActive: true }); // Reset slug for new category
     setEditId(null);
     toggleModal();
   };
@@ -286,6 +288,19 @@ const ManageCategories = () => {
                       name="name"
                       placeholder="Category Name"
                       value={formData.name}
+                      onChange={handleChange}
+                      required
+                      disabled={isLoading}
+                    />
+                  </FormGroup>
+                  <FormGroup>
+                    <Label for="slug">Slug</Label>
+                    <Input
+                      type="text"
+                      id="slug"
+                      name="slug"
+                      placeholder="Category Slug (e.g., adventure-tour)"
+                      value={formData.slug}
                       onChange={handleChange}
                       required
                       disabled={isLoading}
@@ -341,6 +356,7 @@ const ManageCategories = () => {
               <thead>
                 <tr>
                   <th>Name</th>
+                  <th>Slug</th> {/* Added Slug column */}
                   <th>Description</th>
                   <th>Active</th>
                   <th>Actions</th>
@@ -350,6 +366,7 @@ const ManageCategories = () => {
                 {categories.map((category) => (
                   <tr key={category._id}>
                     <td>{category.name}</td>
+                    <td>{category.slug}</td> {/* Display slug */}
                     <td className="description-content">
                       {category.description}
                     </td>
