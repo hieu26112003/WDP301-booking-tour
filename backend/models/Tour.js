@@ -61,6 +61,7 @@ const tourSchema = new mongoose.Schema(
       type: [String],
       required: true,
     },
+    staffId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   },
   { timestamps: true }
 );

@@ -136,7 +136,8 @@ export const createTour = async (req, res) => {
 // Lấy tất cả tour
 export const getAllTours = async (req, res) => {
   try {
-    const tours = await Tour.find().populate("categoryId", "name");
+    const tours = await Tour.find().populate("categoryId", "name")
+  .populate("staffId", "fullName email");
     console.log(
       "Fetched tours:",
       tours.map((t) => ({ id: t._id, images: t.images }))
