@@ -2,6 +2,7 @@ import Booking from "../models/Booking.js";
 import User from "../models/User.js";
 import Tour from "../models/Tour.js";
 import nodemailer from "nodemailer";
+import { createNotification } from "./notificationController.js";
 
 // Tạo booking
 export const createBooking = async (req, res) => {
@@ -40,6 +41,7 @@ export const createBooking = async (req, res) => {
 
     const savedBooking = await booking.save();
 
+    await createNotification(savedBooking._id, "booking", req.app.get("io"));
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
       port: 465,
@@ -132,7 +134,7 @@ export const cancelBooking = async (req, res) => {
 
     let canCancel = true;
     if (hoursUntilDeparture < 48) {
-      canCancel = false; // Giả sử chính sách yêu cầu hủy trước 48 giờ
+      canCancel = false;
     }
 
     if (!canCancel) {
@@ -144,7 +146,11 @@ export const cancelBooking = async (req, res) => {
 
     booking.status = "cancelled";
     const updatedBooking = await booking.save();
-
+    await createNotification(
+      updatedBooking._id,
+      "cancellation",
+      req.app.get("io")
+    );
     const user = await User.findById(userId);
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
@@ -173,7 +179,7 @@ export const cancelBooking = async (req, res) => {
           "vi-VN"
         )} đồng</p>
         <p>Chúng tôi sẽ liên hệ nếu cần thêm thông tin. Vui lòng gọi <strong>1900 1234</strong> nếu có thắc mắc.</p>
-        <p>Trân trọng,<br/>Đội ngũ du lịch</p>
+        <p>Trân trọng,<br/>Đội ngũ du lịch VIET TRAVEL</p>
       `,
     });
 
@@ -213,6 +219,11 @@ export const updateBookingStatus = async (req, res) => {
     const updatedBooking = await booking.save();
 
     if (status === "confirmed") {
+      await createNotification(
+        updatedBooking._id,
+        "confirmation",
+        req.app.get("io")
+      );
       const user = await User.findById(booking.userId);
       const transporter = nodemailer.createTransport({
         host: "smtp.gmail.com",
@@ -241,7 +252,7 @@ export const updateBookingStatus = async (req, res) => {
             "vi-VN"
           )} đồng</p>
           <p>Cảm ơn bạn đã chọn chúng tôi! Nếu có thắc mắc, vui lòng gọi <strong>1900 1234</strong>.</p>
-          <p>Trân trọng,<br/>Đội ngũ du lịch</p>
+          <p>Trân trọng,<br/>Đội ngũ du lịch VIET TRAVEL</p>
         `,
       });
     }

@@ -30,6 +30,7 @@ import StaffBookings from "../pages/Staff/StaffBooking";
 import CallbackList from "../pages/Staff/CallbackList";
 import FeedbackList from "../pages/Staff/FeedbackList";
 import GuideDetail from "../pages/User/GuideDetail";
+import NotificationList from "../components/Notification/Notification";
 
 const Routers = () => {
   return (
@@ -55,6 +56,7 @@ const Routers = () => {
       <Route path="/tours/filter/:slug" element={<ListTour />} />
 
       <Route path="/my-bookings" element={<MyBookings />} />
+      <Route path="/notifications" element={<NotificationList />} />
       <Route
         path="/admin"
         element={

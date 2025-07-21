@@ -1,28 +1,29 @@
-"use client";
-
 import React, { useEffect, useRef, useContext, useState } from "react";
 import { Container } from "reactstrap";
 import { Link, useNavigate } from "react-router-dom";
-import { Search, Phone, ChevronDown, Menu, User, X } from "lucide-react";
+import { Search, Phone, ChevronDown, Menu, User, Bell, X } from "lucide-react";
 import "./header.css";
 import { AuthContext } from "../../context/AuthContext";
 import Swal from "sweetalert2";
 import { getCategories } from "../../services/categoryService";
 import { BASE_URL } from "../../utils/config";
+import axios from "axios";
 
 const Header = ({ onCategorySelect, onSearch }) => {
   const headerRef = useRef(null);
   const menuRef = useRef(null);
   const navigate = useNavigate();
-  const { user, dispatch } = useContext(AuthContext);
+  const { user, accessToken, refreshToken, dispatch } = useContext(AuthContext);
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [menuCategories, setMenuCategories] = useState([]);
+  const [notifications, setNotifications] = useState([]);
+  const [notificationLoading, setNotificationLoading] = useState(false);
   const [menuCategoriesGuide, setMenuCategoriesGuide] = useState([]);
 
-  // Debounce function
+  // Hàm debounce
   const debounce = (func, delay) => {
     let timeoutId;
     return (...args) => {
@@ -31,7 +32,7 @@ const Header = ({ onCategorySelect, onSearch }) => {
     };
   };
 
-   useEffect(() => {
+  useEffect(() => {
     const fetchCategoriesGuide = async () => {
       try {
         const res = await fetch(`${BASE_URL}/guides/categories`);
@@ -61,9 +62,10 @@ const Header = ({ onCategorySelect, onSearch }) => {
     fetchCategories();
   }, []);
 
-  // Debounced search handler
+  // Xử lý tìm kiếm với debounce
   const debouncedSearch = debounce(onSearch, 300);
 
+  // Lấy danh mục
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
@@ -71,7 +73,7 @@ const Header = ({ onCategorySelect, onSearch }) => {
         const res = await getCategories();
         setCategories(res.data?.data || []);
       } catch (error) {
-        console.error("Failed to fetch categories", error);
+        console.error("Lỗi khi lấy danh mục:", error);
         Swal.fire({
           icon: "error",
           title: "Lỗi",
@@ -84,6 +86,166 @@ const Header = ({ onCategorySelect, onSearch }) => {
     };
     fetchData();
   }, []);
+
+  // Lấy thông báo
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      if (!user || !accessToken) {
+        console.warn(
+          "Không có người dùng hoặc token truy cập, bỏ qua lấy thông báo"
+        );
+        return;
+      }
+      setNotificationLoading(true);
+      try {
+        const res = await axios.get(`${BASE_URL}/notifications`, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+        setNotifications(res.data.data || []);
+      } catch (error) {
+        if (error.response?.status === 401) {
+          // Thử làm mới token
+          try {
+            const refreshRes = await axios.post(`${BASE_URL}/auth/refresh`, {
+              refreshToken,
+            });
+            if (refreshRes.data.success) {
+              dispatch({
+                type: "REFRESH_TOKEN_SUCCESS",
+                payload: {
+                  accessToken: refreshRes.data.accessToken,
+                  user: refreshRes.data.data || user,
+                },
+              });
+              // Thử lại lấy thông báo
+              const retryRes = await axios.get(`${BASE_URL}/notifications`, {
+                headers: {
+                  Authorization: `Bearer ${refreshRes.data.accessToken}`,
+                },
+              });
+              setNotifications(retryRes.data.data || []);
+            } else {
+              throw new Error(refreshRes.data.message);
+            }
+          } catch (refreshError) {
+            console.error("Làm mới token thất bại:", refreshError);
+            Swal.fire({
+              icon: "error",
+              title: "Phiên đăng nhập hết hạn",
+              text: "Vui lòng đăng nhập lại",
+              confirmButtonColor: "#3085d6",
+            }).then(() => {
+              dispatch({ type: "LOGOUT" });
+              navigate("/login");
+            });
+          }
+        } else {
+          console.error("Lỗi khi lấy thông báo:", error);
+          Swal.fire({
+            icon: "error",
+            title: "Lỗi",
+            text: error.response?.data?.message || "Không thể tải thông báo",
+            confirmButtonColor: "#d33",
+          });
+        }
+      } finally {
+        setNotificationLoading(false);
+      }
+    };
+    fetchNotifications();
+  }, [user, accessToken, refreshToken, dispatch, navigate]);
+
+  // Xử lý xóa thông báo
+  const handleDeleteNotification = async (id, e) => {
+    e.stopPropagation();
+    Swal.fire({
+      title: "Bạn có chắc muốn xóa thông báo này?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Xóa",
+      cancelButtonText: "Hủy",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await axios.delete(`${BASE_URL}/notifications/${id}`, {
+            headers: { Authorization: `Bearer ${accessToken}` },
+          });
+          setNotifications((prev) => prev.filter((notif) => notif._id !== id));
+          Swal.fire({
+            icon: "success",
+            title: "Xóa thành công",
+            timer: 1500,
+            showConfirmButton: false,
+          });
+        } catch (error) {
+          if (error.response?.status === 401) {
+            // Thử làm mới token
+            try {
+              const refreshRes = await axios.post(`${BASE_URL}/auth/refresh`, {
+                refreshToken,
+              });
+              if (refreshRes.data.success) {
+                dispatch({
+                  type: "REFRESH_TOKEN_SUCCESS",
+                  payload: {
+                    accessToken: refreshRes.data.accessToken,
+                    user: refreshRes.data.data || user,
+                  },
+                });
+                // Thử lại xóa thông báo
+                await axios.delete(`${BASE_URL}/notifications/${id}`, {
+                  headers: {
+                    Authorization: `Bearer ${refreshRes.data.accessToken}`,
+                  },
+                });
+                setNotifications((prev) =>
+                  prev.filter((notif) => notif._id !== id)
+                );
+                Swal.fire({
+                  icon: "success",
+                  title: "Xóa thành công",
+                  timer: 1500,
+                  showConfirmButton: false,
+                });
+              } else {
+                throw new Error(refreshRes.data.message);
+              }
+            } catch (refreshError) {
+              console.error("Làm mới token thất bại:", refreshError);
+              Swal.fire({
+                icon: "error",
+                title: "Phiên đăng nhập hết hạn",
+                text: "Vui lòng đăng nhập lại",
+                confirmButtonColor: "#3085d6",
+              }).then(() => {
+                dispatch({ type: "LOGOUT" });
+                navigate("/login");
+              });
+            }
+          } else {
+            console.error("Lỗi khi xóa thông báo:", error);
+            Swal.fire({
+              icon: "error",
+              title: "Lỗi",
+              text: error.response?.data?.message || "Không thể xóa thông báo",
+              confirmButtonColor: "#d33",
+            });
+          }
+        }
+      }
+    });
+  };
+
+  // Xử lý nhấn vào thông báo
+  const handleNotificationClick = (id, bookingId) => {
+    if (!id || !bookingId) return;
+    navigate(`/bookings/${bookingId}`);
+    setActiveDropdown(null);
+  };
 
   const nav__links = [
     { path: "/home", display: "TRANG CHỦ" },
@@ -106,7 +268,7 @@ const Header = ({ onCategorySelect, onSearch }) => {
         display: cat.name,
       })),
     },
-    { path: "/about", display: "VỀ ASK TRAVEL" },
+    { path: "/about", display: "VỀ VIET TRAVEL" },
     { path: "/contact", display: "LIÊN HỆ" },
   ];
 
@@ -146,7 +308,6 @@ const Header = ({ onCategorySelect, onSearch }) => {
             content: "custom-swal-content",
           },
           willClose: () => {
-            console.log("Success message closed");
             document.body.style.overflow = "auto";
           },
         });
@@ -186,7 +347,6 @@ const Header = ({ onCategorySelect, onSearch }) => {
     debouncedSearch(query);
   };
 
-  // Dropdown items dựa trên vai trò người dùng
   const userDropdownItems = [
     { path: "/profile", display: "Hồ sơ" },
     { path: "/change-password", display: "Đổi mật khẩu" },
@@ -209,7 +369,7 @@ const Header = ({ onCategorySelect, onSearch }) => {
                   <span className="logo-text-redesign">🥥</span>
                 </div>
                 <div className="logo-content-redesign">
-                  <div className="logo-title-redesign">ASK TRAVEL</div>
+                  <div className="logo-title-redesign">VIET TRAVEL</div>
                   <div className="logo-subtitle-redesign">
                     Khám phá trải nghiệm
                   </div>
@@ -249,6 +409,109 @@ const Header = ({ onCategorySelect, onSearch }) => {
                   <div className="phone-subtitle-redesign">Tư vấn ngay</div>
                 </div>
               </div>
+
+              {/* Phần thông báo */}
+              {user && (
+                <div
+                  className="notification-section-redesign"
+                  onMouseEnter={() => handleMouseEnter("notifications")}
+                  onMouseLeave={handleMouseLeave}
+                  onClick={() => handleDropdownClick("notifications")}
+                >
+                  <div className="notification-toggle-redesign">
+                    <Bell className="notification-icon-redesign" size={14} />
+                    {notifications.length > 0 && (
+                      <span className="notification-badge-redesign">
+                        {notifications.length}
+                      </span>
+                    )}
+                  </div>
+                  <div
+                    className={`notification-dropdown-redesign ${
+                      activeDropdown === "notifications" ? "show" : ""
+                    }`}
+                  >
+                    <div className="notification-dropdown-content-redesign">
+                      {notificationLoading ? (
+                        <div className="notification-loading-redesign">
+                          Đang tải...
+                        </div>
+                      ) : notifications.length > 0 ? (
+                        notifications.map((notif) => (
+                          <div
+                            key={notif._id}
+                            className="notification-item-redesign"
+                            onClick={() =>
+                              handleNotificationClick(
+                                notif._id,
+                                notif.bookingId
+                              )
+                            }
+                          >
+                            <div className="notification-content-redesign">
+                              <div className="notification-message-redesign">
+                                {notif.message ||
+                                  (notif.type === "booking"
+                                    ? user.role === "staff"
+                                      ? `Người dùng ${
+                                          notif.userId?.username || "Unknown"
+                                        } đã đặt tour ${
+                                          notif.tourId?.title || "Unknown"
+                                        }`
+                                      : `Bạn đã đặt tour ${
+                                          notif.tourId?.title || "Unknown"
+                                        } thành công`
+                                    : notif.type === "cancellation"
+                                    ? user.role === "staff"
+                                      ? `Người dùng ${
+                                          notif.userId?.username || "Unknown"
+                                        } đã hủy tour ${
+                                          notif.tourId?.title || "Unknown"
+                                        }`
+                                      : `Bạn đã hủy tour ${
+                                          notif.tourId?.title || "Unknown"
+                                        }`
+                                    : user.role === "staff"
+                                    ? `Người dùng ${
+                                        notif.userId?.username || "Unknown"
+                                      } xác nhận booking cho tour ${
+                                        notif.tourId?.title || "Unknown"
+                                      }`
+                                    : `Booking của bạn cho tour ${
+                                        notif.tourId?.title || "Unknown"
+                                      } đã được xác nhận`)}
+                              </div>
+                              <div className="notification-meta-redesign">
+                                <span>{notif.tourId?.title || "Unknown"}</span>{" "}
+                                |{" "}
+                                <span>
+                                  {new Date(notif.createdAt).toLocaleString()}
+                                </span>{" "}
+                                |{" "}
+                                <span>
+                                  {notif.read ? "Đã đọc" : "Chưa đọc"}
+                                </span>
+                              </div>
+                            </div>
+                            <button
+                              className="notification-delete-btn-redesign"
+                              onClick={(e) =>
+                                handleDeleteNotification(notif._id, e)
+                              }
+                            >
+                              <X size={12} />
+                            </button>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="notification-empty-redesign">
+                          Không có thông báo
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
 
               <div className="user-section-redesign">
                 {user ? (

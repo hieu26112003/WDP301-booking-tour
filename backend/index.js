@@ -16,9 +16,10 @@ import categoryRoute from "./routes/category.js";
 import messageRoute from "./routes/messageRoutes.js";
 import Message from "./models/Message.js";
 import guideRoutes from "./routes/guideRoutes.js";
-import contactRoutes from "./routes/contactRoutes.js"
+import contactRoutes from "./routes/contactRoutes.js";
 import bookingRoute from "./routes/booking.js";
 import commentRoute from "./routes/commentRoute.js";
+import notificationRoute from "./routes/notificationRoutes.js";
 
 dotenv.config();
 const app = express();
@@ -64,10 +65,12 @@ app.use("/api/call-request", callRequestRoute);
 app.use("/api/bookings", bookingRoute);
 app.use("/api/messages", messageRoute);
 app.use("/api/comment", commentRoute);
+app.use("/api/notifications", notificationRoute);
 
 app.use('/api/contact', contactRoutes);
 app.use('/api/contact/feedbacks', contactRoutes);
 app.use('/api/contact/callbacks', contactRoutes);
+app.use("/api/contact", contactRoutes);
 
 // --- Socket.IO Logic ---
 io.on("connection", (socket) => {
