@@ -1,5 +1,3 @@
-"use client";
-
 import { useState, useRef, useEffect, useContext } from "react";
 import "../../styles/tourDetail.css";
 import {
@@ -39,7 +37,6 @@ const formatDate = (dateString) => {
     year: "numeric",
   });
 };
-
 
 const TourDetails = () => {
   const { id } = useParams();
@@ -99,32 +96,30 @@ const TourDetails = () => {
   };
 
   const handleCommentSubmit = async (e) => {
-  e.preventDefault();
-  if (!user || !user._id) {
-    Swal.fire("Lỗi", "Bạn cần đăng nhập để bình luận", "error");
-    return;
-  }
-
-  try {
-    const res = await axios.post(
-      `${BASE_URL}/comment`,
-      { content: commentText, tourId: id }, // gửi đúng dữ liệu backend yêu cầu
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
-      }
-    );
-    if (res.data.success) {
-      setComments([...comments, res.data.data]); // backend trả về data: comment
-      setCommentText("");
+    e.preventDefault();
+    if (!user || !user._id) {
+      Swal.fire("Lỗi", "Bạn cần đăng nhập để bình luận", "error");
+      return;
     }
-  } catch (err) {
-    Swal.fire("Lỗi", err.message, "error");
-  }
-};
 
-
+    try {
+      const res = await axios.post(
+        `${BASE_URL}/comment`,
+        { content: commentText, tourId: id }, // gửi đúng dữ liệu backend yêu cầu
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      if (res.data.success) {
+        setComments([...comments, res.data.data]); // backend trả về data: comment
+        setCommentText("");
+      }
+    } catch (err) {
+      Swal.fire("Lỗi", err.message, "error");
+    }
+  };
 
   const settingsMain = {
     asNavFor: nav2,
@@ -181,27 +176,23 @@ const TourDetails = () => {
       }
     };
     const fetchComments = async () => {
-  try {
-    const res = await axios.get(`${BASE_URL}/comment/tour/${id}`);
-    console.log("COMMENTS API RESPONSE:", res.data);
-    // Nếu API trả thẳng mảng:
-    if (Array.isArray(res.data)) {
-      setComments(res.data);
-    } else if (res.data?.data) {
-      setComments(res.data.data);
-    }
-  } catch (err) { 
-    console.error("Error fetching comments:", err);
-  }
-};
+      try {
+        const res = await axios.get(`${BASE_URL}/comment/tour/${id}`);
+        console.log("COMMENTS API RESPONSE:", res.data);
+        // Nếu API trả thẳng mảng:
+        if (Array.isArray(res.data)) {
+          setComments(res.data);
+        } else if (res.data?.data) {
+          setComments(res.data.data);
+        }
+      } catch (err) {
+        console.error("Error fetching comments:", err);
+      }
+    };
     fetchBookings();
     fetchComments();
     window.scrollTo(0, 0);
   }, [tour, user, title, id]);
-
-
-
-
 
   useEffect(() => {
     if (slider2.current) slider2.current.slickGoTo(activeIndex);
@@ -456,7 +447,6 @@ const TourDetails = () => {
                   </Button>
                 </div>
                 <hr />
-
                 {activeTab === "description" && (
                   <div className="tour__details">
                     {notes && (
@@ -503,7 +493,6 @@ const TourDetails = () => {
                     )}
                   </div>
                 )}
-
                 {activeTab === "reviews" && (
                   <div className="tour__comments mt-4">
                     <h5>Bình luận</h5>
@@ -511,7 +500,10 @@ const TourDetails = () => {
                       <p className="text-muted">Chưa có bình luận nào.</p>
                     ) : (
                       comments.map((c) => (
-                        <div key={c._id} className="comment-item mb-3 p-2 border rounded">
+                        <div
+                          key={c._id}
+                          className="comment-item mb-3 p-2 border rounded"
+                        >
                           <p>{c.content}</p>
                           <small className="text-muted">
                             {new Date(c.createdAt).toLocaleString("vi-VN")}
@@ -610,12 +602,42 @@ const TourDetails = () => {
           </Col>
         </Row>
 
-        <Modal isOpen={modal} toggle={toggleModal}>
+        <Modal
+          isOpen={modal}
+          toggle={toggleModal}
+          className="tour-booking-modal"
+        >
           <ModalHeader toggle={toggleModal}>Đặt Tour: {title}</ModalHeader>
           <ModalBody>
             <Form onSubmit={handleBookingSubmit}>
               <FormGroup>
-                <Label for="numberOfAdults">Số lượng người lớn</Label>
+                <Label for="priceAdult" className="fw-bold">
+                  Giá người lớn
+                </Label>
+                <Input
+                  type="text"
+                  id="priceAdult"
+                  value={`${(priceAdult || 0).toLocaleString("vi-VN")} đồng`}
+                  readOnly
+                  className="bg-light"
+                />
+              </FormGroup>
+              <FormGroup>
+                <Label for="priceChild" className="fw-bold">
+                  Giá trẻ em
+                </Label>
+                <Input
+                  type="text"
+                  id="priceChild"
+                  value={`${(priceChild || 0).toLocaleString("vi-VN")} đồng`}
+                  readOnly
+                  className="bg-light"
+                />
+              </FormGroup>
+              <FormGroup>
+                <Label for="numberOfAdults" className="fw-bold">
+                  Số lượng người lớn
+                </Label>
                 <Input
                   type="number"
                   id="numberOfAdults"
@@ -627,7 +649,9 @@ const TourDetails = () => {
                 />
               </FormGroup>
               <FormGroup>
-                <Label for="numberOfChildren">Số lượng trẻ em</Label>
+                <Label for="numberOfChildren" className="fw-bold">
+                  Số lượng trẻ em
+                </Label>
                 <Input
                   type="number"
                   id="numberOfChildren"
@@ -638,20 +662,28 @@ const TourDetails = () => {
                 />
               </FormGroup>
               <FormGroup>
-                <Label>Tổng tiền</Label>
+                <Label for="totalPrice" className="fw-bold">
+                  Tổng tiền
+                </Label>
                 <Input
                   type="text"
+                  id="totalPrice"
                   value={`${totalPrice.toLocaleString("vi-VN")} đồng`}
                   readOnly
+                  className="bg-light fw-bold"
                 />
               </FormGroup>
             </Form>
           </ModalBody>
           <ModalFooter>
-            <Button color="primary" onClick={handleBookingSubmit}>
+            <Button
+              color="primary"
+              onClick={handleBookingSubmit}
+              className="px-4"
+            >
               Xác nhận đặt tour
             </Button>{" "}
-            <Button color="secondary" onClick={toggleModal}>
+            <Button color="secondary" onClick={toggleModal} className="px-4">
               Hủy
             </Button>
           </ModalFooter>

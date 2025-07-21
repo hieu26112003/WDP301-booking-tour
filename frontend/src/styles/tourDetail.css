@@ -1,5 +1,4 @@
-/* tourDetail.css */
-
+/* Existing styles (unchanged, included for context) */
 .tour__image-carousel {
   margin-bottom: 2rem;
 }
@@ -59,6 +58,7 @@
 .thumbnail-btn.active {
   box-shadow: 0 0 0 2px #007bff;
 }
+
 .thumbnail-slide img {
   opacity: 0.5;
   transition: opacity 0.3s ease, transform 0.3s ease;
@@ -70,6 +70,197 @@
   box-shadow: 0 0 0 2px #007bff;
 }
 
+/* New Modal Styles */
+.modal-content {
+  border-radius: 12px;
+  border: none;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, sans-serif;
+}
+
+.modal-header {
+  background: #f8f9fa;
+  border-bottom: 1px solid #ebedf0;
+  padding: 1.5rem;
+}
+
+.modal-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1a2b3c;
+}
+
+.modal-body {
+  padding: 1.5rem;
+  background: #ffffff;
+}
+
+.modal-body .form-group {
+  margin-bottom: 1.25rem;
+}
+
+.modal-body label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1a2b3c;
+  margin-bottom: 0.5rem;
+}
+
+.modal-body input {
+  border-radius: 8px;
+  border: 1px solid #ced4da;
+  padding: 0.75rem;
+  font-size: 0.95rem;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.modal-body input:focus {
+  border-color: #0066ff;
+  box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
+  outline: none;
+}
+
+.modal-body input.bg-light {
+  background-color: #f8f9fa;
+  color: #1a2b3c;
+  font-weight: 500;
+}
+
+.modal-body input[readonly] {
+  cursor: not-allowed;
+  opacity: 0.9;
+}
+
+.modal-footer {
+  border-top: 1px solid #ebedf0;
+  padding: 1rem 1.5rem;
+  background: #ffffff;
+}
+
+.modal-footer .btn {
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  transition: transform 0.2s ease, background-color 0.3s ease;
+}
+
+.modal-footer .btn-primary {
+  background-color: #0066ff;
+  border-color: #0066ff;
+}
+
+.modal-footer .btn-primary:hover {
+  background-color: #0052cc;
+  transform: translateY(-2px);
+}
+
+.modal-footer .btn-secondary {
+  background-color: #6c757d;
+  border-color: #6c757d;
+}
+
+.modal-footer .btn-secondary:hover {
+  background-color: #5a6268;
+  transform: translateY(-2px);
+}
+
+/* Booking Card Styles (Updated for Consistency) */
+.tour__booking-card {
+  background: linear-gradient(135deg, #0066ff 0%, #2196f3 100%);
+  border-radius: 12px;
+  padding: 2rem;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.tour__booking-card h5 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.tour__booking-card ul {
+  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
+}
+
+.tour__booking-card ul li {
+  margin-bottom: 0.75rem;
+}
+
+.tour__booking-card ul li strong {
+  font-weight: 600;
+}
+
+.tour__booking-card h4 {
+  background: #ffffff;
+  color: #0066ff;
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.tour__booking-card .btn {
+  border-radius: 8px;
+  padding: 0.75rem;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: transform 0.2s ease, background-color 0.3s ease;
+}
+
+.tour__booking-card .btn-danger {
+  background-color: #dc3545;
+  border-color: #dc3545;
+}
+
+.tour__booking-card .btn-danger:hover {
+  background-color: #c82333;
+  transform: translateY(-2px);
+}
+
+.tour__booking-card .btn-warning {
+  background-color: #ffc107;
+  border-color: #ffc107;
+  color: #1a2b3c;
+}
+
+.tour__booking-card .btn-warning:hover {
+  background-color: #e0a800;
+  transform: translateY(-2px);
+}
+
+.tour__booking-card input {
+  border-radius: 8px;
+  padding: 0.75rem;
+  font-size: 0.95rem;
+  border: 1px solid #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.tour__booking-card input::placeholder {
+  color: #d1e7ff;
+}
+
+.tour__booking-card input:focus {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
+  outline: none;
+}
+
+.tour__booking-card p {
+  font-size: 0.9rem;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+/* Responsive Adjustments */
 @media (max-width: 768px) {
   .tour__main-image {
     height: 250px !important;
@@ -83,5 +274,37 @@
   .thumbnail-btn {
     width: 60px !important;
     height: 45px !important;
+  }
+
+  .modal-content {
+    margin: 15px;
+  }
+
+  .modal-header {
+    padding: 1rem;
+  }
+
+  .modal-title {
+    font-size: 1.3rem;
+  }
+
+  .modal-body {
+    padding: 1rem;
+  }
+
+  .modal-footer .btn {
+    padding: 0.5rem 1rem;
+  }
+
+  .tour__booking-card {
+    padding: 1.5rem;
+  }
+
+  .tour__booking-card h5 {
+    font-size: 1.3rem;
+  }
+
+  .tour__booking-card h4 {
+    padding: 0.5rem;
   }
 }
