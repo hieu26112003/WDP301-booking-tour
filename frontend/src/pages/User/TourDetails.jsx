@@ -211,53 +211,7 @@ const TourDetails = () => {
     (b) => b.userId === user?._id && b.status === "confirmed"
   );
 
-  const submitHandler = async (e) => {
-    e.preventDefault();
-    const reviewText = reviewMsgRef.current.value;
-
-    if (!user || !user._id) {
-      Swal.fire({
-        icon: "error",
-        title: "Bạn phải đăng nhập để đánh giá",
-        showConfirmButton: true,
-        confirmButtonText: "Đăng nhập",
-        confirmButtonColor: "#3085d6",
-      });
-      return;
-    }
-
-    try {
-      const res = await fetch(`${BASE_URL}/review/${id}`, {
-        method: "post",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          username: user.username,
-          reviewText,
-          rating: tourRating,
-        }),
-      });
-      const result = await res.json();
-      if (!res.ok) throw new Error(result.message);
-
-      Swal.fire({
-        icon: "success",
-        title: "Đánh giá thành công",
-        confirmButtonColor: "#3085d6",
-      });
-      navigate("/tours");
-    } catch (err) {
-      Swal.fire({
-        icon: "error",
-        title: "Lỗi",
-        text: err.message,
-        confirmButtonColor: "#d33",
-      });
-    }
-  };
+  
 
   const handleCallBackSubmit = async (e) => {
     e.preventDefault();

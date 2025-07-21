@@ -5,7 +5,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import { Server } from "socket.io";
 import http from "http";
-import callRequestRoute from "./routes/callRequest.js";
+// import callRequestRoute from "./routes/callRequest.js";
 
 import User from "./models/User.js";
 
@@ -60,7 +60,7 @@ app.use("/api/admin", adminRoute);
 app.use("/api/tours", tourRoute);
 app.use("/api/categories", categoryRoute);
 app.use("/api/guides", guideRoutes);
-app.use("/api/call-request", callRequestRoute);
+// app.use("/api/call-request", callRequestRoute);
 app.use("/api/bookings", bookingRoute);
 app.use("/api/messages", messageRoute);
 app.use("/api/comment", commentRoute);
