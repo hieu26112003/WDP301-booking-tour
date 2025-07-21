@@ -26,6 +26,7 @@ import ListTour from "../pages/User/ListTour";
 import TourDetail from "../pages/Admin/components/TourDetail";
 import MyBookings from "../pages/User/MyBookings";
 import StaffBookings from "../pages/Staff/StaffBooking";
+import NotificationList from "../components/Notification/Notification";
 
 const Routers = () => {
   return (
@@ -48,6 +49,7 @@ const Routers = () => {
       <Route path="/tours/filter/:slug" element={<ListTour />} />
 
       <Route path="/my-bookings" element={<MyBookings />} />
+      <Route path="/notifications" element={<NotificationList />} />
       <Route
         path="/admin"
         element={

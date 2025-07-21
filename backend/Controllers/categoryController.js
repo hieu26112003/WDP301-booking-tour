@@ -1,6 +1,6 @@
 // categoryController.js
 import Category from "../models/Category.js";
-import Tour from "../models/Tour.js"; // Assuming Tour model exists
+import Tour from "../models/Tour.js"; 
 import mongoose from "mongoose";
 
 // Create
