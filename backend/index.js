@@ -6,20 +6,21 @@ import cookieParser from "cookie-parser";
 import { Server } from "socket.io";
 import http from "http";
 
-
 import User from "./models/User.js";
 
 import authRoute from "./routes/auth.js";
-import adminRoute from "./routes/adminRoutes.js"
-import tourRoute from './routes/tour.js'
-import categoryRoute from './routes/category.js'
+import adminRoute from "./routes/adminRoutes.js";
+import tourRoute from "./routes/tour.js";
+import categoryRoute from "./routes/category.js";
 import messageRoute from "./routes/messageRoutes.js";
 import Message from "./models/Message.js";
-import guideRoutes from './routes/guideRoutes.js';
 import categoryGuideRoutes from "./routes/categoryGuideRoutes.js";
-
-
-
+import guideRoutes from "./routes/guideRoutes.js";
+import contactRoutes from "./routes/contactRoutes.js";
+import bookingRoute from "./routes/booking.js";
+import commentRoute from "./routes/commentRoute.js";
+import notificationRoute from "./routes/notificationRoutes.js";
+import statisticRotue from "./routes/statisticRoutes.js";
 
 dotenv.config();
 const app = express();
@@ -56,16 +57,22 @@ app.use(cors({ origin: true, credentials: true }));
 app.use(cookieParser());
 
 // Routes
+
 app.use("/api/auth", authRoute);
 app.use("/api/admin", adminRoute);
 app.use('/api/tours', tourRoute)
 app.use('/api/categories', categoryRoute)
 app.use('/api/guides', guideRoutes);
 app.use("/api/category-guides", categoryGuideRoutes);
-
-
-
+app.use("/api/bookings", bookingRoute);
 app.use("/api/messages", messageRoute);
+app.use("/api/comment", commentRoute);
+app.use("/api/notifications", notificationRoute);
+app.use("/api/admin/statistic", statisticRotue);
+app.use("/api/contact", contactRoutes);
+app.use("/api/contact/feedbacks", contactRoutes);
+app.use("/api/contact/callbacks", contactRoutes);
+app.use("/api/callback/:id/call", contactRoutes);
 
 // --- Socket.IO Logic ---
 io.on("connection", (socket) => {
@@ -95,7 +102,6 @@ io.on("connection", (socket) => {
 
         // Chỉ lưu tin nhắn không có receiverId
         newMessage = new Message({ senderId, message });
-
       } else if (sender.role === "staff" && receiverId) {
         // Gửi lại cho user
         io.to(receiverId).emit("receiveMessage", {
@@ -115,9 +121,6 @@ io.on("connection", (socket) => {
       console.error("❌ Lỗi khi xử lý gửi tin nhắn:", err);
     }
   });
-
-
-
 
   socket.on("disconnect", () => {
     console.log("❌ A user disconnected:", socket.id);

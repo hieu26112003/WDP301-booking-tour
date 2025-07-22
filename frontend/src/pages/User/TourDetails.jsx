@@ -198,6 +198,7 @@ const TourDetails = () => {
     if (slider2.current) slider2.current.slickGoTo(activeIndex);
   }, [activeIndex]);
 
+
   const userCanReview = bookings.some(
     (b) => b.userId === user?._id && b.status === "confirmed"
   );
@@ -219,6 +220,7 @@ const TourDetails = () => {
             alert("Lỗi gửi yêu cầu gọi lại");
         }
     };
+
 
   const toggleModal = () => setModal(!modal);
 

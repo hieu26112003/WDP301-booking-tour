@@ -1,4 +1,5 @@
 import { createContext, useEffect, useReducer } from "react";
+import axios from "axios";
 import { BASE_URL } from "../utils/config";
 
 const initial_state = {
@@ -76,9 +77,85 @@ const AuthReducer = (state, action) => {
   }
 };
 
+// Create an Axios instance for API requests
+const api = axios.create({
+  baseURL: BASE_URL,
+});
+
 export const AuthContextProvider = ({ children }) => {
   const [state, dispatch] = useReducer(AuthReducer, initial_state);
 
+  // Axios interceptor to handle 401 errors and refresh token
+  useEffect(() => {
+    const interceptor = api.interceptors.response.use(
+      (response) => response,
+      async (error) => {
+        const originalRequest = error.config;
+        if (
+          error.response?.status === 401 &&
+          !originalRequest._retry &&
+          originalRequest.url !== "/auth/refresh-token"
+        ) {
+          originalRequest._retry = true; // Mark as retried to prevent infinite loops
+          try {
+            const refreshToken = localStorage.getItem("refreshToken");
+            if (!refreshToken) {
+              dispatch({
+                type: "LOGIN_FAILURE",
+                payload: "No refresh token available",
+              });
+              localStorage.removeItem("user");
+              localStorage.removeItem("accessToken");
+              localStorage.removeItem("refreshToken");
+              return Promise.reject(error);
+            }
+
+            const response = await axios.post(
+              `${BASE_URL}/auth/refresh-token`,
+              {
+                refreshToken,
+              }
+            );
+
+            if (response.data.success) {
+              const newAccessToken = response.data.accessToken;
+              localStorage.setItem("accessToken", newAccessToken);
+              originalRequest.headers[
+                "Authorization"
+              ] = `Bearer ${newAccessToken}`;
+              return api(originalRequest); // Retry the original request
+            } else {
+              dispatch({
+                type: "LOGIN_FAILURE",
+                payload: "Failed to refresh token",
+              });
+              localStorage.removeItem("user");
+              localStorage.removeItem("accessToken");
+              localStorage.removeItem("refreshToken");
+              return Promise.reject(error);
+            }
+          } catch (refreshError) {
+            console.error("Token refresh error:", refreshError);
+            dispatch({
+              type: "LOGIN_FAILURE",
+              payload: "Failed to refresh token",
+            });
+            localStorage.removeItem("user");
+            localStorage.removeItem("accessToken");
+            localStorage.removeItem("refreshToken");
+            return Promise.reject(error);
+          }
+        }
+        return Promise.reject(error);
+      }
+    );
+
+    return () => {
+      api.interceptors.response.eject(interceptor);
+    };
+  }, []);
+
+  // Verify token on mount
   useEffect(() => {
     const verifyToken = async () => {
       if (state.user) return;
@@ -87,19 +164,16 @@ export const AuthContextProvider = ({ children }) => {
         const accessToken = localStorage.getItem("accessToken");
         if (!accessToken) return;
 
-        const res = await fetch(`${BASE_URL}/auth/me`, {
-          method: "GET",
+        const res = await api.get("/auth/me", {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
         });
 
-        const result = await res.json();
-
-        if (res.ok && result.success) {
-          dispatch({ type: "LOGIN_SUCCESS", payload: result.data });
+        if (res.data.success) {
+          dispatch({ type: "LOGIN_SUCCESS", payload: res.data.data });
         } else {
-          dispatch({ type: "LOGIN_FAILURE", payload: result.message });
+          dispatch({ type: "LOGIN_FAILURE", payload: res.data.message });
           localStorage.removeItem("user");
           localStorage.removeItem("accessToken");
           localStorage.removeItem("refreshToken");
@@ -128,6 +202,7 @@ export const AuthContextProvider = ({ children }) => {
         loading: state.loading,
         error: state.error,
         dispatch,
+        api,
       }}
     >
       {children}

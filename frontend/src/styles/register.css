@@ -1,0 +1,447 @@
+/* register.css */
+:root {
+  --primary-color: #ff6f61; /* Coral */
+  --secondary-color: #00aaff; /* Ocean blue */
+  --heading-color: #1a1a3d; /* Deep navy */
+  --text-color: #5a6a7a; /* Soft gray */
+  --font-name: "Poppins", sans-serif; /* Font chính */
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.register__section {
+  background: linear-gradient(135deg, #f8f9fa, #e0e7ff);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: 20px 0;
+}
+
+.register__container {
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25);
+  margin-top: 30px;
+  background: #ffffff;
+  border-radius: 24px;
+  overflow: hidden;
+  display: flex;
+  align-items: stretch;
+  max-width: 1800px; /* To hơn để chứa nhiều input */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.register__img {
+  width: 30%; /* To hơn để hình ảnh nổi bật */
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--secondary-color)
+  );
+  background-size: 200% 200%;
+  animation: gradientShift 10s ease infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 80px;
+}
+
+.register__img img {
+  width: 110%; /* To hơn để hình ảnh nổi bật */
+  max-width: 120%;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.4));
+  transition: transform 0.5s ease, filter 0.5s ease;
+}
+
+.register__img img:hover {
+  transform: scale(1.12) rotate(3deg);
+  filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.5));
+}
+
+.register__form {
+  width: 70%; /* To hơn để chứa nhiều input */
+  padding: 90px 80px;
+  background: #ffffff;
+  border-radius: 24px 0 0 24px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: inset 0 0 15px rgba(0, 170, 255, 0.2);
+}
+
+.register__form .user {
+  width: 180px;
+  height: 180px;
+  position: absolute;
+  top: -90px;
+  left: 50%;
+  transform: translateX(-50%);
+  transition: transform 0.5s ease;
+}
+
+.register__form .user img {
+  width: 100%;
+  border-radius: 50%;
+  border: 5px solid transparent;
+  background: linear-gradient(
+        135deg,
+        var(--primary-color),
+        var(--secondary-color)
+      )
+      padding-box,
+    linear-gradient(135deg, var(--primary-color), var(--secondary-color))
+      border-box;
+  background-size: 200% 200%;
+  animation: gradientShift 8s ease infinite;
+  padding: 10px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  transition: transform 0.5s ease;
+}
+
+.register__form .user img:hover {
+  transform: scale(1.15) rotate(8deg);
+}
+
+.register__form h2 {
+  color: var(--heading-color);
+  text-align: center;
+  margin-bottom: 5rem;
+  font-size: 3rem;
+  font-weight: 700;
+  font-family: var(--font-name);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.register__form form {
+  width: 100%;
+  max-width: 700px; /* To hơn để chứa nhiều input */
+}
+
+.input__group {
+  position: relative;
+  margin-bottom: 1.5rem; /* Giảm để chứa nhiều input */
+}
+
+.input__wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input__icon {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  font-size: 18px; /* Nhỏ hơn để cân đối với input */
+  z-index: 10;
+}
+
+.toggle__password {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #9ca3af;
+  font-size: 18px;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  z-index: 10;
+}
+
+.toggle__password:hover {
+  color: var(--primary-color);
+}
+
+.register__form input {
+  width: 100%;
+  padding: 10px 16px 10px 50px; /* Nhỏ hơn để input gọn */
+  height: 40px; /* Nhỏ hơn để input gọn */
+  border-radius: 8px; /* Nhỏ hơn */
+  border: 1px solid #d1d5db;
+  font-size: 0.9rem; /* Nhỏ hơn để chứa nhiều input */
+  font-family: var(--font-name);
+  color: var(--heading-color);
+  background: #f8f9fa;
+  transition: all 0.4s ease;
+  z-index: 1;
+}
+
+.register__form input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 4px rgba(255, 111, 97, 0.3);
+  background: #ffffff;
+  transform: translateY(-3px);
+}
+
+.register__form input::placeholder {
+  color: #9ca3af;
+  font-size: 0.9rem;
+}
+
+.register__form input[type="file"] {
+  padding: 10px 16px; /* Không cần padding-left lớn vì không có icon */
+  height: auto; /* Để phù hợp với input file */
+}
+
+.auth__btn {
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--secondary-color)
+  );
+  background-size: 200% 200%;
+  animation: gradientShift 6s ease infinite;
+  width: 100%;
+  padding: 10px; /* Nhỏ hơn để nút gọn */
+  font-size: 1rem; /* Nhỏ hơn */
+  font-weight: 600;
+  color: #fff;
+  border: none;
+  border-radius: 8px; /* Nhỏ hơn */
+  font-family: var(--font-name);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.4s ease;
+  cursor: pointer;
+}
+
+.auth__btn:hover {
+  background: linear-gradient(
+    135deg,
+    var(--secondary-color),
+    var(--primary-color)
+  );
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+}
+
+.auth__btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.auth__btn .spinner {
+  animation: spin 1s linear infinite;
+  margin-right: 12px;
+}
+
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.register__links {
+  margin-top: 3.5rem;
+  text-align: center;
+}
+
+.register__form p {
+  font-size: 1.2rem;
+  color: var(--text-color);
+  margin: 0.5rem 0;
+  font-family: var(--font-name);
+}
+
+.register__form p a {
+  color: var(--primary-color);
+  text-decoration: none;
+  margin-left: 12px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.register__form p a:hover {
+  color: var(--secondary-color);
+  text-decoration: underline;
+  transform: translateY(-2px);
+}
+
+/* Responsive Design */
+@media only screen and (max-width: 1024px) {
+  .register__container {
+    margin-top: 25px;
+    max-width: 1400px;
+  }
+
+  .register__img {
+    width: 25%;
+  }
+
+  .register__form {
+    width: 75%;
+    padding: 80px 70px;
+  }
+
+  .register__form h2 {
+    font-size: 2.8rem;
+  }
+
+  .register__form .user {
+    width: 160px;
+    height: 160px;
+    top: -80px;
+  }
+
+  .register__form form {
+    max-width: 550px;
+  }
+
+  .register__form input {
+    padding: 8px 14px 8px 46px;
+    font-size: 0.8rem;
+    height: 36px;
+  }
+
+  .register__form input[type="file"] {
+    padding: 8px 14px;
+  }
+
+  .auth__btn {
+    padding: 8px;
+    font-size: 0.9rem;
+  }
+
+  .register__form p {
+    font-size: 1.1rem;
+  }
+
+  .input__icon,
+  .toggle__password {
+    font-size: 16px;
+    left: 14px;
+    right: 14px;
+  }
+}
+
+@media only screen and (max-width: 768px) {
+  .register__container {
+    flex-direction: column;
+    margin-top: 20px;
+    max-width: 900px;
+    padding-bottom: 1.5rem;
+  }
+
+  .register__img {
+    display: none;
+  }
+
+  .register__form {
+    width: 100%;
+    padding: 70px 60px;
+    border-radius: 24px;
+  }
+
+  .register__form h2 {
+    font-size: 2.5rem;
+  }
+
+  .register__form .user {
+    width: 140px;
+    height: 140px;
+    top: -70px;
+  }
+
+  .register__form form {
+    max-width: 500px;
+  }
+
+  .register__form input {
+    padding: 6px 12px 6px 42px;
+    font-size: 0.7rem;
+    height: 32px;
+  }
+
+  .register__form input[type="file"] {
+    padding: 6px 12px;
+  }
+
+  .auth__btn {
+    padding: 6px;
+    font-size: 0.8rem;
+  }
+
+  .register__form p {
+    font-size: 1rem;
+  }
+
+  .input__icon,
+  .toggle__password {
+    font-size: 14px;
+    left: 12px;
+    right: 12px;
+  }
+}
+
+@media only screen and (max-width: 576px) {
+  .register__container {
+    margin-top: 15px;
+    max-width: 100%;
+  }
+
+  .register__form {
+    padding: 60px 40px;
+  }
+
+  .register__form .user {
+    width: 120px;
+    height: 120px;
+    top: -60px;
+  }
+
+  .register__form h2 {
+    font-size: 2.2rem;
+    margin-bottom: 4rem;
+  }
+
+  .register__form form {
+    max-width: 450px;
+  }
+
+  .register__form input {
+    padding: 5px 10px 5px 38px;
+    font-size: 0.6rem;
+    height: 30px;
+  }
+
+  .register__form input[type="file"] {
+    padding: 5px 10px;
+  }
+
+  .register__form p {
+    font-size: 0.9rem;
+    margin-top: 2rem;
+  }
+
+  .auth__btn {
+    padding: 5px;
+    font-size: 0.7rem;
+  }
+
+  .input__icon,
+  .toggle__password {
+    font-size: 12px;
+    left: 10px;
+    right: 10px;
+  }
+}

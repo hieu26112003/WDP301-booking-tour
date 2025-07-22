@@ -1,10 +1,11 @@
+// TourList.js
 import React from "react";
 import { Container, Row, Col } from "reactstrap";
 import TourCard from "../../shared/TourCard";
 import useFetch from "../../hooks/useFetch";
 import { BASE_URL } from "../../utils/config";
 
-const TourList = ({ selectedCategory }) => {
+const TourList = ({ selectedCategory, searchQuery }) => {
   const {
     data: categoriesResponse,
     loading: categoriesLoading,
@@ -52,6 +53,7 @@ const TourList = ({ selectedCategory }) => {
               <CategoryTourList
                 categoryId={selectedCategory.id}
                 categoryName={selectedCategory.name}
+                searchQuery={searchQuery}
               />
             </Row>
           </Container>
@@ -80,6 +82,7 @@ const TourList = ({ selectedCategory }) => {
                 <CategoryTourList
                   categoryId={category._id}
                   categoryName={category.name}
+                  searchQuery={searchQuery}
                 />
               </Row>
             </Container>
@@ -100,13 +103,16 @@ const TourList = ({ selectedCategory }) => {
   );
 };
 
-const CategoryTourList = ({ categoryId, categoryName }) => {
+const CategoryTourList = ({ categoryId, categoryName, searchQuery }) => {
   const [page, setPage] = React.useState(1);
+  const queryString = `page=${page}&limit=6${
+    searchQuery ? `&search=${encodeURIComponent(searchQuery)}` : ""
+  }`;
   const {
     data: tourResponse,
     loading: toursLoading,
     error: toursError,
-  } = useFetch(`${BASE_URL}/tours/category/${categoryId}?page=${page}&limit=6`);
+  } = useFetch(`${BASE_URL}/tours/category/${categoryId}?${queryString}`);
 
   const tours = tourResponse?.success
     ? tourResponse.data
@@ -114,6 +120,10 @@ const CategoryTourList = ({ categoryId, categoryName }) => {
     ? tourResponse
     : null;
   const pagination = tourResponse?.pagination;
+
+  React.useEffect(() => {
+    setPage(1);
+  }, [searchQuery]);
 
   return (
     <>
@@ -130,7 +140,10 @@ const CategoryTourList = ({ categoryId, categoryName }) => {
       {!toursLoading && !toursError && (!tours || tours.length === 0) && (
         <Col lg="12" className="text-center">
           <h4>
-            {tourResponse?.message || `Không có tour nào cho ${categoryName}`}
+            {tourResponse?.message ||
+              `Không có tour nào cho ${categoryName}${
+                searchQuery ? ` với từ khóa "${searchQuery}"` : ""
+              }`}
           </h4>
         </Col>
       )}

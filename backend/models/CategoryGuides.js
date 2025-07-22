@@ -1,3 +1,4 @@
+
 import mongoose from "mongoose";
 import slugify from "slugify";
 
@@ -33,3 +34,4 @@ categoryGuideSchema.pre("validate", function (next) {
 });
 
 export default mongoose.model("CategoryGuide", categoryGuideSchema);
+

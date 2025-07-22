@@ -11,7 +11,7 @@ const Layout = () => {
 
   return (
     <>
-      {!isHomePage && <Header />} {/* Only render Header if not on /home */}
+      {!isHomePage && <Header />}
       <Routers />
       <Footer />
       <ScrollUpButton />

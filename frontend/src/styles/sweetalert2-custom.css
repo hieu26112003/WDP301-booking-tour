@@ -1,0 +1,221 @@
+/* src/styles/sweetalert2-custom.css */
+:root {
+  --primary-color: #ff6f61; /* Coral */
+  --secondary-color: #00aaff; /* Ocean blue */
+  --heading-color: #1a1a3d; /* Deep navy */
+  --text-color: #5a6a7a; /* Soft gray */
+  --font-name: "Poppins", sans-serif; /* Font chính */
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
+.custom-swal-popup {
+  background: linear-gradient(135deg, #ffffff, #f8f9fa);
+  border-radius: 20px;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+  font-family: var(--font-name);
+  padding: 30px;
+  max-width: 500px; /* Giữ nhỏ gọn */
+  width: 90%;
+  animation: fadeIn 0.15s ease;
+  z-index: 10000;
+}
+
+.custom-swal-popup.swal2-toast {
+  animation: fadeIn 0.15s ease, fadeOut 0.15s ease 1.35s; /* Khớp timer: 1500 */
+}
+
+.custom-swal-title {
+  color: var(--heading-color);
+  font-size: 1.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  margin-bottom: 1.2rem;
+}
+
+.custom-swal-content {
+  color: var(--text-color);
+  font-size: 1.1rem;
+  font-family: var(--font-name);
+  line-height: 1.5;
+  margin-bottom: 1.5rem;
+}
+
+.custom-swal-confirm {
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--secondary-color)
+  );
+  background-size: 200% 200%;
+  animation: gradientShift 4s ease infinite;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 24px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.custom-swal-confirm:hover {
+  background: linear-gradient(
+    135deg,
+    var(--secondary-color),
+    var(--primary-color)
+  );
+  transform: translateY(-3px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+.custom-swal-cancel {
+  background: #d33;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 24px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.custom-swal-cancel:hover {
+  background: #b32d2d;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+.swal2-icon {
+  margin: 0 auto 1.2rem;
+  transform: scale(1.2);
+  transition: transform 0.3s ease;
+}
+
+.swal2-icon:hover {
+  transform: scale(1.3);
+}
+
+.swal2-timer-progress-bar {
+  background: var(--primary-color);
+  height: 4px;
+  border-radius: 4px;
+}
+
+/* Đảm bảo backdrop ẩn hoàn toàn và không chặn cuộn */
+.swal2-container {
+  z-index: 10000;
+}
+
+.swal2-container.swal2-backdrop-show {
+  transition: opacity 0.15s ease;
+  pointer-events: auto;
+}
+
+.swal2-container.swal2-backdrop-hide {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  display: none !important; /* Ẩn hoàn toàn backdrop */
+}
+
+/* Khôi phục cuộn khi thông báo đóng */
+body.swal2-shown:not(.swal2-no-backdrop):not(.swal2-toast-shown) {
+  overflow: auto !important;
+}
+
+/* Responsive Design */
+@media only screen and (max-width: 768px) {
+  .custom-swal-popup {
+    max-width: 400px;
+    padding: 25px;
+  }
+
+  .custom-swal-title {
+    font-size: 1.6rem;
+    margin-bottom: 1rem;
+  }
+
+  .custom-swal-content {
+    font-size: 1rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .custom-swal-confirm,
+  .custom-swal-cancel {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+  }
+
+  .swal2-icon {
+    transform: scale(1.1);
+  }
+
+  .swal2-timer-progress-bar {
+    height: 3px;
+  }
+}
+
+@media only screen and (max-width: 576px) {
+  .custom-swal-popup {
+    max-width: 300px;
+    padding: 20px;
+  }
+
+  .custom-swal-title {
+    font-size: 1.4rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .custom-swal-content {
+    font-size: 0.9rem;
+  }
+
+  .custom-swal-confirm,
+  .custom-swal-cancel {
+    padding: 8px 16px;
+    font-size: 0.8rem;
+  }
+
+  .swal2-icon {
+    transform: scale(1);
+  }
+
+  .swal2-timer-progress-bar {
+    height: 2px;
+  }
+}

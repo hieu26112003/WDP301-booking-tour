@@ -13,7 +13,7 @@ const storage = multer.diskStorage({
       __dirname,
       "../../frontend/public/user_images"
     );
-    
+
     if (!fs.existsSync(uploadPath)) {
       fs.mkdirSync(uploadPath, { recursive: true });
     }

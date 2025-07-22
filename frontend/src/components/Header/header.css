@@ -1,11 +1,11 @@
 :root {
-  --primary-color: #ff6f61; /* Coral for vibrant travel energy */
-  --secondary-color: #00aaff; /* Ocean blue for adventure */
-  --heading-color: #1a1a3d; /* Deep navy for elegance */
-  --text-color: #5a6a7a; /* Soft gray for readability */
-  --teal-color: #004aad; /* Rich blue for navigation */
-  --teal-dark: #002f6c; /* Darker teal for gradient */
-  --font-name: "Poppins", sans-serif; /* Modern, clean font */
+  --primary-color: #ff6f61;
+  --secondary-color: #00aaff;
+  --heading-color: #1a1a3d;
+  --text-color: #5a6a7a;
+  --teal-color: #004aad;
+  --teal-dark: #002f6c;
+  --font-name: "Poppins", sans-serif;
 }
 
 .header-redesign {
@@ -19,14 +19,15 @@
 /* Top Header Section */
 .top-header-redesign {
   background: #f8f9fa;
-  padding: 6px 0; /* Ultra-compact */
+  padding: 10px 0;
 }
 
+/* Top Header Wrapper */
 .top-header-wrapper-redesign {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: 12px;
 }
 
 /* Logo Section */
@@ -43,8 +44,8 @@
 }
 
 .logo-icon-redesign {
-  width: 32px;
-  height: 32px;
+  width: 38px;
+  height: 38px;
   background: linear-gradient(
     135deg,
     var(--primary-color),
@@ -54,12 +55,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 6px;
+  margin-right: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .logo-text-redesign {
-  font-size: 16px;
+  font-size: 18px;
   color: white;
 }
 
@@ -69,14 +70,14 @@
 }
 
 .logo-title-redesign {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 700;
   color: var(--heading-color);
   font-family: var(--font-name);
 }
 
 .logo-subtitle-redesign {
-  font-size: 8px;
+  font-size: 9px;
   color: var(--text-color);
   font-family: var(--font-name);
 }
@@ -84,8 +85,8 @@
 /* Search Bar */
 .search-bar-redesign {
   flex: 1;
-  max-width: 280px; /* More compact */
-  margin: 0 8px;
+  max-width: 420px;
+  margin: 0 14px;
 }
 
 .search-wrapper-redesign {
@@ -94,10 +95,11 @@
 
 .search-input-redesign {
   width: 100%;
-  padding: 5px 10px 5px 28px;
+  padding: 9px 18px 9px 44px;
+  height: 44px;
   border: 1px solid #d1d5db;
-  border-radius: 20px;
-  font-size: 11px;
+  border-radius: 26px;
+  font-size: 15px;
   font-family: var(--font-name);
   background: #ffffff;
   transition: all 0.3s ease;
@@ -110,32 +112,47 @@
 
 .search-input-redesign::placeholder {
   color: #9ca3af;
+  font-size: 15px;
 }
 
 .search-icon-redesign {
   position: absolute;
-  left: 8px;
+  left: 14px;
   top: 50%;
   transform: translateY(-50%);
   color: #9ca3af;
+  font-size: 20px;
+}
+
+.clear-search-btn-redesign {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #6b7280;
+  font-size: 20px;
+  cursor: pointer;
 }
 
 /* Header Right Section */
 .header-right-redesign {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 /* Phone Section */
 .phone-section-redesign {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
 }
 
 .phone-icon-redesign {
   color: var(--secondary-color);
+  font-size: 16px;
 }
 
 .phone-content-redesign {
@@ -145,12 +162,12 @@
 
 .phone-number-redesign {
   font-weight: 600;
-  font-size: 11px;
+  font-size: 12px;
   color: var(--heading-color);
 }
 
 .phone-subtitle-redesign {
-  font-size: 8px;
+  font-size: 9px;
   color: var(--text-color);
 }
 
@@ -162,15 +179,15 @@
 
 .user-menu-redesign {
   position: relative;
-  z-index: 1100; /* Higher than navigation bar */
+  z-index: 1100;
 }
 
 .user-toggle-redesign {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   cursor: pointer;
-  padding: 5px 8px;
+  padding: 6px 10px;
   border-radius: 6px;
   transition: background-color 0.2s ease;
 }
@@ -180,53 +197,55 @@
 }
 
 .user-avatar-redesign {
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   border: 1px solid var(--secondary-color);
   background: #e5e7eb;
-  overflow: hidden; /* Ensure image fits within circle */
+  overflow: hidden;
 }
 
 .user-avatar-img-redesign {
   width: 100%;
   height: 100%;
-  object-fit: cover; /* Ensure image scales properly */
+  object-fit: cover;
 }
 
 .user-icon-redesign {
   color: #6b7280;
+  font-size: 16px;
 }
 
 .user-name-redesign {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
   color: var(--heading-color);
 }
 
 .chevron-down-redesign {
   color: #6b7280;
+  font-size: 14px;
 }
 
 .user-dropdown-redesign {
   position: absolute;
   top: 100%;
   right: 0;
-  margin-top: 4px;
-  width: 120px;
-  background: white;
-  border-radius: 6px;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  margin-top: 6px;
+  width: 200px;
+  background: linear-gradient(135deg, #ffffff, #f8f9fa);
+  border-radius: 10px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
   border: 1px solid #e5e7eb;
-  padding: 5px 0;
+  padding: 10px 0;
   opacity: 0;
   visibility: hidden;
   transform: translateY(-6px);
-  transition: all 0.3s ease;
-  z-index: 1200; /* Ensure it overlays navigation bar */
+  transition: all 0.4s ease;
+  z-index: 1200;
 }
 
 .user-menu-redesign:hover .user-dropdown-redesign,
@@ -237,43 +256,59 @@
 }
 
 .user-dropdown-item-redesign {
-  display: block;
-  padding: 6px 10px;
-  color: #374151;
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  color: #1e293b;
   text-decoration: none;
-  font-size: 11px;
+  font-size: 14px;
   font-family: var(--font-name);
+  font-weight: 500;
+  letter-spacing: 0.5px;
   background: none;
   border: none;
   width: 100%;
   text-align: left;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.4s ease;
+}
+
+.user-dropdown-item-redesign:nth-child(3)::before {
+  content: "★";
+  margin-right: 8px;
+  color: var(--primary-color);
+  font-size: 12px;
+}
+
+.user-dropdown-item-redesign:last-child {
+  color: #dc2626;
+  font-weight: 600;
 }
 
 .user-dropdown-item-redesign:hover {
-  background-color: #f3f4f6;
+  background: linear-gradient(90deg, #e5e7eb, #d1d5db);
   color: var(--primary-color);
+  transform: translateX(4px);
 }
 
 .user-dropdown-divider-redesign {
   height: 1px;
-  background: #e5e7eb;
-  margin: 4px 0;
+  background: #d1d5db;
+  margin: 8px 0;
 }
 
 /* Auth Buttons */
 .auth-buttons-redesign {
   display: flex;
-  gap: 5px;
+  gap: 6px;
 }
 
 .login-btn-redesign,
 .register-btn-redesign {
-  padding: 5px 12px;
-  font-size: 11px;
+  padding: 6px 14px;
+  font-size: 12px;
   font-weight: 500;
-  border-radius: 20px;
+  border-radius: 22px;
   text-decoration: none;
   font-family: var(--font-name);
   transition: all 0.3s ease;
@@ -307,20 +342,21 @@
   background: none;
   border: none;
   cursor: pointer;
-  padding: 5px;
+  padding: 6px;
 }
 
 .mobile-menu-icon-redesign {
   color: var(--heading-color);
+  font-size: 18px;
 }
 
 /* Navigation Bar */
 .navigation-bar-redesign {
   background: linear-gradient(135deg, var(--teal-color), var(--teal-dark));
-  padding: 5px 0; /* Ultra-compact */
+  padding: 5px 0;
   position: sticky;
   top: 0;
-  z-index: 1000; /* Lower than user dropdown */
+  z-index: 1000;
 }
 
 .sticky__header .navigation-bar-redesign {
@@ -387,7 +423,7 @@
   opacity: 0;
   visibility: hidden;
   transition: all 0.3s ease;
-  z-index: 1100; /* Ensure it overlays navigation bar */
+  z-index: 1100;
 }
 
 .nav-item-redesign:hover .dropdown-menu-redesign,
@@ -418,6 +454,7 @@
   font-size: 11px;
   font-family: var(--font-name);
   transition: all 0.2s ease;
+  cursor: pointer;
 }
 
 .dropdown-item-redesign:hover {
@@ -526,6 +563,7 @@
   font-family: var(--font-name);
   border-radius: 4px;
   transition: all 0.2s ease;
+  cursor: pointer;
 }
 
 .mobile-submenu-link-redesign:hover {
@@ -538,6 +576,141 @@
   display: block;
 }
 
+/* Phần thông báo */
+.notification-section-redesign {
+  position: relative;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  margin-right: 16px;
+}
+
+.notification-toggle-redesign {
+  display: flex;
+  align-items: center;
+  position: relative;
+  padding: 6px;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+}
+
+.notification-toggle-redesign:hover {
+  background-color: #f3f4f6;
+}
+
+.notification-icon-redesign {
+  color: var(--heading-color);
+  font-size: 16px;
+}
+
+.notification-badge-redesign {
+  position: absolute;
+  top: -4px;
+  right: -8px;
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--secondary-color)
+  );
+  color: white;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 10px;
+  font-family: var(--font-name);
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.notification-dropdown-redesign {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 6px;
+  width: 240px;
+  background: linear-gradient(135deg, #ffffff, #f8f9fa);
+  border-radius: 10px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  border: 1px solid #e5e7eb;
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 1200;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition: all 0.4s ease;
+}
+
+.notification-dropdown-redesign.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.notification-dropdown-content-redesign {
+  padding: 8px;
+}
+
+.notification-item-redesign {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 10px;
+  color: #1e293b;
+  font-size: 12px;
+  font-family: var(--font-name);
+  font-weight: 500;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.notification-item-redesign:hover {
+  background: linear-gradient(90deg, #e5e7eb, #d1d5db);
+  color: var(--primary-color);
+  transform: translateX(4px);
+}
+
+.notification-content-redesign {
+  flex: 1;
+  margin-right: 8px;
+}
+
+.notification-message-redesign {
+  font-size: 12px;
+  color: #1e293b;
+  font-family: var(--font-name);
+  line-height: 1.4;
+}
+
+.notification-meta-redesign {
+  font-size: 10px;
+  color: var(--text-color);
+  font-family: var(--font-name);
+}
+
+.notification-delete-btn-redesign {
+  background: none;
+  border: none;
+  color: #dc2626;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 4px;
+  transition: color 0.2s ease;
+}
+
+.notification-delete-btn-redesign:hover {
+  color: var(--primary-color);
+}
+
+.notification-loading-redesign,
+.notification-empty-redesign {
+  padding: 8px;
+  text-align: center;
+  color: var(--text-color);
+  font-size: 11px;
+  font-family: var(--font-name);
+}
+
 /* Responsive Design */
 @media (max-width: 1024px) {
   .phone-section-redesign {
@@ -545,11 +718,28 @@
   }
 
   .search-bar-redesign {
-    max-width: 200px;
+    max-width: 320px;
   }
 
-  .menu-redesign {
-    gap: 12px;
+  .top-header-wrapper-redesign {
+    gap: 10px;
+  }
+
+  .logo-icon-redesign {
+    width: 34px;
+    height: 34px;
+  }
+
+  .logo-text-redesign {
+    font-size: 16px;
+  }
+
+  .logo-title-redesign {
+    font-size: 14px;
+  }
+
+  .logo-subtitle-redesign {
+    font-size: 8px;
   }
 }
 
@@ -566,19 +756,39 @@
     flex-wrap: wrap;
   }
 
+  .top-header-redesign {
+    padding: 8px 0;
+  }
+
   .search-bar-redesign {
     order: 3;
     flex-basis: 100%;
-    margin: 6px 0;
+    margin: 10px 0;
     max-width: 100%;
   }
 
+  .search-input-redesign {
+    height: 38px;
+    padding: 7px 16px 7px 40px;
+    font-size: 14px;
+  }
+
+  .search-icon-redesign {
+    font-size: 18px;
+    left: 12px;
+  }
+
+  .clear-search-btn-redesign {
+    font-size: 18px;
+    right: 12px;
+  }
+
   .header-right-redesign {
-    gap: 6px;
+    gap: 8px;
   }
 
   .logo-title-redesign {
-    font-size: 12px;
+    font-size: 13px;
   }
 
   .logo-subtitle-redesign {
@@ -586,23 +796,77 @@
   }
 
   .logo-icon-redesign {
-    width: 28px;
-    height: 28px;
+    width: 30px;
+    height: 30px;
   }
 
   .logo-text-redesign {
     font-size: 14px;
   }
+
+  .user-dropdown-redesign {
+    width: 160px;
+  }
+
+  .user-dropdown-item-redesign {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
+  .user-dropdown-item-redesign:nth-child(3)::before {
+    margin-right: 6px;
+    font-size: 11px;
+  }
+
+  .notification-section-redesign {
+    margin-right: 12px;
+  }
+
+  .notification-icon-redesign {
+    font-size: 14px;
+  }
+
+  .notification-badge-redesign {
+    top: -3px;
+    right: -6px;
+    padding: 1px 5px;
+    font-size: 9px;
+  }
+
+  .notification-dropdown-redesign {
+    width: 200px;
+    max-height: 250px;
+    right: -10px;
+  }
+
+  .notification-message-redesign {
+    font-size: 11px;
+  }
+
+  .notification-meta-redesign {
+    font-size: 9px;
+  }
+
+  .notification-delete-btn-redesign {
+    font-size: 10px;
+  }
 }
 
 @media (max-width: 480px) {
   .search-input-redesign {
-    padding: 4px 8px 4px 26px;
-    font-size: 10px;
+    padding: 6px 14px 6px 36px;
+    font-size: 13px;
+    height: 34px;
   }
 
   .search-icon-redesign {
-    left: 6px;
+    left: 10px;
+    font-size: 16px;
+  }
+
+  .clear-search-btn-redesign {
+    font-size: 16px;
+    right: 10px;
   }
 
   .auth-buttons-redesign {
@@ -612,7 +876,41 @@
 
   .login-btn-redesign,
   .register-btn-redesign {
-    padding: 4px 10px;
+    padding: 5px 12px;
+    font-size: 11px;
+  }
+
+  .mobile-menu-icon-redesign {
+    font-size: 16px;
+  }
+
+  .user-dropdown-redesign {
+    width: 140px;
+  }
+
+  .user-dropdown-item-redesign {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .notification-section-redesign {
+    margin-right: 8px;
+  }
+
+  .notification-dropdown-redesign {
+    width: 180px;
+    max-height: 200px;
+  }
+
+  .notification-message-redesign {
     font-size: 10px;
+  }
+
+  .notification-meta-redesign {
+    font-size: 8px;
+  }
+
+  .notification-delete-btn-redesign {
+    font-size: 9px;
   }
 }
