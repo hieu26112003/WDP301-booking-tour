@@ -20,7 +20,7 @@ import contactRoutes from "./routes/contactRoutes.js";
 import bookingRoute from "./routes/booking.js";
 import commentRoute from "./routes/commentRoute.js";
 import notificationRoute from "./routes/notificationRoutes.js";
-
+import statisticRotue from "./routes/statisticRoutes.js";
 dotenv.config();
 const app = express();
 const port = process.env.PORT || 8000;
@@ -56,6 +56,7 @@ app.use(cors({ origin: true, credentials: true }));
 app.use(cookieParser());
 
 // Routes
+
 app.use("/api/auth", authRoute);
 app.use("/api/admin", adminRoute);
 app.use("/api/tours", tourRoute);
@@ -66,10 +67,10 @@ app.use("/api/bookings", bookingRoute);
 app.use("/api/messages", messageRoute);
 app.use("/api/comment", commentRoute);
 app.use("/api/notifications", notificationRoute);
-
-app.use('/api/contact', contactRoutes);
-app.use('/api/contact/feedbacks', contactRoutes);
-app.use('/api/contact/callbacks', contactRoutes);
+app.use("/api/admin/statistic", statisticRotue);
+app.use("/api/contact", contactRoutes);
+app.use("/api/contact/feedbacks", contactRoutes);
+app.use("/api/contact/callbacks", contactRoutes);
 app.use("/api/callback/:id/call", contactRoutes);
 
 // --- Socket.IO Logic ---
