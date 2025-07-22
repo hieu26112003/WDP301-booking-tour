@@ -5,7 +5,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import { Server } from "socket.io";
 import http from "http";
-import callRequestRoute from './routes/callRequest.js'
+
 
 import User from "./models/User.js";
 
@@ -16,6 +16,8 @@ import categoryRoute from './routes/category.js'
 import messageRoute from "./routes/messageRoutes.js";
 import Message from "./models/Message.js";
 import guideRoutes from './routes/guideRoutes.js';
+import categoryGuideRoutes from "./routes/categoryGuideRoutes.js";
+
 
 
 
@@ -59,7 +61,8 @@ app.use("/api/admin", adminRoute);
 app.use('/api/tours', tourRoute)
 app.use('/api/categories', categoryRoute)
 app.use('/api/guides', guideRoutes);
-app.use('/api/call-request', callRequestRoute)
+app.use("/api/category-guides", categoryGuideRoutes);
+
 
 
 app.use("/api/messages", messageRoute);

@@ -21,6 +21,7 @@ import ManageGuide from "../pages/Staff/ManageGuide";
 import AboutUs from "../components/About/About";
 import Contact from "../components/Contact/Contact";
 import TourDetails from "../pages/User/TourDetails";
+import ManageCategoryGuides from "../pages/Admin/components/ManagerCategoryGuides";
 
 import TourDetail from "../pages/Admin/components/TourDetail";
 
@@ -104,6 +105,14 @@ const Routers = () => {
           </AdminLayout>
         }
       />
+      <Route
+  path="/admin/category-guides"
+  element={
+    <AdminLayout>
+      <ManageCategoryGuides />
+    </AdminLayout>
+  }
+/>
       <Route
         path="/staff"
         element={
