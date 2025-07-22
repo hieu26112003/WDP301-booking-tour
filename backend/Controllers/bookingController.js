@@ -271,11 +271,72 @@ export const updateBookingStatus = async (req, res) => {
   }
 };
 
-// Lấy danh sách tất cả booking (nhân viên hoặc quản trị viên)
 export const getAllBookings = async (req, res) => {
   try {
-    const bookings = await Booking.find().populate("userId tourId");
-    res.status(200).json({ success: true, data: bookings });
+    const userId = req.user.id;
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Người dùng không tồn tại" });
+    }
+
+    const { startDate, endDate, status, page = 1, limit = 10 } = req.query;
+    let query = {};
+
+    // Lọc theo khoảng thời gian
+    if (startDate && endDate) {
+      query.createdAt = {
+        $gte: new Date(startDate),
+        $lte: new Date(endDate),
+      };
+    }
+
+    // Lọc theo trạng thái
+    if (status && ["pending", "confirmed", "cancelled"].includes(status)) {
+      query.status = status;
+    }
+
+    // Phân trang
+    const pageNum = parseInt(page, 10);
+    const limitNum = parseInt(limit, 10);
+    const skip = (pageNum - 1) * limitNum;
+
+    let bookings;
+    let totalBookings;
+
+    if (user.role === "admin") {
+      // Admin có thể xem tất cả booking
+      bookings = await Booking.find(query)
+        .populate("userId tourId")
+        .skip(skip)
+        .limit(limitNum);
+      totalBookings = await Booking.countDocuments(query);
+    } else if (user.role === "staff") {
+      const managedTours = await Tour.find({ staffId: userId }).select("_id");
+      const tourIds = managedTours.map((tour) => tour._id);
+      query.tourId = { $in: tourIds };
+      bookings = await Booking.find(query)
+        .populate("userId tourId")
+        .skip(skip)
+        .limit(limitNum);
+      totalBookings = await Booking.countDocuments(query);
+    } else {
+      return res
+        .status(403)
+        .json({ success: false, message: "Không có quyền truy cập" });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: bookings,
+      pagination: {
+        total: totalBookings,
+        page: pageNum,
+        pages: Math.ceil(totalBookings / limitNum),
+      },
+    });
   } catch (err) {
     console.error("Lỗi khi lấy danh sách booking:", err);
     res.status(500).json({

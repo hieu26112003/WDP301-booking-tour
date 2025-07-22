@@ -1,7 +1,6 @@
-/* staffBookings.css */
 .staff-bookings-section {
   padding: 40px 0;
-  background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+  background: linear-gradient(135deg, #e6f0fa 0%, #f4f4f4 100%);
   min-height: 93vh;
 }
 
@@ -9,10 +8,11 @@
 .staff-bookings-title {
   font-size: 2rem;
   font-weight: 700;
-  color: #1e293b;
-  margin-bottom: 1.5rem;
+  color: #1a3c6c;
+  margin-bottom: 2rem;
   letter-spacing: 0.5px;
   text-align: center;
+  text-transform: uppercase;
 }
 
 /* Table */
@@ -21,9 +21,10 @@
   border-collapse: separate;
   border-spacing: 0;
   background: #ffffff;
-  border-radius: 8px;
+  border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
 }
 
 .staff-bookings-table th,
@@ -32,11 +33,12 @@
   font-size: 0.9rem;
   vertical-align: middle;
   text-align: center;
+  color: #1a3c6c;
 }
 
 .staff-bookings-table th {
-  background: #f1f5f9;
-  color: #1e293b;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e6f0fa 100%);
+  color: #1a3c6c;
   font-weight: 600;
   text-transform: uppercase;
   font-size: 0.85rem;
@@ -44,15 +46,12 @@
 
 .staff-bookings-table td {
   border-top: 1px solid #e2e8f0;
-  color: #1e293b;
-}
-
-.staff-bookings-table tbody tr {
-  transition: background 0.3s;
 }
 
 .staff-bookings-table tbody tr:hover {
-  background: #f8fafc;
+  background: #f1f5f9;
+  transform: scale(1.01);
+  transition: transform 0.2s ease;
 }
 
 /* Select Input */
@@ -62,7 +61,7 @@
   border-radius: 6px;
   border: 1px solid #e2e8f0;
   background: #ffffff;
-  color: #1e293b;
+  color: #1a3c6c;
   cursor: pointer;
   transition: border-color 0.3s;
 }
@@ -70,6 +69,27 @@
 .staff-bookings-table select:focus {
   border-color: #2563eb;
   outline: none;
+}
+
+/* Màu sắc cho trạng thái */
+.staff-bookings-table .status-select.status-pending {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.staff-bookings-table .status-select.status-confirmed {
+  background-color: #d1e7ff;
+  color: #004085;
+}
+
+.staff-bookings-table .status-select.status-cancelled {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.staff-bookings-table select:disabled {
+  background: #e2e8f0;
+  cursor: not-allowed;
 }
 
 /* Buttons */
@@ -95,74 +115,97 @@
 /* No Bookings Message */
 .no-bookings-message {
   font-size: 1rem;
-  color: #1e293b;
+  color: #1a3c6c;
   text-align: center;
   margin-top: 2rem;
+}
+
+/* Pagination */
+.pagination {
+  justify-content: center;
+}
+
+.pagination .page-item .page-link {
+  border-radius: 6px;
+  margin: 0 5px;
+  color: #1a3c6c;
+  font-weight: 500;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.pagination .page-item.active .page-link {
+  background-color: #2563eb;
+  border-color: #2563eb;
+  color: #ffffff;
+}
+
+.pagination .page-item .page-link:hover {
+  background-color: #f1f5f9;
+  transform: translateY(-2px);
+}
+
+.pagination .page-item.disabled .page-link {
+  color: #a0aec0;
+  cursor: not-allowed;
 }
 
 /* Table Column Widths */
 .staff-bookings-table th:nth-child(1),
 .staff-bookings-table td:nth-child(1) {
-  width: 12%;
-  /* Mã Booking */
+  width: 12%; /* Mã Booking */
 }
 
 .staff-bookings-table th:nth-child(2),
 .staff-bookings-table td:nth-child(2) {
-  width: 18%;
-  /* Tên Tour */
+  width: 18%; /* Tên Tour */
 }
 
 .staff-bookings-table th:nth-child(3),
 .staff-bookings-table td:nth-child(3) {
-  width: 12%;
-  /* Tên Người Dùng */
+  width: 12%; /* Tên Người Dùng */
 }
 
 .staff-bookings-table th:nth-child(4),
 .staff-bookings-table td:nth-child(4) {
-  width: 12%;
-  /* Số Điện Thoại */
+  width: 12%; /* Số Điện Thoại */
 }
 
 .staff-bookings-table th:nth-child(5),
 .staff-bookings-table td:nth-child(5) {
-  width: 10%;
-  /* Số Người Lớn */
+  width: 10%; /* Số Người Lớn */
 }
 
 .staff-bookings-table th:nth-child(6),
 .staff-bookings-table td:nth-child(6) {
-  width: 10%;
-  /* Số Trẻ Em */
+  width: 10%; /* Số Trẻ Em */
 }
 
 .staff-bookings-table th:nth-child(7),
 .staff-bookings-table td:nth-child(7) {
-  width: 10%;
-  /* Tổng Tiền */
+  width: 10%; /* Tổng Tiền */
 }
 
 .staff-bookings-table th:nth-child(8),
 .staff-bookings-table td:nth-child(8) {
-  width: 12%;
-  /* Trạng Thái */
+  width: 12%; /* Trạng Thái */
 }
 
 .staff-bookings-table th:nth-child(9),
 .staff-bookings-table td:nth-child(9) {
-  width: 10%;
-  /* Ngày Đặt */
+  width: 10%; /* Ngày Đặt */
 }
 
 .staff-bookings-table th:nth-child(10),
 .staff-bookings-table td:nth-child(10) {
-  width: 10%;
-  /* Hành Động */
+  width: 10%; /* Hành Động */
 }
 
 /* Responsive */
 @media (max-width: 768px) {
+  .staff-bookings-section {
+    padding: 20px 0;
+  }
+
   .staff-bookings-title {
     font-size: 1.75rem;
   }
@@ -187,54 +230,27 @@
     padding: 0.4rem;
   }
 
-  /* Điều chỉnh chiều rộng cột trên mobile */
-  .staff-bookings-table th:nth-child(1),
-  .staff-bookings-table td:nth-child(1) {
-    width: 15%;
+  .pagination .page-link {
+    font-size: 0.85rem;
+    padding: 0.4rem 0.8rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .staff-bookings-title {
+    font-size: 1.5rem;
   }
 
-  .staff-bookings-table th:nth-child(2),
-  .staff-bookings-table td:nth-child(2) {
-    width: 20%;
+  .staff-bookings-table th,
+  .staff-bookings-table td {
+    font-size: 0.8rem;
   }
 
-  .staff-bookings-table th:nth-child(3),
-  .staff-bookings-table td:nth-child(3) {
-    width: 15%;
+  .staff-bookings-table select {
+    font-size: 0.8rem;
   }
 
-  .staff-bookings-table th:nth-child(4),
-  .staff-bookings-table td:nth-child(4) {
-    width: 15%;
-  }
-
-  .staff-bookings-table th:nth-child(5),
-  .staff-bookings-table td:nth-child(5) {
-    width: 10%;
-  }
-
-  .staff-bookings-table th:nth-child(6),
-  .staff-bookings-table td:nth-child(6) {
-    width: 10%;
-  }
-
-  .staff-bookings-table th:nth-child(7),
-  .staff-bookings-table td:nth-child(7) {
-    width: 10%;
-  }
-
-  .staff-bookings-table th:nth-child(8),
-  .staff-bookings-table td:nth-child(8) {
-    width: 15%;
-  }
-
-  .staff-bookings-table th:nth-child(9),
-  .staff-bookings-table td:nth-child(9) {
-    width: 10%;
-  }
-
-  .staff-bookings-table th:nth-child(10),
-  .staff-bookings-table td:nth-child(10) {
-    width: 10%;
+  .staff-bookings-table .btn {
+    font-size: 0.8rem;
   }
 }
