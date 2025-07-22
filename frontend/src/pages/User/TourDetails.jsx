@@ -198,6 +198,7 @@ const TourDetails = () => {
     if (slider2.current) slider2.current.slickGoTo(activeIndex);
   }, [activeIndex]);
 
+
   const userCanReview = bookings.some(
     (b) => b.userId === user?._id && b.status === "confirmed"
   );
@@ -205,36 +206,21 @@ const TourDetails = () => {
   
 
   const handleCallBackSubmit = async (e) => {
-    e.preventDefault();
-    const phoneRegex =
-      /^(0|\+84)(3[2-9]|5[6|8|9]|7[0|6-9]|8[1-9]|9[0-9])[0-9]{7}$/;
-    const trimmedPhone = phoneNumber.trim();
-    if (!phoneRegex.test(trimmedPhone)) {
-      Swal.fire("Lỗi", "Số điện thoại không hợp lệ!", "error");
-      return;
-    }
+  e.preventDefault();
+  try {
+            const res = await fetch("http://localhost:8000/api/contact", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ type: "callback", phoneNumber }),
+            });
+            const data = await res.json();
+            alert(data.message);
+            setPhoneNumber("");
+        } catch (err) {
+            alert("Lỗi gửi yêu cầu gọi lại");
+        }
+    };
 
-    try {
-      const res = await fetch(`${BASE_URL}/call-request`, {
-        method: "post",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
-        body: JSON.stringify({ phoneNumber: trimmedPhone }),
-      });
-      const result = await res.json();
-      if (!res.ok) throw new Error(result.message);
-      Swal.fire("Thành công", "Chúng tôi sẽ gọi lại cho bạn sớm!", "success");
-      setPhoneNumber("");
-    } catch (err) {
-      Swal.fire(
-        "Lỗi khi gửi yêu cầu!",
-        err.message || "Lỗi không xác định",
-        "error"
-      );
-    }
-  };
 
   const toggleModal = () => setModal(!modal);
 
@@ -547,6 +533,7 @@ const TourDetails = () => {
                   onChange={(e) => setPhoneNumber(e.target.value)}
                   placeholder="Số điện thoại của tôi là"
                   className="mb-3"
+                  required
                 />
                 <Button color="warning" className="w-100 fw-bold" type="submit">
                   YÊU CẦU GỌI LẠI

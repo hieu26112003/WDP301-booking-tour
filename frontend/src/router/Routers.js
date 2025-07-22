@@ -23,6 +23,7 @@ import ManageGuide from "../pages/Staff/ManageGuide";
 import AboutUs from "../components/About/About";
 import Contact from "../components/Contact/ContactPage";
 import TourDetails from "../pages/User/TourDetails";
+import ManageCategoryGuides from "../pages/Admin/components/ManagerCategoryGuides";
 import ListTour from "../pages/User/ListTour";
 import TourDetail from "../pages/Admin/components/TourDetail";
 import MyBookings from "../pages/User/MyBookings";
@@ -130,6 +131,14 @@ const Routers = () => {
           </AdminLayout>
         }
       />
+      <Route
+  path="/admin/category-guides"
+  element={
+    <AdminLayout>
+      <ManageCategoryGuides />
+    </AdminLayout>
+  }
+/>
       <Route
         path="/staff"
         element={

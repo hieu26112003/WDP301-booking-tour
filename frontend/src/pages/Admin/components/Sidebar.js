@@ -1,4 +1,6 @@
 import { Link } from "react-router-dom";
+import { FaBookOpen } from "react-icons/fa";
+
 import {
   FaTachometerAlt,
   FaTags,
@@ -39,6 +41,11 @@ const Sidebar = () => {
           icon={<FaTags />}
           label="Manage Categories"
         />
+        <SidebarItem
+  to="/admin/category-guides"
+  icon={<FaBookOpen />}
+  label="Manage Guide Categories"
+/>
       </ul>
 
       <div className="footer">© 2025 Admin Dashboard</div>
