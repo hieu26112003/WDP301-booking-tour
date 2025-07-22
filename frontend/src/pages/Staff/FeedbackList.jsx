@@ -1,10 +1,11 @@
 import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
-import { Container, Table } from "reactstrap";
+import { Container, Table, Spinner, Card, CardBody } from "reactstrap";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import { BASE_URL } from "../../utils/config";
+import { FaEnvelope, FaPhoneAlt, FaMapMarkerAlt, FaUser } from "react-icons/fa";
 
 const FeedbackList = () => {
     const [feedbacks, setFeedbacks] = useState([]);
@@ -57,36 +58,48 @@ const FeedbackList = () => {
     if (loading) {
         return (
             <Container className="mt-5 text-center">
-                <h4>Đang tải...</h4>
+                <Spinner color="primary" />
+                <h5 className="mt-3">Đang tải dữ liệu góp ý...</h5>
             </Container>
         );
     }
 
     return (
         <Container className="mt-5">
-            <h3 className="mb-3">Danh sách góp ý</h3>
-            <Table bordered hover responsive>
-                <thead className="table-light">
+            <div className="text-center mb-4">
+                <h3 className="fw-bold">📝 Danh sách góp ý của khách hàng</h3>
+            </div>
+
+            <Table bordered responsive hover className="shadow-sm">
+                <thead className="table-info text-center">
                     <tr>
-                        <th>Họ tên</th>
-                        <th>Góp ý</th>
-                        <th>Email</th>
-                        <th>Địa chỉ</th>
-                        <th>SĐT</th>
-                        <th>Ngày gửi</th>
+                        <th><FaUser /> Họ tên</th>
+                        <th>✉️ Góp ý</th>
+                        <th><FaEnvelope /> Email</th>
+                        <th><FaMapMarkerAlt /> Địa chỉ</th>
+                        <th><FaPhoneAlt /> SĐT</th>
+                        <th>📅 Ngày</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {feedbacks.map((item) => (
-                        <tr key={item._id}>
-                            <td>{item.name || "-"}</td>
-                            <td>{item.feedback || "-"}</td>
-                            <td>{item.email || "-"}</td>
-                            <td>{item.address || "-"}</td>
-                            <td>{item.phone}</td>
-                            <td>{new Date(item.createdAt).toLocaleString("vi-VN")}</td>
+                    {feedbacks.length > 0 ? (
+                        feedbacks.map((item) => (
+                            <tr key={item._id}>
+                                <td>{item.name || "-"}</td>
+                                <td style={{ maxWidth: "300px", whiteSpace: "pre-wrap" }}>{item.feedback || "-"}</td>
+                                <td>{item.email || "-"}</td>
+                                <td>{item.address || "-"}</td>
+                                <td>{item.phone || "-"}</td>
+                                <td>{new Date(item.createdAt).toLocaleString("vi-VN")}</td>
+                            </tr>
+                        ))
+                    ) : (
+                        <tr>
+                            <td colSpan="6" className="text-center text-muted">
+                                Không có góp ý nào.
+                            </td>
                         </tr>
-                    ))}
+                    )}
                 </tbody>
             </Table>
         </Container>

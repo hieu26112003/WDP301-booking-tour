@@ -14,6 +14,17 @@ const ContactSchema = new mongoose.Schema({
     email: String,
     address: String,
     feedback: String,
+
+    called: {
+        type: Boolean,
+        default: false,
+    },
+    calledBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User', // liên kết với collection User
+        default: null,
+    },
+
     createdAt: {
         type: Date,
         default: Date.now,

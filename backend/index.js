@@ -70,7 +70,7 @@ app.use("/api/notifications", notificationRoute);
 app.use('/api/contact', contactRoutes);
 app.use('/api/contact/feedbacks', contactRoutes);
 app.use('/api/contact/callbacks', contactRoutes);
-app.use("/api/contact", contactRoutes);
+app.use("/api/callback/:id/call", contactRoutes);
 
 // --- Socket.IO Logic ---
 io.on("connection", (socket) => {

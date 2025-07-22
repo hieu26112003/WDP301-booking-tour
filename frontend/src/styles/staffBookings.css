@@ -2,7 +2,7 @@
 .staff-bookings-section {
   padding: 40px 0;
   background: linear-gradient(135deg, #f8fafc, #e2e8f0);
-  min-height: 100vh;
+  min-height: 93vh;
 }
 
 /* Header */
@@ -103,52 +103,62 @@
 /* Table Column Widths */
 .staff-bookings-table th:nth-child(1),
 .staff-bookings-table td:nth-child(1) {
-  width: 12%; /* Mã Booking */
+  width: 12%;
+  /* Mã Booking */
 }
 
 .staff-bookings-table th:nth-child(2),
 .staff-bookings-table td:nth-child(2) {
-  width: 18%; /* Tên Tour */
+  width: 18%;
+  /* Tên Tour */
 }
 
 .staff-bookings-table th:nth-child(3),
 .staff-bookings-table td:nth-child(3) {
-  width: 12%; /* Tên Người Dùng */
+  width: 12%;
+  /* Tên Người Dùng */
 }
 
 .staff-bookings-table th:nth-child(4),
 .staff-bookings-table td:nth-child(4) {
-  width: 12%; /* Số Điện Thoại */
+  width: 12%;
+  /* Số Điện Thoại */
 }
 
 .staff-bookings-table th:nth-child(5),
 .staff-bookings-table td:nth-child(5) {
-  width: 10%; /* Số Người Lớn */
+  width: 10%;
+  /* Số Người Lớn */
 }
 
 .staff-bookings-table th:nth-child(6),
 .staff-bookings-table td:nth-child(6) {
-  width: 10%; /* Số Trẻ Em */
+  width: 10%;
+  /* Số Trẻ Em */
 }
 
 .staff-bookings-table th:nth-child(7),
 .staff-bookings-table td:nth-child(7) {
-  width: 10%; /* Tổng Tiền */
+  width: 10%;
+  /* Tổng Tiền */
 }
 
 .staff-bookings-table th:nth-child(8),
 .staff-bookings-table td:nth-child(8) {
-  width: 12%; /* Trạng Thái */
+  width: 12%;
+  /* Trạng Thái */
 }
 
 .staff-bookings-table th:nth-child(9),
 .staff-bookings-table td:nth-child(9) {
-  width: 10%; /* Ngày Đặt */
+  width: 10%;
+  /* Ngày Đặt */
 }
 
 .staff-bookings-table th:nth-child(10),
 .staff-bookings-table td:nth-child(10) {
-  width: 10%; /* Hành Động */
+  width: 10%;
+  /* Hành Động */
 }
 
 /* Responsive */
