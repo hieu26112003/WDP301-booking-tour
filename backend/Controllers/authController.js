@@ -136,7 +136,6 @@ export const refreshToken = async (req, res) => {
     });
   }
 };
-
 export const getCurrentUser = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select("-password");
@@ -188,13 +187,13 @@ export const resetPassword = async (req, res) => {
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
       port: 465,
-      secure: true, 
+      secure: true,
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
       },
       tls: {
-        rejectUnauthorized: false, 
+        rejectUnauthorized: false,
       },
     });
     const mailOptions = {

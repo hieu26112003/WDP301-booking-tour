@@ -285,10 +285,9 @@ export const getAllBookings = async (req, res) => {
   }
 };
 
-// Lấy danh sách booking của khách hàng
 export const getUserBookings = async (req, res) => {
   try {
-    const userId = req.user.id; // Lấy từ verifyToken
+    const userId = req.user.id;
     const bookings = await Booking.find({ userId }).populate("tourId");
     res.status(200).json({ success: true, data: bookings });
   } catch (err) {
