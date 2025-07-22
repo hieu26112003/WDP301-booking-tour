@@ -25,6 +25,7 @@ export const createTour = async (req, res) => {
       departureDate,
       time,
       categoryId,
+      staffId,
       imageUrls,
     } = req.body;
 
@@ -53,6 +54,13 @@ export const createTour = async (req, res) => {
       return res
         .status(400)
         .json({ success: false, message: "Invalid category ID" });
+    }
+
+    // Validate staffId if provided
+    if (staffId && !mongoose.Types.ObjectId.isValid(staffId)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid staff ID" });
     }
 
     // Validate departureDate
@@ -116,6 +124,7 @@ export const createTour = async (req, res) => {
       departureDate: parsedDate,
       time,
       categoryId,
+      staffId, // Include staffId if provided
       images,
     });
 
@@ -136,8 +145,9 @@ export const createTour = async (req, res) => {
 // Lấy tất cả tour
 export const getAllTours = async (req, res) => {
   try {
-    const tours = await Tour.find().populate("categoryId", "name")
-  .populate("staffId", "fullName email");
+    const tours = await Tour.find()
+      .populate("categoryId", "name")
+      .populate("staffId", "fullName email");
     console.log(
       "Fetched tours:",
       tours.map((t) => ({ id: t._id, images: t.images }))
@@ -211,7 +221,7 @@ export const getTourById = async (req, res) => {
         .json({ success: false, message: "Tour not found" });
     }
 
-    console.log("Fetched tour:", { id: tour._id, images: tour.images }); // Debugging log
+    console.log("Fetched tour:", { id: tour._id, images: tour.images });
     res.status(200).json({ success: true, data: tour });
   } catch (err) {
     console.error("Error in getTourById:", err);
@@ -285,7 +295,6 @@ export const getTourByCategoryId = async (req, res) => {
   }
 };
 
-// Cập nhật tour
 export const updateTour = async (req, res) => {
   try {
     const { id } = req.params;
@@ -308,55 +317,74 @@ export const updateTour = async (req, res) => {
       departureDate,
       time,
       categoryId,
+      staffId,
       featured,
       existingImages,
       imageUrls,
     } = req.body;
 
-    const updateData = {
-      title,
-      summary,
-      days,
-      serviceStandards,
-      priceChild,
-      priceAdult,
-      notes,
-      cancellationPolicy,
-      schedule,
-      time,
-      categoryId,
-      featured,
-    };
+    const updateData = {};
 
-    if (departureDate) {
-      const parsedDate = new Date(departureDate);
-      if (isNaN(parsedDate.getTime())) {
-        return res
-          .status(400)
-          .json({ success: false, message: "Invalid departure date format" });
-      }
+    // Conditionally add fields to updateData to avoid setting undefined values
+    if (title !== undefined) updateData.title = title;
+    if (summary !== undefined) updateData.summary = summary;
+    if (days !== undefined) updateData.days = days;
+    if (serviceStandards !== undefined)
+      updateData.serviceStandards = serviceStandards;
+    if (priceChild !== undefined) updateData.priceChild = priceChild;
+    if (priceAdult !== undefined) updateData.priceAdult = priceAdult;
+    if (notes !== undefined) updateData.notes = notes;
+    if (cancellationPolicy !== undefined)
+      updateData.cancellationPolicy = cancellationPolicy;
+    if (schedule !== undefined) updateData.schedule = schedule;
+    if (time !== undefined) updateData.time = time;
+    if (categoryId !== undefined) updateData.categoryId = categoryId;
+    if (staffId !== undefined) updateData.staffId = staffId;
+    if (featured !== undefined) updateData.featured = featured;
 
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      if (parsedDate < today) {
-        return res.status(400).json({
-          success: false,
-          message: "Departure date cannot be earlier than today",
-        });
-      }
-      updateData.departureDate = parsedDate;
+    // Validate departureDate (required for updates)
+    if (
+      departureDate === undefined ||
+      departureDate === null ||
+      departureDate === ""
+    ) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Departure date is required" });
     }
 
+    const parsedDate = new Date(departureDate);
+    if (isNaN(parsedDate.getTime())) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid departure date format" });
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (parsedDate < today) {
+      return res.status(400).json({
+        success: false,
+        message: "Departure date cannot be earlier than today",
+      });
+    }
+    updateData.departureDate = parsedDate;
+
+    // Only update images if new images are provided or existingImages is explicitly modified
     let images = [];
+    let imagesModified = false;
+
     if (existingImages) {
       try {
         images = JSON.parse(existingImages);
+        imagesModified = true; // Mark as modified if existingImages is provided
       } catch (err) {
         console.warn("Failed to parse existingImages:", err);
       }
     }
     if (req.file) {
       images.unshift(`/user_images/${path.basename(req.file.path)}`);
+      imagesModified = true; // Mark as modified if a new file is uploaded
     }
     if (imageUrls) {
       try {
@@ -365,40 +393,25 @@ export const updateTour = async (req, res) => {
           images.push(
             ...urls.filter((url) => typeof url === "string" && url.trim())
           );
+          imagesModified = true; // Mark as modified if new URLs are provided
         }
       } catch (err) {
         console.warn("Failed to parse imageUrls:", err);
       }
     }
 
-    if (images.length > 0) {
+    // Only include images in updateData if images were modified
+    if (imagesModified) {
       updateData.images = images;
-    } else if (!req.file && !existingImages && !imageUrls) {
-      return res
-        .status(400)
-        .json({ success: false, message: "At least one image is required" });
+      if (images.length === 0) {
+        return res
+          .status(400)
+          .json({ success: false, message: "At least one image is required" });
+      }
     }
+    // If imagesModified is false, do not include images in updateData, preserving existing images
 
-    console.log("Updated tour image paths:", updateData.images);
-
-    if (
-      !title &&
-      !summary &&
-      !days &&
-      !serviceStandards &&
-      !priceChild &&
-      !priceAdult &&
-      !notes &&
-      !cancellationPolicy &&
-      !schedule &&
-      !departureDate &&
-      !time &&
-      !categoryId &&
-      !req.file &&
-      !existingImages &&
-      !imageUrls &&
-      featured === undefined
-    ) {
+    if (Object.keys(updateData).length === 0) {
       return res
         .status(400)
         .json({ success: false, message: "No valid fields to update" });
@@ -410,11 +423,19 @@ export const updateTour = async (req, res) => {
         .json({ success: false, message: "Invalid category ID" });
     }
 
+    if (staffId && !mongoose.Types.ObjectId.isValid(staffId)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid staff ID" });
+    }
+
     const updated = await Tour.findByIdAndUpdate(
       id,
       { $set: updateData },
       { new: true, runValidators: true }
-    ).populate("categoryId", "name");
+    )
+      .populate("categoryId", "name")
+      .populate("staffId", "fullName email");
 
     if (!updated) {
       return res
@@ -435,7 +456,6 @@ export const updateTour = async (req, res) => {
     res.status(500).json({ success: false, message: "Failed to update tour" });
   }
 };
-
 // Xóa tour
 export const deleteTour = async (req, res) => {
   try {
