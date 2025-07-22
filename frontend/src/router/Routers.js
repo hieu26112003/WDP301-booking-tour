@@ -31,6 +31,7 @@ import CallbackList from "../pages/Staff/CallbackList";
 import FeedbackList from "../pages/Staff/FeedbackList";
 import GuideDetail from "../pages/User/GuideDetail";
 import NotificationList from "../components/Notification/Notification";
+import AdminStatistics from "../components/Statistic/AdminStatistics";
 
 const Routers = () => {
   return (
@@ -40,7 +41,7 @@ const Routers = () => {
       <Route path="/cam-nang/guide/:id" element={<GuideDetail />} />
       <Route path="/cam-nang/:slug" element={<CamNang />} />
       <Route path="/cam-nang" element={<CamNang />} />
-      
+
       <Route path="/login" element={<Login />} />
       <Route path="/tours/:id" element={<TourDetails />} />
       <Route path="/register" element={<Register />} />
@@ -52,7 +53,7 @@ const Routers = () => {
       <Route path="/about" element={<AboutUs />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/tours/" element={<ListTour />} />
-      
+
       <Route path="/tours/filter/:slug" element={<ListTour />} />
 
       <Route path="/my-bookings" element={<MyBookings />} />
@@ -61,7 +62,7 @@ const Routers = () => {
         path="/admin"
         element={
           <AdminLayout>
-            <h2>Admin!</h2>
+            <AdminStatistics />
           </AdminLayout>
         }
       />
