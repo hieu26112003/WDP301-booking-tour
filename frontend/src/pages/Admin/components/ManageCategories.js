@@ -24,12 +24,16 @@ const ManageCategories = () => {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
+    slug: "", // Added slug to formData
     isActive: true,
   });
   const [editId, setEditId] = useState(null);
   const [modal, setModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const toggleModal = () => setModal(!modal);
+  const toggleModal = () => {
+    if (!isLoading) setModal(!modal);
+  };
 
   const fetchCategories = async () => {
     try {
@@ -41,24 +45,33 @@ const ManageCategories = () => {
         },
       });
       const result = await res.json();
-      if (!res.ok) throw new Error(result.message);
+      if (!res.ok) throw new Error(result.message || "Không thể tải danh mục");
       setCategories(result.data);
     } catch (err) {
       Swal.fire({
         icon: "error",
         title: "Lỗi",
-        text: "Không thể tải danh mục",
+        text: err.message,
         confirmButtonColor: "#d33",
+        backdrop: true,
+        allowOutsideClick: true,
+        customClass: {
+          popup: "custom-swal-popup",
+          title: "custom-swal-title",
+          content: "custom-swal-content",
+          confirmButton: "custom-swal-confirm",
+        },
+        willClose: () => {
+          document.body.style.overflow = "auto";
+        },
       });
     }
   };
 
-  // Gọi API khi component mount
   useEffect(() => {
     fetchCategories();
   }, []);
 
-  // Xử lý thay đổi input
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
@@ -67,14 +80,13 @@ const ManageCategories = () => {
     }));
   };
 
-  // Xử lý submit form
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     const accessToken = localStorage.getItem("accessToken");
     try {
       let res;
       if (editId) {
-        // Cập nhật danh mục
         res = await fetch(`${BASE_URL}/categories/${editId}`, {
           method: "PUT",
           headers: {
@@ -84,7 +96,6 @@ const ManageCategories = () => {
           body: JSON.stringify(formData),
         });
       } else {
-        // Tạo danh mục mới
         res = await fetch(`${BASE_URL}/categories`, {
           method: "POST",
           headers: {
@@ -96,42 +107,64 @@ const ManageCategories = () => {
       }
 
       const result = await res.json();
-      if (!res.ok) throw new Error(result.message);
+      if (!res.ok) throw new Error(result.message || "Không thể lưu danh mục");
 
       Swal.fire({
         icon: "success",
         title: editId ? "Cập nhật thành công" : "Tạo thành công",
-        confirmButtonText: "OK",
-        confirmButtonColor: "#3085d6",
+        showConfirmButton: false,
         timer: 1500,
+        timerProgressBar: true,
+        backdrop: true,
+        allowOutsideClick: true,
+        customClass: {
+          popup: "custom-swal-popup",
+          title: "custom-swal-title",
+          content: "custom-swal-content",
+        },
+        willClose: () => {
+          document.body.style.overflow = "auto";
+        },
+      }).then(() => {
+        setFormData({ name: "", description: "", slug: "", isActive: true }); // Reset slug in formData
+        setEditId(null);
+        toggleModal();
+        fetchCategories();
       });
-
-      setFormData({ name: "", description: "", isActive: true });
-      setEditId(null);
-      toggleModal();
-      fetchCategories();
     } catch (err) {
       Swal.fire({
         icon: "error",
         title: "Lỗi",
-        text: err.message || "Không thể lưu danh mục",
+        text: err.message,
         confirmButtonColor: "#d33",
+        backdrop: true,
+        allowOutsideClick: true,
+        customClass: {
+          popup: "custom-swal-popup",
+          title: "custom-swal-title",
+          content: "custom-swal-content",
+          confirmButton: "custom-swal-confirm",
+        },
+        willClose: () => {
+          document.body.style.overflow = "auto";
+        },
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // Xử lý chỉnh sửa
   const handleEdit = (category) => {
     setFormData({
       name: category.name,
       description: category.description,
+      slug: category.slug, // Include slug when editing
       isActive: category.isActive,
     });
     setEditId(category._id);
     toggleModal();
   };
 
-  // Xử lý xóa
   const handleDelete = async (id) => {
     const result = await Swal.fire({
       title: "Bạn có chắc?",
@@ -142,9 +175,19 @@ const ManageCategories = () => {
       cancelButtonColor: "#d33",
       confirmButtonText: "Xóa",
       cancelButtonText: "Hủy",
+      backdrop: true,
+      allowOutsideClick: true,
+      customClass: {
+        popup: "custom-swal-popup",
+        title: "custom-swal-title",
+        content: "custom-swal-content",
+        confirmButton: "custom-swal-confirm",
+        cancelButton: "custom-swal-cancel",
+      },
     });
 
     if (result.isConfirmed) {
+      setIsLoading(true);
       try {
         const accessToken = localStorage.getItem("accessToken");
         const res = await fetch(`${BASE_URL}/categories/${id}`, {
@@ -154,30 +197,62 @@ const ManageCategories = () => {
           },
         });
         const result = await res.json();
-        if (!res.ok) throw new Error(result.message);
+        console.log("Delete category response:", result);
+
+        if (!res.ok) {
+          const errorMessage =
+            result.message ===
+            "Cannot delete category because it has associated tours"
+              ? "Không thể xóa danh mục vì có các tour liên quan"
+              : result.message || "Không thể xóa danh mục";
+          throw new Error(errorMessage);
+        }
 
         Swal.fire({
           icon: "success",
           title: "Xóa thành công",
-          confirmButtonText: "OK",
-          confirmButtonColor: "#3085d6",
+          showConfirmButton: false,
           timer: 1500,
+          timerProgressBar: true,
+          backdrop: true,
+          allowOutsideClick: true,
+          customClass: {
+            popup: "custom-swal-popup",
+            title: "custom-swal-title",
+            content: "custom-swal-content",
+          },
+          willClose: () => {
+            document.body.style.overflow = "auto";
+          },
+        }).then(() => {
+          fetchCategories();
         });
-        fetchCategories();
       } catch (err) {
         Swal.fire({
           icon: "error",
           title: "Lỗi",
-          text: err.message || "Không thể xóa danh mục",
+          text: err.message,
           confirmButtonColor: "#d33",
+          backdrop: true,
+          allowOutsideClick: true,
+          customClass: {
+            popup: "custom-swal-popup",
+            title: "custom-swal-title",
+            content: "custom-swal-content",
+            confirmButton: "custom-swal-confirm",
+          },
+          willClose: () => {
+            document.body.style.overflow = "auto";
+          },
         });
+      } finally {
+        setIsLoading(false);
       }
     }
   };
 
-  // Mở modal để thêm danh mục mới
   const handleAddNew = () => {
-    setFormData({ name: "", description: "", isActive: true });
+    setFormData({ name: "", description: "", slug: "", isActive: true }); // Reset slug for new category
     setEditId(null);
     toggleModal();
   };
@@ -193,6 +268,7 @@ const ManageCategories = () => {
                 color="primary"
                 onClick={handleAddNew}
                 className="icon-btn"
+                disabled={isLoading}
               >
                 <FaPlus />
               </Button>
@@ -214,6 +290,20 @@ const ManageCategories = () => {
                       value={formData.name}
                       onChange={handleChange}
                       required
+                      disabled={isLoading}
+                    />
+                  </FormGroup>
+                  <FormGroup>
+                    <Label for="slug">Slug</Label>
+                    <Input
+                      type="text"
+                      id="slug"
+                      name="slug"
+                      placeholder="Category Slug (e.g., adventure-tour)"
+                      value={formData.slug}
+                      onChange={handleChange}
+                      required
+                      disabled={isLoading}
                     />
                   </FormGroup>
                   <FormGroup>
@@ -226,6 +316,7 @@ const ManageCategories = () => {
                       value={formData.description}
                       onChange={handleChange}
                       required
+                      disabled={isLoading}
                     />
                   </FormGroup>
                   <FormGroup check>
@@ -236,6 +327,7 @@ const ManageCategories = () => {
                         name="isActive"
                         checked={formData.isActive}
                         onChange={handleChange}
+                        disabled={isLoading}
                       />{" "}
                       Active
                     </Label>
@@ -243,10 +335,18 @@ const ManageCategories = () => {
                 </Form>
               </ModalBody>
               <ModalFooter>
-                <Button color="primary" onClick={handleSubmit}>
+                <Button
+                  color="primary"
+                  onClick={handleSubmit}
+                  disabled={isLoading}
+                >
                   {editId ? "Update" : "Create"}
                 </Button>{" "}
-                <Button color="secondary" onClick={toggleModal}>
+                <Button
+                  color="secondary"
+                  onClick={toggleModal}
+                  disabled={isLoading}
+                >
                   Cancel
                 </Button>
               </ModalFooter>
@@ -256,6 +356,7 @@ const ManageCategories = () => {
               <thead>
                 <tr>
                   <th>Name</th>
+                  <th>Slug</th> {/* Added Slug column */}
                   <th>Description</th>
                   <th>Active</th>
                   <th>Actions</th>
@@ -265,6 +366,7 @@ const ManageCategories = () => {
                 {categories.map((category) => (
                   <tr key={category._id}>
                     <td>{category.name}</td>
+                    <td>{category.slug}</td> {/* Display slug */}
                     <td className="description-content">
                       {category.description}
                     </td>
@@ -280,6 +382,7 @@ const ManageCategories = () => {
                         color="link"
                         className="icon-btn"
                         onClick={() => handleEdit(category)}
+                        disabled={isLoading}
                       >
                         <FaEdit />
                       </Button>
@@ -287,6 +390,7 @@ const ManageCategories = () => {
                         color="link"
                         className="icon-btn"
                         onClick={() => handleDelete(category._id)}
+                        disabled={isLoading}
                       >
                         <FaTrash />
                       </Button>

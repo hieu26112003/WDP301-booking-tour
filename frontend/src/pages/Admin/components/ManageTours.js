@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useContext } from "react";
 import {
   Container,
   Row,
@@ -17,11 +17,11 @@ import {
 import Swal from "sweetalert2";
 import { FaPlus, FaEdit, FaTrash, FaCheck, FaEye } from "react-icons/fa";
 import ReactQuill, { Quill } from "react-quill";
-import parse from "html-react-parser";
 import "react-quill/dist/quill.snow.css";
 import { BASE_URL } from "../../../utils/config";
 import "../../../styles/manageTour.css";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../../context/AuthContext";
 
 // Thêm module image-resize cho ReactQuill
 import ImageResize from "quill-image-resize-module-react";
@@ -33,8 +33,10 @@ Size.whitelist = ["12px", "14px", "16px", "18px", "20px"];
 Quill.register(Size, true);
 
 const ManageTours = () => {
+  const { api, dispatch } = useContext(AuthContext); // Use api from AuthContext
   const [tours, setTours] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [staffs, setStaffs] = useState([]);
   const [formData, setFormData] = useState({
     title: "",
     summary: "",
@@ -48,65 +50,118 @@ const ManageTours = () => {
     departureDate: "",
     time: "",
     categoryId: "",
+    staffId: "",
     featured: false,
   });
+
   const [imageFile, setImageFile] = useState(null);
+  const [imageUrls, setImageUrls] = useState([""]);
+  const [existingImages, setExistingImages] = useState([]);
   const [editId, setEditId] = useState(null);
   const [modal, setModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedStaff, setSelectedStaff] = useState("");
+
   const navigate = useNavigate();
 
-  // Mở/đóng modal
-  const toggleModal = () => setModal(!modal);
+  const toggleModal = () => {
+    if (!isLoading) {
+      setModal(!modal);
+      if (!modal) {
+        setImageFile(null);
+        setImageUrls([""]);
+        setExistingImages([]);
+      }
+    }
+  };
 
-  // Lấy danh sách danh mục
+  // ------------------ FETCH HELPERS ------------------
+  const getToken = () => localStorage.getItem("accessToken");
+
   const fetchCategories = async () => {
     try {
-      const accessToken = localStorage.getItem("accessToken");
-      const res = await fetch(`${BASE_URL}/categories`, {
-        method: "GET",
+      const accessToken = getToken();
+      if (!accessToken) {
+        showError("No access token found. Please log in again.");
+        return;
+      }
+      const res = await api.get("/categories", {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
-      const result = await res.json();
-      if (!res.ok) throw new Error(result.message);
-      setCategories(result.data);
+      setCategories(res.data.data);
     } catch (err) {
-      Swal.fire({
-        icon: "error",
-        title: "Lỗi",
-        text: "Không thể tải danh mục",
-        confirmButtonColor: "#d33",
-      });
+      showError(err.response?.data?.message || "Không thể tải danh mục");
     }
   };
 
-  // Lấy danh sách tour
-  const fetchTours = async () => {
+  const fetchStaffs = useCallback(async () => {
     try {
-      const accessToken = localStorage.getItem("accessToken");
-      const res = await fetch(`${BASE_URL}/tours`, {
-        method: "GET",
+      const accessToken = getToken();
+      if (!accessToken) {
+        console.warn("No access token found for fetchStaffs");
+        showError("No access token found. Please log in again.");
+        return;
+      }
+      const res = await api.get("/admin/staff", {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
-      const result = await res.json();
-      if (!res.ok) throw new Error(result.message);
-      setTours(result.data);
+      console.log("fetchStaffs response:", res.data);
+      const staffList = res.data.filter((user) => user.role === "staff");
+      if (staffList.length === 0) {
+        console.warn("No staff members found in response");
+      }
+      setStaffs(staffList);
     } catch (err) {
-      Swal.fire({
-        icon: "error",
-        title: "Lỗi",
-        text: "Không thể tải tour",
-        confirmButtonColor: "#d33",
-      });
+      console.error("Error in fetchStaffs:", err);
+      showError(err.response?.data?.message || "Failed to fetch staff list");
     }
-  };
-
-  // Gọi API khi component mount
-  useEffect(() => {
-    fetchCategories();
-    fetchTours();
   }, []);
 
-  // Xử lý thay đổi input
+  const fetchTours = async () => {
+    try {
+      const accessToken = getToken();
+      if (!accessToken) {
+        showError("No access token found. Please log in again.");
+        return;
+      }
+      const res = await api.get("/tours", {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      setTours(res.data.data);
+    } catch (err) {
+      showError(err.response?.data?.message || "Không thể tải tour");
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories();
+    fetchStaffs();
+    fetchTours();
+  }, [fetchStaffs]);
+
+  // ------------------ UI HELPERS ------------------
+  const showError = (msg) => {
+    Swal.fire({
+      icon: "error",
+      title: "Lỗi",
+      text: msg,
+      confirmButtonColor: "#d33",
+      backdrop: true,
+      allowOutsideClick: true,
+      customClass: {
+        popup: "custom-swal-popup",
+        title: "custom-swal-title",
+        content: "custom-swal-content",
+        confirmButton: "custom-swal-confirm",
+      },
+      willClose: () => {
+        document.body.style.overflow = "auto";
+      },
+    });
+  };
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
@@ -115,7 +170,6 @@ const ManageTours = () => {
     }));
   };
 
-  // Xử lý thay đổi ReactQuill
   const handleQuillChange = (name) => (value) => {
     setFormData((prev) => ({
       ...prev,
@@ -123,151 +177,177 @@ const ManageTours = () => {
     }));
   };
 
-  // Xử lý chọn file ảnh
   const handleImageChange = (e) => {
     setImageFile(e.target.files[0]);
   };
 
-  // Xử lý submit form
+  const handleImageUrlChange = (index, value) => {
+    const newImageUrls = [...imageUrls];
+    newImageUrls[index] = value;
+    setImageUrls(newImageUrls);
+  };
+
+  const handleAddImageUrl = () => {
+    if (imageUrls.length < 4) {
+      setImageUrls([...imageUrls, ""]);
+    }
+  };
+
+  const handleRemoveExistingImage = (index) => {
+    setExistingImages((prev) => prev.filter((_, i) => i !== index));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const accessToken = localStorage.getItem("accessToken");
-    const data = new FormData();
+    setIsLoading(true);
 
-    // Thêm các trường formData vào FormData
+    // Validate required fields
+    if (!formData.title) {
+      showError("Title is required");
+      setIsLoading(false);
+      return;
+    }
+    if (!formData.summary) {
+      showError("Summary is required");
+      setIsLoading(false);
+      return;
+    }
+    if (!formData.days) {
+      showError("Days is required");
+      setIsLoading(false);
+      return;
+    }
+    if (!formData.serviceStandards) {
+      showError("Service standards is required");
+      setIsLoading(false);
+      return;
+    }
+    if (!formData.priceChild) {
+      showError("Price for child is required");
+      setIsLoading(false);
+      return;
+    }
+    if (!formData.priceAdult) {
+      showError("Price for adult is required");
+      setIsLoading(false);
+      return;
+    }
+    if (!formData.notes) {
+      showError("Notes is required");
+      setIsLoading(false);
+      return;
+    }
+    if (!formData.cancellationPolicy) {
+      showError("Cancellation policy is required");
+      setIsLoading(false);
+      return;
+    }
+    if (!formData.schedule) {
+      showError("Schedule is required");
+      setIsLoading(false);
+      return;
+    }
+    if (!formData.departureDate) {
+      showError("Departure date is required");
+      setIsLoading(false);
+      return;
+    }
+    if (!formData.time) {
+      showError("Time is required");
+      setIsLoading(false);
+      return;
+    }
+    if (!formData.categoryId) {
+      showError("Category is required");
+      setIsLoading(false);
+      return;
+    }
+
+    const parsedDate = new Date(formData.departureDate);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (isNaN(parsedDate.getTime())) {
+      showError("Invalid departure date format");
+      setIsLoading(false);
+      return;
+    }
+    if (parsedDate < today) {
+      showError("Departure date cannot be earlier than today");
+      setIsLoading(false);
+      return;
+    }
+
+    const data = new FormData();
     Object.keys(formData).forEach((key) => {
-      data.append(key, formData[key]);
+      const val = formData[key];
+      if (val === undefined || val === null) return;
+      data.append(key, typeof val === "boolean" ? String(val) : val);
     });
 
-    // Thêm file ảnh nếu có
     if (imageFile) {
       data.append("image", imageFile);
+    }
+
+    const validUrls = imageUrls.filter((url) => url.trim());
+    if (validUrls.length > 0) {
+      data.append("imageUrls", JSON.stringify(validUrls));
+    }
+
+    if (editId && existingImages.length > 0) {
+      data.append("existingImages", JSON.stringify(existingImages));
+    }
+
+    if (!editId && !imageFile && validUrls.length === 0) {
+      showError("At least one image is required");
+      setIsLoading(false);
+      return;
     }
 
     try {
       let res;
       if (editId) {
-        // Cập nhật tour
-        res = await fetch(`${BASE_URL}/tours/${editId}`, {
-          method: "PUT",
-          headers: { Authorization: `Bearer ${accessToken}` },
-          body: data,
+        res = await api.put(`/tours/${editId}`, data, {
+          headers: { Authorization: `Bearer ${getToken()}` },
         });
       } else {
-        // Tạo tour mới
-        res = await fetch(`${BASE_URL}/tours`, {
-          method: "POST",
-          headers: { Authorization: `Bearer ${accessToken}` },
-          body: data,
+        res = await api.post("/tours", data, {
+          headers: { Authorization: `Bearer ${getToken()}` },
         });
       }
-
-      const result = await res.json();
-      if (!res.ok) throw new Error(result.message);
 
       Swal.fire({
         icon: "success",
         title: editId ? "Cập nhật thành công" : "Tạo thành công",
-        confirmButtonText: "OK",
-        confirmButtonColor: "#3085d6",
+        showConfirmButton: false,
         timer: 1500,
-      });
-
-      setFormData({
-        title: "",
-        summary: "",
-        days: "",
-        serviceStandards: "",
-        priceChild: "",
-        priceAdult: "",
-        notes: "",
-        cancellationPolicy: "",
-        schedule: "",
-        departureDate: "",
-        time: "",
-        categoryId: "",
-        featured: false,
-      });
-      setImageFile(null);
-      setEditId(null);
-      toggleModal();
-      fetchTours();
-    } catch (err) {
-      Swal.fire({
-        icon: "error",
-        title: "Lỗi",
-        text: err.message || "Không thể lưu tour",
-        confirmButtonColor: "#d33",
-      });
-    }
-  };
-
-  // Xử lý chỉnh sửa
-  const handleEdit = (tour) => {
-    setFormData({
-      title: tour.title,
-      summary: tour.summary,
-      days: tour.days,
-      serviceStandards: tour.serviceStandards,
-      priceChild: tour.priceChild,
-      priceAdult: tour.priceAdult,
-      notes: tour.notes,
-      cancellationPolicy: tour.cancellationPolicy,
-      schedule: tour.schedule,
-      departureDate: tour.departureDate,
-      time: tour.time,
-      categoryId: tour.categoryId?._id || tour.categoryId,
-      featured: tour.featured || false,
-    });
-    setImageFile(null);
-    setEditId(tour._id);
-    toggleModal();
-  };
-
-  // Xử lý xóa
-  const handleDelete = async (id) => {
-    const result = await Swal.fire({
-      title: "Bạn có chắc?",
-      text: "Bạn muốn xóa tour này?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Xóa",
-      cancelButtonText: "Hủy",
-    });
-
-    if (result.isConfirmed) {
-      try {
-        const accessToken = localStorage.getItem("accessToken");
-        const res = await fetch(`${BASE_URL}/tours/${id}`, {
-          method: "DELETE",
-          headers: { Authorization: `Bearer ${accessToken}` },
-        });
-        const result = await res.json();
-        if (!res.ok) throw new Error(result.message);
-
-        Swal.fire({
-          icon: "success",
-          title: "Xóa thành công",
-          confirmButtonText: "OK",
-          confirmButtonColor: "#3085d6",
-          timer: 1500,
-        });
+        timerProgressBar: true,
+        backdrop: true,
+        allowOutsideClick: true,
+        customClass: {
+          popup: "custom-swal-popup",
+          title: "custom-swal-title",
+          content: "custom-swal-content",
+        },
+        willClose: () => {
+          document.body.style.overflow = "auto";
+        },
+      }).then(() => {
+        resetForm();
+        toggleModal();
         fetchTours();
-      } catch (err) {
-        Swal.fire({
-          icon: "error",
-          title: "Lỗi",
-          text: err.message || "Không thể xóa tour",
-          confirmButtonColor: "#d33",
-        });
+      });
+    } catch (err) {
+      if (err.response?.status === 401 && !err.config._retry) {
+        // Let the interceptor handle 401 errors
+        return;
       }
+      showError(err.response?.data?.message || "Không thể lưu tour");
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // Mở modal để thêm tour mới
-  const handleAddNew = () => {
+  const resetForm = () => {
     setFormData({
       title: "",
       summary: "",
@@ -281,19 +361,132 @@ const ManageTours = () => {
       departureDate: "",
       time: "",
       categoryId: "",
+      staffId: "",
       featured: false,
     });
     setImageFile(null);
+    setImageUrls([""]);
+    setExistingImages([]);
     setEditId(null);
+  };
+
+  const handleEdit = (tour) => {
+    const formattedDate = tour.departureDate
+      ? new Date(tour.departureDate).toISOString().split("T")[0]
+      : "";
+    setFormData({
+      title: tour.title || "",
+      summary: tour.summary || "",
+      days: tour.days || "",
+      serviceStandards: tour.serviceStandards || "",
+      priceChild: tour.priceChild || "",
+      priceAdult: tour.priceAdult || "",
+      notes: tour.notes || "",
+      cancellationPolicy: tour.cancellationPolicy || "",
+      schedule: tour.schedule || "",
+      departureDate: formattedDate,
+      time: tour.time || "",
+      categoryId: tour.categoryId?._id || tour.categoryId || "",
+      staffId: tour.staffId?._id || tour.staffId || "",
+      featured: tour.featured || false,
+    });
+    setImageFile(null);
+    setImageUrls([""]);
+    setExistingImages(tour.images || []);
+    setEditId(tour._id);
     toggleModal();
   };
 
-  // Xem chi tiết tour
+  const handleDelete = async (id) => {
+    const result = await Swal.fire({
+      title: "Bạn có chắc?",
+      text: "Bạn muốn xóa tour này?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Xóa",
+      cancelButtonText: "Hủy",
+      backdrop: true,
+      allowOutsideClick: true,
+      customClass: {
+        popup: "custom-swal-popup",
+        title: "custom-swal-title",
+        content: "custom-swal-content",
+        confirmButton: "custom-swal-confirm",
+        cancelButton: "custom-swal-cancel",
+      },
+    });
+
+    if (result.isConfirmed) {
+      setIsLoading(true);
+      try {
+        const accessToken = getToken();
+        if (!accessToken) {
+          showError("No access token found. Please log in again.");
+          return;
+        }
+        await api.delete(`/tours/${id}`, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        Swal.fire({
+          icon: "success",
+          title: "Xóa thành công",
+          showConfirmButton: false,
+          timer: 1500,
+          timerProgressBar: true,
+          backdrop: true,
+          allowOutsideClick: true,
+          customClass: {
+            popup: "custom-swal-popup",
+            title: "custom-swal-title",
+            content: "custom-swal-content",
+          },
+          willClose: () => {
+            document.body.style.overflow = "auto";
+          },
+        }).then(() => {
+          fetchTours();
+        });
+      } catch (err) {
+        if (err.response?.status === 401 && !err.config._retry) {
+          // Let the interceptor handle 401 errors
+          return;
+        }
+        showError(err.response?.data?.message || "Không thể xóa tour");
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  };
+
+  const handleAddNew = () => {
+    resetForm();
+    toggleModal();
+  };
+
   const handleViewDetail = (tour) => {
     navigate(`/tour-detail/${tour._id}`, { state: { tour } });
   };
 
-  // Cấu hình module cho ReactQuill
+  const handleSearchChange = (e) => setSearchTerm(e.target.value);
+  const handleCategoryChange = (e) => setSelectedCategory(e.target.value);
+  const handleStaffFilterChange = (e) => setSelectedStaff(e.target.value);
+
+  const filteredTours = tours.filter((tour) => {
+    const matchesSearch = tour.title
+      ?.toLowerCase()
+      .includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedCategory
+      ? tour.categoryId?._id === selectedCategory ||
+        tour.categoryId === selectedCategory
+      : true;
+    const matchesStaff = selectedStaff
+      ? tour.staffId?._id === selectedStaff || tour.staffId === selectedStaff
+      : true;
+    return matchesSearch && matchesCategory && matchesStaff;
+  });
+
   const quillModules = {
     toolbar: [
       [{ size: ["12px", "14px", "16px", "18px", "20px"] }],
@@ -308,7 +501,6 @@ const ManageTours = () => {
     },
   };
 
-  // Hàm trích xuất text thuần túy từ HTML và cắt chuỗi
   const truncateText = (html, maxLength = 100) => {
     const tempDiv = document.createElement("div");
     tempDiv.innerHTML = html;
@@ -324,14 +516,82 @@ const ManageTours = () => {
         <Row>
           <Col lg="12">
             <div className="d-flex justify-content-between align-items-center mb-4">
-              <h2>Manage Tours</h2>
-              <Button
-                color="primary"
-                onClick={handleAddNew}
-                className="icon-btn"
-              >
-                <FaPlus />
-              </Button>
+              <div className="w-100">
+                <h2>Manage Tours</h2>
+                <div className="d-flex align-items-center mt-2 flex-wrap gap-2">
+                  <FormGroup
+                    className="me-3 mb-0"
+                    style={{ minWidth: "200px" }}
+                  >
+                    <Input
+                      type="select"
+                      value={selectedCategory}
+                      onChange={handleCategoryChange}
+                      disabled={isLoading}
+                    >
+                      <option value="">All Categories</option>
+                      {categories.length > 0 ? (
+                        categories.map((category) => (
+                          <option key={category._id} value={category._id}>
+                            {category.name}
+                          </option>
+                        ))
+                      ) : (
+                        <option value="" disabled>
+                          No categories available
+                        </option>
+                      )}
+                    </Input>
+                  </FormGroup>
+
+                  <FormGroup
+                    className="me-3 mb-0"
+                    style={{ minWidth: "200px" }}
+                  >
+                    <Input
+                      type="select"
+                      value={selectedStaff}
+                      onChange={handleStaffFilterChange}
+                      disabled={isLoading || staffs.length === 0}
+                    >
+                      <option value="">All Staff</option>
+                      {staffs.length > 0 ? (
+                        staffs.map((s) => (
+                          <option key={s._id} value={s._id}>
+                            {s.fullName || s.name || s.email || "Unknown"}
+                          </option>
+                        ))
+                      ) : (
+                        <option value="" disabled>
+                          No staff available
+                        </option>
+                      )}
+                    </Input>
+                  </FormGroup>
+
+                  <FormGroup
+                    className="me-3 mb-0"
+                    style={{ flex: 1, minWidth: "200px" }}
+                  >
+                    <Input
+                      type="text"
+                      placeholder="Search by tour title..."
+                      value={searchTerm}
+                      onChange={handleSearchChange}
+                      disabled={isLoading}
+                    />
+                  </FormGroup>
+
+                  <Button
+                    color="primary"
+                    onClick={handleAddNew}
+                    className="icon-btn"
+                    disabled={isLoading}
+                  >
+                    <FaPlus />
+                  </Button>
+                </div>
+              </div>
             </div>
 
             <Modal isOpen={modal} toggle={toggleModal} size="lg">
@@ -341,7 +601,7 @@ const ManageTours = () => {
               <ModalBody>
                 <Form onSubmit={handleSubmit}>
                   <FormGroup>
-                    <Label for="title">Title</Label>
+                    <Label for="title">Title (Required)</Label>
                     <Input
                       type="text"
                       id="title"
@@ -350,10 +610,12 @@ const ManageTours = () => {
                       value={formData.title}
                       onChange={handleChange}
                       required
+                      disabled={isLoading}
                     />
                   </FormGroup>
+
                   <FormGroup>
-                    <Label for="summary">Summary</Label>
+                    <Label for="summary">Summary (Required)</Label>
                     <Input
                       type="textarea"
                       id="summary"
@@ -362,10 +624,12 @@ const ManageTours = () => {
                       value={formData.summary}
                       onChange={handleChange}
                       required
+                      disabled={isLoading}
                     />
                   </FormGroup>
+
                   <FormGroup>
-                    <Label for="days">Days</Label>
+                    <Label for="days">Days (Required)</Label>
                     <Input
                       type="text"
                       id="days"
@@ -374,10 +638,14 @@ const ManageTours = () => {
                       value={formData.days}
                       onChange={handleChange}
                       required
+                      disabled={isLoading}
                     />
                   </FormGroup>
+
                   <FormGroup>
-                    <Label for="serviceStandards">Service Standards</Label>
+                    <Label for="serviceStandards">
+                      Service Standards (Required)
+                    </Label>
                     <Input
                       type="text"
                       id="serviceStandards"
@@ -386,10 +654,12 @@ const ManageTours = () => {
                       value={formData.serviceStandards}
                       onChange={handleChange}
                       required
+                      disabled={isLoading}
                     />
                   </FormGroup>
+
                   <FormGroup>
-                    <Label for="priceChild">Price (Child)</Label>
+                    <Label for="priceChild">Price (Child) (Required)</Label>
                     <Input
                       type="number"
                       id="priceChild"
@@ -398,10 +668,12 @@ const ManageTours = () => {
                       value={formData.priceChild}
                       onChange={handleChange}
                       required
+                      disabled={isLoading}
                     />
                   </FormGroup>
+
                   <FormGroup>
-                    <Label for="priceAdult">Price (Adult)</Label>
+                    <Label for="priceAdult">Price (Adult) (Required)</Label>
                     <Input
                       type="number"
                       id="priceAdult"
@@ -410,28 +682,36 @@ const ManageTours = () => {
                       value={formData.priceAdult}
                       onChange={handleChange}
                       required
+                      disabled={isLoading}
                     />
                   </FormGroup>
+
                   <FormGroup>
-                    <Label for="notes">Notes</Label>
+                    <Label for="notes">Notes (Required)</Label>
                     <ReactQuill
                       value={formData.notes}
                       onChange={handleQuillChange("notes")}
                       modules={quillModules}
                       placeholder="Enter notes (supports HTML formatting)"
+                      readOnly={isLoading}
                     />
                   </FormGroup>
+
                   <FormGroup>
-                    <Label for="cancellationPolicy">Cancellation Policy</Label>
+                    <Label for="cancellationPolicy">
+                      Cancellation Policy (Required)
+                    </Label>
                     <ReactQuill
                       value={formData.cancellationPolicy}
                       onChange={handleQuillChange("cancellationPolicy")}
                       modules={quillModules}
                       placeholder="Enter cancellation policy (supports HTML formatting)"
+                      readOnly={isLoading}
                     />
                   </FormGroup>
+
                   <FormGroup>
-                    <Label for="schedule">Schedule</Label>
+                    <Label for="schedule">Schedule (Required)</Label>
                     <Input
                       type="textarea"
                       id="schedule"
@@ -440,22 +720,25 @@ const ManageTours = () => {
                       value={formData.schedule}
                       onChange={handleChange}
                       required
+                      disabled={isLoading}
                     />
                   </FormGroup>
+
                   <FormGroup>
-                    <Label for="departureDate">Departure Date</Label>
+                    <Label for="departureDate">Departure Date (Required)</Label>
                     <Input
-                      type="text"
+                      type="date"
                       id="departureDate"
                       name="departureDate"
-                      placeholder="Departure Date (e.g., 2025-08-01)"
                       value={formData.departureDate}
                       onChange={handleChange}
                       required
+                      disabled={isLoading}
                     />
                   </FormGroup>
+
                   <FormGroup>
-                    <Label for="time">Time</Label>
+                    <Label for="time">Time (Required)</Label>
                     <Input
                       type="text"
                       id="time"
@@ -464,10 +747,12 @@ const ManageTours = () => {
                       value={formData.time}
                       onChange={handleChange}
                       required
+                      disabled={isLoading}
                     />
                   </FormGroup>
+
                   <FormGroup>
-                    <Label for="categoryId">Category</Label>
+                    <Label for="categoryId">Category (Required)</Label>
                     <Input
                       type="select"
                       id="categoryId"
@@ -475,26 +760,137 @@ const ManageTours = () => {
                       value={formData.categoryId}
                       onChange={handleChange}
                       required
+                      disabled={isLoading || categories.length === 0}
                     >
                       <option value="">Select Category</option>
-                      {categories.map((category) => (
-                        <option key={category._id} value={category._id}>
-                          {category.name}
+                      {categories.length > 0 ? (
+                        categories.map((category) => (
+                          <option key={category._id} value={category._id}>
+                            {category.name}
+                          </option>
+                        ))
+                      ) : (
+                        <option value="" disabled>
+                          No categories available
                         </option>
-                      ))}
+                      )}
                     </Input>
                   </FormGroup>
+
                   <FormGroup>
-                    <Label for="image">Image</Label>
+                    <Label for="staffId">Staff (Optional)</Label>
+                    <Input
+                      type="select"
+                      id="staffId"
+                      name="staffId"
+                      value={formData.staffId}
+                      onChange={handleChange}
+                      disabled={isLoading || staffs.length === 0}
+                    >
+                      <option value="">Select Staff</option>
+                      {staffs.length > 0 ? (
+                        staffs.map((staff) => (
+                          <option key={staff._id} value={staff._id}>
+                            {staff.fullName ||
+                              staff.name ||
+                              staff.email ||
+                              "Unknown"}
+                          </option>
+                        ))
+                      ) : (
+                        <option value="" disabled>
+                          No staff available
+                        </option>
+                      )}
+                    </Input>
+                  </FormGroup>
+
+                  <FormGroup>
+                    <Label for="image">
+                      First Image (Upload){" "}
+                      {editId ? "(Optional)" : "(Required)"}
+                    </Label>
                     <Input
                       type="file"
                       id="image"
                       name="image"
                       accept="image/*"
                       onChange={handleImageChange}
-                      required={!editId}
+                      required={!editId && !imageUrls.some((url) => url.trim())}
+                      disabled={isLoading}
                     />
+                    {imageFile && (
+                      <div className="mt-2">
+                        <p>Selected file: {imageFile.name}</p>
+                      </div>
+                    )}
                   </FormGroup>
+
+                  <FormGroup>
+                    <Label>Additional Images (URLs)</Label>
+                    {imageUrls.map((url, index) => (
+                      <div
+                        key={index}
+                        className="d-flex align-items-center mb-2"
+                      >
+                        <Input
+                          type="text"
+                          placeholder={`Image URL ${index + 1}`}
+                          value={url}
+                          onChange={(e) =>
+                            handleImageUrlChange(index, e.target.value)
+                          }
+                          disabled={isLoading}
+                          className="me-2"
+                        />
+                        {index === imageUrls.length - 1 &&
+                          imageUrls.length < 4 && (
+                            <Button
+                              color="primary"
+                              size="sm"
+                              onClick={handleAddImageUrl}
+                              disabled={isLoading}
+                            >
+                              <FaPlus />
+                            </Button>
+                          )}
+                      </div>
+                    ))}
+                  </FormGroup>
+
+                  {editId && existingImages.length > 0 && (
+                    <FormGroup>
+                      <Label>Existing Images</Label>
+                      <div className="d-flex flex-wrap">
+                        {existingImages.map((image, index) => (
+                          <div key={index} className="position-relative m-2">
+                            <img
+                              src={image}
+                              alt={`Existing image ${index + 1}`}
+                              style={{ maxWidth: "100px", height: "auto" }}
+                              onError={(e) => {
+                                console.error(
+                                  "Existing image load error:",
+                                  image
+                                );
+                                e.target.src = "/placeholder.jpg";
+                              }}
+                            />
+                            <Button
+                              color="danger"
+                              size="sm"
+                              className="position-absolute top-0 end-0"
+                              onClick={() => handleRemoveExistingImage(index)}
+                              disabled={isLoading}
+                            >
+                              <FaTrash />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    </FormGroup>
+                  )}
+
                   <FormGroup check>
                     <Label check>
                       <Input
@@ -503,6 +899,7 @@ const ManageTours = () => {
                         name="featured"
                         checked={formData.featured}
                         onChange={handleChange}
+                        disabled={isLoading}
                       />{" "}
                       Featured
                     </Label>
@@ -510,10 +907,18 @@ const ManageTours = () => {
                 </Form>
               </ModalBody>
               <ModalFooter>
-                <Button color="primary" onClick={handleSubmit}>
+                <Button
+                  color="primary"
+                  onClick={handleSubmit}
+                  disabled={isLoading}
+                >
                   {editId ? "Update" : "Create"}
                 </Button>{" "}
-                <Button color="secondary" onClick={toggleModal}>
+                <Button
+                  color="secondary"
+                  onClick={toggleModal}
+                  disabled={isLoading}
+                >
                   Cancel
                 </Button>
               </ModalFooter>
@@ -527,73 +932,110 @@ const ManageTours = () => {
                   <th>Title</th>
                   <th>Summary</th>
                   <th>Price (Adult)</th>
-                  {/* <th>Days</th> */}
                   <th>Notes</th>
                   <th>Cancellation Policy</th>
                   <th>Category</th>
+                  <th>Staff</th>
+                  <th>Departure Date</th>
                   <th>Featured</th>
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {tours.map((tour, index) => (
-                  <tr key={tour._id}>
-                    <td>{index + 1}</td>
-                    <td className="image-cell">
-                      {tour.image ? (
-                        <img
-                          src={tour.image}
-                          alt={tour.title}
-                          className="tour-image"
-                        />
-                      ) : (
-                        <span className="no-image">N/A</span>
-                      )}
-                    </td>
-                    <td>{tour.title}</td>
-                    <td>{tour.summary}</td>
-                    <td>{tour.priceAdult}</td>
-                    {/* <td>{tour.days}</td> */}
-                    <td className="html-content">{truncateText(tour.notes)}</td>
-                    <td className="html-content">
-                      {truncateText(tour.cancellationPolicy)}
-                    </td>
-                    <td>{tour.categoryId?.name || "N/A"}</td>
-                    <td>
-                      <FaCheck
-                        className={
-                          tour.featured ? "active-check" : "inactive-check"
-                        }
-                      />
-                    </td>
-                    <td>
-                      <Button
-                        color="link"
-                        className="icon-btn"
-                        onClick={() => handleViewDetail(tour)}
-                        title="View Details"
-                      >
-                        <FaEye />
-                      </Button>
-                      <Button
-                        color="link"
-                        className="icon-btn"
-                        onClick={() => handleEdit(tour)}
-                        title="Edit"
-                      >
-                        <FaEdit />
-                      </Button>
-                      <Button
-                        color="link"
-                        className="icon-btn"
-                        onClick={() => handleDelete(tour._id)}
-                        title="Delete"
-                      >
-                        <FaTrash />
-                      </Button>
+                {filteredTours.length > 0 ? (
+                  filteredTours.map((tour, index) => {
+                    const firstImage =
+                      tour.images && tour.images.length > 0
+                        ? tour.images[0]
+                        : "/placeholder.jpg";
+                    const staffName =
+                      tour.staffId?.fullName ||
+                      tour.staffId?.name ||
+                      tour.staffId?.email ||
+                      "N/A";
+                    return (
+                      <tr key={tour._id}>
+                        <td>{index + 1}</td>
+                        <td className="image-cell">
+                          <img
+                            src={firstImage}
+                            alt={tour.title}
+                            className="tour-image"
+                            onError={(e) => {
+                              console.error("Image load error:", firstImage);
+                              e.target.src = "/placeholder.jpg";
+                            }}
+                          />
+                        </td>
+                        <td>{tour.title}</td>
+                        <td>{tour.summary}</td>
+                        <td>{tour.priceAdult}</td>
+                        <td className="html-content">
+                          {truncateText(tour.notes)}
+                        </td>
+                        <td className="html-content">
+                          {truncateText(tour.cancellationPolicy)}
+                        </td>
+                        <td>{tour.categoryId?.name || "N/A"}</td>
+                        <td>{staffName}</td>
+                        <td>
+                          {tour.departureDate
+                            ? new Date(tour.departureDate).toLocaleDateString(
+                                "vi-VN",
+                                {
+                                  day: "2-digit",
+                                  month: "2-digit",
+                                  year: "numeric",
+                                }
+                              )
+                            : "N/A"}
+                        </td>
+                        <td>
+                          <FaCheck
+                            className={
+                              tour.featured ? "active-check" : "inactive-check"
+                            }
+                          />
+                        </td>
+                        <td>
+                          <Button
+                            color="link"
+                            className="icon-btn"
+                            onClick={() => handleViewDetail(tour)}
+                            title="View Details"
+                            disabled={isLoading}
+                          >
+                            <FaEye />
+                          </Button>
+                          <Button
+                            color="link"
+                            className="icon-btn"
+                            onClick={() => handleEdit(tour)}
+                            title="Edit"
+                            disabled={isLoading}
+                          >
+                            <FaEdit />
+                          </Button>
+                          <Button
+                            color="link"
+                            className="icon-btn"
+                            onClick={() => handleDelete(tour._id)}
+                            title="Delete"
+                            disabled={isLoading}
+                          >
+                            <FaTrash />
+                          </Button>
+                        </td>
+                      </tr>
+                    );
+                  })
+                ) : (
+                  <tr>
+                    <td colSpan="12" className="text-center">
+                      No tours found
                     </td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </Table>
           </Col>

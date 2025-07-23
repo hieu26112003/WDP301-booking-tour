@@ -9,6 +9,7 @@ import {
   getNorthernTours,
   getComboTours,
   getTourByCategoryId,
+  getToursByCategorySlug,
 } from "../Controllers/tourControllers.js";
 import { verifyAdmin } from "../middleware/VerifyToken.js";
 import upload from "../middleware/upload.js";
@@ -19,6 +20,7 @@ router.get("/north", getNorthernTours);
 router.get("/combo", getComboTours);
 router.get("/:id", getTourById);
 router.get("/category/:categoryId", getTourByCategoryId);
+router.get("/filter/:slug", getToursByCategorySlug);
 router.post("/", verifyAdmin, upload.single("image"), createTour);
 router.get("/", getAllTours);
 router.put("/:id", verifyAdmin, upload.single("image"), updateTour);

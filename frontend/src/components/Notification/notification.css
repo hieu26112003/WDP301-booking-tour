@@ -1,0 +1,128 @@
+.notification-section-redesign {
+  position: relative;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  margin-right: 20px;
+}
+
+.notification-toggle-redesign {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.notification-icon-redesign {
+  color: #333;
+}
+
+.notification-badge-redesign {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 12px;
+  font-weight: bold;
+  color: white;
+}
+
+.notification-badge-redesign.user {
+  background-color: #3085d6; /* Xanh cho user */
+}
+
+.notification-badge-redesign.staff {
+  background-color: #d33; /* Đỏ cho staff */
+}
+
+.notification-dropdown-redesign {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  min-width: 300px;
+  max-height: 400px;
+  overflow-y: auto;
+  z-index: 1000;
+  display: none;
+}
+
+.notification-dropdown-redesign.show {
+  display: block;
+}
+
+.notification-dropdown-content-redesign {
+  padding: 10px;
+}
+
+.notification-item-redesign {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+}
+
+.notification-item-redesign:hover {
+  background-color: #f1f1f1; /* Hiệu ứng hover để báo hiệu có thể nhấp */
+}
+
+.notification-item-redesign.unread {
+  background-color: #f8f9fa;
+  font-weight: 500;
+}
+
+.notification-item-redesign.read {
+  background-color: white;
+}
+
+.notification-message-redesign {
+  font-size: 14px;
+  color: #333;
+}
+
+.notification-time-redesign {
+  font-size: 12px;
+  color: #666;
+  margin-top: 4px;
+}
+
+.no-notifications-redesign {
+  padding: 10px;
+  text-align: center;
+  color: #666;
+}
+
+.notification-toggle-redesign.new-notification {
+  animation: pulse 1s ease-in-out;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.mobile-menu-item-redesign
+  .mobile-submenu-redesign
+  .notification-time-redesign {
+  font-size: 12px;
+  color: #666;
+  margin-top: 4px;
+}
+
+.mobile-submenu-item-redesign.unread {
+  background-color: #f8f9fa;
+  font-weight: 500;
+}
+
+.mobile-submenu-item-redesign:hover {
+  background-color: #f1f1f1; /* Hiệu ứng hover cho di động */
+}

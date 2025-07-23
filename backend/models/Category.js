@@ -14,6 +14,7 @@ const categorySchema = new mongoose.Schema(
     isActive: {
       type: Boolean,
     },
+    slug: { type: String, required: true, unique: true },
   },
   { timestamps: true }
 );

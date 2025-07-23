@@ -45,7 +45,7 @@ const tourSchema = new mongoose.Schema(
       required: true,
     },
     departureDate: {
-      type: String,
+      type: Date,
       required: true,
     },
     time: {
@@ -61,6 +61,7 @@ const tourSchema = new mongoose.Schema(
       type: [String],
       required: true,
     },
+    staffId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   },
   { timestamps: true }
 );

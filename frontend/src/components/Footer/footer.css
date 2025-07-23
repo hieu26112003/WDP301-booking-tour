@@ -1,53 +1,30 @@
-.footer {
-   padding-top   : 30px;
-   padding-bottom: 30px;
+.footer-custom {
+   background-color: #002f6c;
+   padding: 8px 0;
+   font-size: 0.75rem;
 }
 
-.footer .logo img {
-   width        : 60%;
-   margin-bottom: 1rem;
+.footer-custom h6 {
+   font-size: 0.8rem;
+   margin: 0;
+   padding: 2px 0;
 }
 
-.footer .logo p {
-   color    : var(--text-color);
-   font-size: 1rem;
+.footer-custom p {
+   margin: 2px 0;
+   font-size: 0.75rem;
+   color: #ccc;
 }
 
-.social__link span a {
-   text-decoration: none;
-   color          : var(--heading-color);
-   font-size      : 1.5rem;
+.footer-custom a {
+   color: #fff;
+   font-size: 0.8rem;
 }
 
-.footer__link-title {
-   color        : var(--heading-color);
-   margin-bottom: 1rem;
+.footer-custom a:hover {
+   color: #ffd700;
 }
 
-.footer__quick-links li a {
-   text-decoration: none;
-   color          : var(--text-color);
-   font-size      : 1.2rem;
-}
-
-.footer__quick-links a:hover {
-   color: var(--secondary-color);
-}
-
-.footer__quick-links h6 span i {
-   color    : var(--secondary-color);
-   font-size: 1.4rem;
-}
-
-.footer__quick-links h6 {
-   margin-bottom: 1rem;
-}
-
-.footer__quick-links p {
-   font-size: 1.2rem;
-}
-
-.copyright {
-   color    : var(--text-color);
-   font-size: 1.2rem;
+.footer-custom i {
+   font-size: 0.9rem;
 }
