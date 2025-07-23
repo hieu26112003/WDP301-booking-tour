@@ -1,5 +1,7 @@
 import CategoryGuide from "../models/CategoryGuides.js";
 import slugify from "slugify";
+import mongoose from "mongoose";
+import Guide from '../models/Guide.js';
 
 // [POST] /api/category-guides
 // [POST] /api/category-guides
@@ -45,16 +47,39 @@ export const getAllCategoryGuides = async (req, res) => {
 export const deleteCategoryGuide = async (req, res) => {
   try {
     const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid category guide ID" });
+    }
+
+    // Kiểm tra nếu còn Guide liên kết với category này
+    const guides = await Guide.find({ category: id });
+    if (guides.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Cannot delete category guide because it has associated guides",
+      });
+    }
+
     const deleted = await CategoryGuide.findByIdAndDelete(id);
     if (!deleted) {
-      return res.status(404).json({ success: false, message: "Category not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Category guide not found" });
     }
-    res.status(200).json({ success: true, message: "Category deleted" });
+
+    res.status(200).json({ success: true, message: "Category guide deleted successfully" });
   } catch (err) {
-    console.error("❌ Delete category error:", err);
-    res.status(500).json({ success: false, message: "Server error" });
+    console.error("❌ Delete category guide error:", err);
+    res.status(500).json({
+      success: false,
+      message: `Failed to delete category guide: ${err.message}`,
+    });
   }
 };
+
 export const updateCategoryGuide = async (req, res) => {
   try {
     const { id } = req.params;
