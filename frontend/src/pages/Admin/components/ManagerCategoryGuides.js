@@ -10,12 +10,14 @@ import {
   Button,
   Table,
   Modal,
+  InputGroup,
   ModalHeader,
   ModalBody,
   ModalFooter,
+  InputGroupText,
 } from "reactstrap";
 import Swal from "sweetalert2";
-import { FaPlus, FaEdit, FaTrash, FaCheck } from "react-icons/fa";
+import { FaPlus, FaEdit, FaTrash, FaCheck, FaSearch } from "react-icons/fa";
 import { BASE_URL } from "../../../utils/config";
 import "../../../styles/managerGuides.css";
 
@@ -29,6 +31,20 @@ const ManageCategories = () => {
   const [editId, setEditId] = useState(null);
   const [modal, setModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+const [filterStatus, setFilterStatus] = useState("all"); // all | active | inactive
+
+const filteredCategories = categories.filter((category) => {
+  const matchesSearch = category.name.toLowerCase().includes(searchTerm.toLowerCase());
+  const matchesStatus =
+    filterStatus === "all"
+      ? true
+      : filterStatus === "active"
+      ? category.isActive
+      : !category.isActive;
+
+  return matchesSearch && matchesStatus;
+});
 
   const toggleModal = () => {
     if (!isLoading) setModal(!modal);
@@ -143,6 +159,38 @@ const ManageCategories = () => {
           <Col lg="12">
             <div className="d-flex justify-content-between align-items-center mb-4">
               <h2>Manager Categories Guides </h2>
+              <div className="mb-3">
+  <div className="d-flex justify-content-between align-items-center flex-wrap gap-2">
+    
+    {/* Thanh tìm kiếm với icon kính lúp nằm trong input */}
+    <div style={{ flex: "1", maxWidth: "400px" }}>
+      <InputGroup>
+        <InputGroupText>
+          <FaSearch className="text-muted" />
+        </InputGroupText>
+        <Input
+          type="text"
+          placeholder="Tìm theo tên danh mục..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </InputGroup>
+    </div>
+
+    {/* Dropdown lọc trạng thái */}
+    <div style={{ width: "200px" }}>
+      <Input
+        type="select"
+        value={filterStatus}
+        onChange={(e) => setFilterStatus(e.target.value)}
+      >
+        <option value="all">All Status</option>
+        <option value="active">Active</option>
+        <option value="inactive">Inactive</option>
+      </Input>
+    </div>
+  </div>
+</div>
               <Button color="primary" onClick={handleAddNew} className="icon-btn" disabled={isLoading}>
                 <FaPlus />
               </Button>
@@ -219,7 +267,7 @@ const ManageCategories = () => {
                 </tr>
               </thead>
               <tbody>
-                {categories.map((category) => (
+                {filteredCategories.map((category) => (
                   <tr key={category._id}>
                     <td>{category.name}</td>
                     <td>{category.slug}</td>
