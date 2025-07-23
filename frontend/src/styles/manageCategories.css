@@ -248,6 +248,19 @@ h2 {
 .table td:nth-child(4) {
   width: 10%; /* Actions */
 }
+/* managerGuides.css */
+.icon-btn {
+  padding: 4px 8px;
+}
+
+.active-check {
+  color: green;
+}
+
+.inactive-check {
+  color: red;
+}
+
 
 /* Responsive */
 @media (max-width: 768px) {

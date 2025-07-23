@@ -25,6 +25,7 @@ import { FaChevronDown, FaChevronUp, FaStar, FaPhoneAlt } from "react-icons/fa";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import html2pdf from "html2pdf.js";
 
 // Utility function to format Date to DD/MM/YYYY
 const formatDate = (dateString) => {
@@ -50,6 +51,7 @@ const TourDetails = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [modal, setModal] = useState(false);
   const [comments, setComments] = useState([]);
+  const contentRef = useRef(null);
   const [commentText, setCommentText] = useState("");
   const [bookingData, setBookingData] = useState({
     numberOfAdults: 1,
@@ -72,6 +74,50 @@ const TourDetails = () => {
   const [nav2, setNav2] = useState(null);
   const slider1 = useRef(null);
   const slider2 = useRef(null);
+
+  const pdfRef = useRef();
+
+  const exportPDF = () => {
+    setShowMore(true); // Ensure all content is visible
+    setTimeout(() => {
+      if (!contentRef.current) return;
+
+      // Preload images to handle CORS and ensure they load in the PDF
+      const preloadImages = () => {
+        const imgElements = contentRef.current.querySelectorAll("img");
+        const promises = Array.from(imgElements).map((img) => {
+          return new Promise((resolve) => {
+            if (img.complete) {
+              resolve();
+            } else {
+              img.onload = resolve;
+              img.onerror = resolve; // Continue even if an image fails to load
+              img.crossOrigin = "anonymous"; // Set crossOrigin for CORS
+              img.src = img.src; // Trigger reload if needed
+            }
+          });
+        });
+        return Promise.all(promises);
+      };
+
+      preloadImages().then(() => {
+        const opt = {
+          margin: 0.3,
+          filename: "lich-trinh-tour.pdf",
+          image: { type: "jpeg", quality: 0.98 },
+          html2canvas: {
+            scale: 2,
+            useCORS: true, // Enable CORS for images
+            logging: true,
+            windowWidth: contentRef.current.scrollWidth,
+          },
+          jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
+        };
+
+        html2pdf().set(opt).from(contentRef.current).save();
+      });
+    }, 300);
+  };
 
   const SampleNextArrow = (props) => {
     const { className, style, onClick } = props;
@@ -386,11 +432,15 @@ const TourDetails = () => {
                     Đánh Giá ({safeReviews.length})
                   </Button>
                 </div>
+                
                 <hr />
                 {activeTab === "description" && (
                   <div className="tour__details">
+                    <button onClick={exportPDF} style={{ marginBottom: "10px" }}>
+                      Xuất PDF Lịch trình
+                    </button>
                     {notes && (
-                      <div className="mt-4">
+                      <div className="mt-4" ref={contentRef}>
                         <div
                           style={{
                             maxHeight: showMore ? "none" : 500,
