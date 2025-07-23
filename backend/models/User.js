@@ -4,7 +4,7 @@ const userSchema = new mongoose.Schema(
   {
     username: {
       type: String,
-      required: true,
+      required: false,
       unique: true,
       maxlength: 50,
       trim: true,
@@ -37,7 +37,7 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: true,
+      required: false,
       maxlength: 255,
     },
     avatar: {

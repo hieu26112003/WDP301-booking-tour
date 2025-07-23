@@ -21,10 +21,16 @@ import bookingRoute from "./routes/booking.js";
 import commentRoute from "./routes/commentRoute.js";
 import notificationRoute from "./routes/notificationRoutes.js";
 import statisticRotue from "./routes/statisticRoutes.js";
+import googleAuthRoutes from "./routes/auth.js";
+import session from "express-session";
+import "./config/passport.js"; // hoặc đường dẫn tương ứng với dự án
+import passport from "passport";
+
 
 dotenv.config();
 const app = express();
 const port = process.env.PORT || 8000;
+
 
 // Tạo server HTTP để dùng với Socket.IO
 const server = http.createServer(app);
@@ -36,6 +42,7 @@ const io = new Server(server, {
     credentials: true,
   },
 });
+
 
 mongoose.set("strictQuery", false);
 const connect = async () => {
@@ -55,6 +62,15 @@ const connect = async () => {
 app.use(express.json());
 app.use(cors({ origin: true, credentials: true }));
 app.use(cookieParser());
+app.use(
+  session({
+    secret: process.env.COOKIE_KEY,
+    resave: false,
+    saveUninitialized: true,
+  })
+);
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Routes
 
@@ -73,6 +89,7 @@ app.use("/api/contact", contactRoutes);
 app.use("/api/contact/feedbacks", contactRoutes);
 app.use("/api/contact/callbacks", contactRoutes);
 app.use("/api/callback/:id/call", contactRoutes);
+app.use("/auth", googleAuthRoutes);
 
 // --- Socket.IO Logic ---
 io.on("connection", (socket) => {
