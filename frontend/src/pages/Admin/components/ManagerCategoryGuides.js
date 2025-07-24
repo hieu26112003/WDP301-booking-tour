@@ -10,12 +10,14 @@ import {
   Button,
   Table,
   Modal,
+  InputGroup,
   ModalHeader,
   ModalBody,
   ModalFooter,
+  InputGroupText,
 } from "reactstrap";
 import Swal from "sweetalert2";
-import { FaPlus, FaEdit, FaTrash, FaCheck } from "react-icons/fa";
+import { FaPlus, FaEdit, FaTrash, FaCheck, FaSearch } from "react-icons/fa";
 import { BASE_URL } from "../../../utils/config";
 import "../../../styles/managerGuides.css";
 
@@ -29,6 +31,20 @@ const ManageCategories = () => {
   const [editId, setEditId] = useState(null);
   const [modal, setModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+const [filterStatus, setFilterStatus] = useState("all"); // all | active | inactive
+
+const filteredCategories = categories.filter((category) => {
+  const matchesSearch = category.name.toLowerCase().includes(searchTerm.toLowerCase());
+  const matchesStatus =
+    filterStatus === "all"
+      ? true
+      : filterStatus === "active"
+      ? category.isActive
+      : !category.isActive;
+
+  return matchesSearch && matchesStatus;
+});
 
   const toggleModal = () => {
     if (!isLoading) setModal(!modal);
@@ -105,31 +121,94 @@ const ManageCategories = () => {
     toggleModal();
   };
 
-  const handleDelete = async (id) => {
-    const confirm = await Swal.fire({
-      title: "Xác nhận xóa?",
-      text: "Bạn chắc chắn muốn xóa?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Xóa",
-      cancelButtonText: "Hủy",
+ const handleDelete = async (id) => {
+  const result = await Swal.fire({
+    title: "Bạn có chắc?",
+    text: "Bạn muốn xóa danh mục hướng dẫn viên này?",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#3085d6",
+    cancelButtonColor: "#d33",
+    confirmButtonText: "Xóa",
+    cancelButtonText: "Hủy",
+    backdrop: true,
+    allowOutsideClick: true,
+    customClass: {
+      popup: "custom-swal-popup",
+      title: "custom-swal-title",
+      content: "custom-swal-content",
+      confirmButton: "custom-swal-confirm",
+      cancelButton: "custom-swal-cancel",
+    },
+  });
+
+  if (!result.isConfirmed) return;
+
+  setIsLoading(true); // Nếu có spinner
+
+  try {
+    const accessToken = localStorage.getItem("accessToken");
+
+    const res = await fetch(`${BASE_URL}/category-guides/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
     });
 
-    if (!confirm.isConfirmed) return;
+    const data = await res.json();
+    console.log("Delete category-guide response:", data);
 
-    try {
-      const res = await fetch(`${BASE_URL}/category-guides/${id}`, {
-        method: "DELETE",
-      });
-      const result = await res.json();
-      if (!res.ok) throw new Error(result.message || "Xóa thất bại");
-      Swal.fire("Đã xóa", "", "success");
-      fetchCategories();
-    } catch (err) {
-      Swal.fire("Lỗi", err.message, "error");
+    if (!res.ok) {
+      const errorMessage =
+        data.message ===
+        "Cannot delete category guide because it has associated guides"
+          ? "Không thể xóa danh mục vì có hướng dẫn viên liên quan"
+          : data.message || "Không thể xóa danh mục";
+      throw new Error(errorMessage);
     }
-  };
 
+    Swal.fire({
+      icon: "success",
+      title: "Xóa thành công",
+      showConfirmButton: false,
+      timer: 1500,
+      timerProgressBar: true,
+      backdrop: true,
+      allowOutsideClick: true,
+      customClass: {
+        popup: "custom-swal-popup",
+        title: "custom-swal-title",
+        content: "custom-swal-content",
+      },
+      willClose: () => {
+        document.body.style.overflow = "auto";
+      },
+    }).then(() => {
+      fetchCategories(); // load lại danh sách
+    });
+  } catch (err) {
+    Swal.fire({
+      icon: "error",
+      title: "Lỗi",
+      text: err.message,
+      confirmButtonColor: "#d33",
+      backdrop: true,
+      allowOutsideClick: true,
+      customClass: {
+        popup: "custom-swal-popup",
+        title: "custom-swal-title",
+        content: "custom-swal-content",
+        confirmButton: "custom-swal-confirm",
+      },
+      willClose: () => {
+        document.body.style.overflow = "auto";
+      },
+    });
+  } finally {
+    setIsLoading(false); // nếu có loading
+  }
+};
   const handleAddNew = () => {
     setFormData({ name: "", description: "", isActive: true });
     setEditId(null);
@@ -143,6 +222,38 @@ const ManageCategories = () => {
           <Col lg="12">
             <div className="d-flex justify-content-between align-items-center mb-4">
               <h2>Manager Categories Guides </h2>
+              <div className="mb-3">
+  <div className="d-flex justify-content-between align-items-center flex-wrap gap-2">
+    
+    {/* Thanh tìm kiếm với icon kính lúp nằm trong input */}
+    <div style={{ flex: "1", maxWidth: "400px" }}>
+      <InputGroup>
+        <InputGroupText>
+          <FaSearch className="text-muted" />
+        </InputGroupText>
+        <Input
+          type="text"
+          placeholder="Tìm theo tên danh mục..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </InputGroup>
+    </div>
+
+    {/* Dropdown lọc trạng thái */}
+    <div style={{ width: "200px" }}>
+      <Input
+        type="select"
+        value={filterStatus}
+        onChange={(e) => setFilterStatus(e.target.value)}
+      >
+        <option value="all">All Status</option>
+        <option value="active">Active</option>
+        <option value="inactive">Inactive</option>
+      </Input>
+    </div>
+  </div>
+</div>
               <Button color="primary" onClick={handleAddNew} className="icon-btn" disabled={isLoading}>
                 <FaPlus />
               </Button>
@@ -219,7 +330,7 @@ const ManageCategories = () => {
                 </tr>
               </thead>
               <tbody>
-                {categories.map((category) => (
+                {filteredCategories.map((category) => (
                   <tr key={category._id}>
                     <td>{category.name}</td>
                     <td>{category.slug}</td>

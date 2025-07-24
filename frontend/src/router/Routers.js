@@ -33,6 +33,7 @@ import FeedbackList from "../pages/Staff/FeedbackList";
 import GuideDetail from "../pages/User/GuideDetail";
 import NotificationList from "../components/Notification/Notification";
 import AdminStatistics from "../components/Statistic/AdminStatistics";
+import GoogleSuccess from "../pages/User/GoogleSuccess"; 
 
 const Routers = () => {
   return (
@@ -44,6 +45,7 @@ const Routers = () => {
       <Route path="/cam-nang" element={<CamNang />} />
 
       <Route path="/login" element={<Login />} />
+      <Route path="/google-success" element={<GoogleSuccess />} />
       <Route path="/tours/:id" element={<TourDetails />} />
       <Route path="/register" element={<Register />} />
       <Route path="/profile" element={<Profile />} />
