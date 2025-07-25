@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Container } from "reactstrap";
 import { Link, useParams } from "react-router-dom"; // <-- thêm useParams
 import { BASE_URL } from "../../utils/config";
-import "../User/CamNang.css"; // CSS giữ nguyên
+import "../../styles/CamNang.css"; // CSS giữ nguyên
 
 const CamNang = () => {
   const [guides, setGuides] = useState([]);
