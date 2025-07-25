@@ -18,7 +18,7 @@ import Swal from "sweetalert2";
 import { FaPlus, FaTrash, FaEdit } from "react-icons/fa";
 import ReactQuill, { Quill } from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import { BASE_URL } from "../../utils/config";
+import { BASE_URL } from "../../../utils/config";
 
 // Quill module resize
 import ImageResize from "quill-image-resize-module-react";

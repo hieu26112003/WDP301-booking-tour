@@ -5,6 +5,7 @@ import {
   updateBookingStatus,
   getAllBookings,
   getUserBookings,
+  getAllBookingsforAdmin,
 } from "../Controllers/bookingController.js";
 import {
   verifyAdmin,
@@ -23,5 +24,7 @@ router.put("/:id", verifyStaff, updateBookingStatus);
 router.get("/all", verifyStaff, getAllBookings);
 
 router.get("/", verifyUser, getUserBookings);
+
+router.get("/allbooking", getAllBookingsforAdmin);
 
 export default router;

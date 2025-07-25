@@ -14,12 +14,13 @@ import ChangePassword from "../pages/User/ChangePassword";
 import ResetPassword from "../pages/User/ResetPassword";
 import ResetPasswordConfirm from "../pages/User/ResetPasswordConfirm";
 import ManageTours from "../pages/Admin/components/ManageTours";
+import ManageBooking from "../pages/Admin/components/ManageBoking";
 import ManageCategories from "../pages/Admin/components/ManageCategories";
 import StaffLayout from "../components/Layout/StaffLayout";
 import StaffChatPage from "../pages/Staff/StaffChatPage";
 import StaffComment from "../pages/Staff/StaffComment";
 import Guide from "../pages/User/Guide";
-import ManageGuide from "../pages/Staff/ManageGuide";
+import ManageGuide from "../pages/Admin/components/ManageGuide";
 import AboutUs from "../components/About/About";
 import Contact from "../components/Contact/ContactPage";
 import TourDetails from "../pages/User/TourDetails";
@@ -77,6 +78,14 @@ const Routers = () => {
           </AdminLayout>
         }
       />
+      <Route
+        path="/admin/booking"
+        element={
+          <AdminLayout>
+            <ManageBooking />
+          </AdminLayout>
+        }
+      />
       {/* <Route
         path="/admin/hotels"
         element={
@@ -112,9 +121,9 @@ const Routers = () => {
       <Route
         path="/staff/guides"
         element={
-          <StaffLayout>
+          <AdminLayout>
             <ManageGuide />
-          </StaffLayout>
+          </AdminLayout>
         }
       />
       <Route

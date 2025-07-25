@@ -1,0 +1,226 @@
+/* ManageBooking.css */
+
+/* Container */
+.booking-container {
+  padding: 40px;
+  min-height: 93vh;
+  background: linear-gradient(135deg, #e6f0fa 0%, #f4f4f4 100%);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Header */
+.booking-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.booking-header h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a3c6c;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.booking-header input,
+.booking-header input[type="date"] {
+  padding: 0.6rem 1rem;
+  font-size: 0.9rem;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  outline: none;
+  background-color: #fff;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: border 0.3s ease;
+}
+
+.booking-header input:focus {
+  border-color: #2563eb;
+}
+
+/* Table */
+.booking-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+.booking-table th,
+.booking-table td {
+  padding: 0.9rem 1.2rem;
+  font-size: 0.95rem;
+  text-align: center;
+  color: #1a3c6c;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.booking-table th {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e6f0fa 100%);
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.booking-table tbody tr:hover {
+  background-color: #eef4ff;
+  transition: background-color 0.2s;
+}
+
+/* Bo tròn các góc bảng */
+.booking-table thead th:first-child {
+  border-top-left-radius: 16px;
+}
+.booking-table thead th:last-child {
+  border-top-right-radius: 16px;
+}
+.booking-table tbody tr:last-child td:first-child {
+  border-bottom-left-radius: 16px;
+}
+.booking-table tbody tr:last-child td:last-child {
+  border-bottom-right-radius: 16px;
+}
+
+/* Status Select */
+.booking-status {
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+  background-color: #fff;
+}
+
+.booking-status:focus {
+  border-color: #2563eb;
+  outline: none;
+}
+
+.status-pending {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.status-confirmed {
+  background-color: #d1e7ff;
+  color: #004085;
+}
+
+.status-cancelled {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+/* Pagination */
+.booking-pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.booking-pagination button {
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  color: #1a3c6c;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.booking-pagination button:hover {
+  background-color: #dbeafe;
+  transform: translateY(-2px);
+}
+
+.booking-pagination .active-page {
+  background-color: #2563eb;
+  color: #fff;
+  border-color: #2563eb;
+}
+
+/* Empty Message */
+.booking-empty {
+  text-align: center;
+  color: #6c757d;
+  margin-top: 2rem;
+  font-size: 1.1rem;
+  font-style: italic;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .booking-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .booking-header h2 {
+    font-size: 1.6rem;
+  }
+
+  .booking-header input {
+    width: 100%;
+    margin: 8px 0 0;
+  }
+
+  .booking-table th,
+  .booking-table td {
+    font-size: 0.85rem;
+  }
+
+  .booking-status {
+    font-size: 0.85rem;
+  }
+}
+/* Cally calendar wrapper */
+calendar-date.cally {
+  display: block;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+  font-family: 'Segoe UI', sans-serif;
+  margin-top: 10px;
+  width: 100%;
+  max-width: 350px;
+}
+
+/* Nút điều hướng */
+calendar-date svg[slot="previous"],
+calendar-date svg[slot="next"] {
+  width: 20px;
+  height: 20px;
+  fill: #1a3c6c;
+  cursor: pointer;
+}
+
+/* Tháng */
+calendar-date calendar-month {
+  display: block;
+}
+
+/* Ngày được chọn */
+calendar-date .selected {
+  background-color: #2563eb !important;
+  color: white !important;
+  border-radius: 6px;
+}
+
+/* Hover trên ngày */
+calendar-date td:hover {
+  background-color: #e0ecff;
+  cursor: pointer;
+  border-radius: 6px;
+}

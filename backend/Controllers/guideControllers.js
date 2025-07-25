@@ -13,11 +13,16 @@ export const createGuide = async (req, res) => {
     const { title, content, category } = req.body;
 
     // Kiểm tra các trường bắt buộc
-    if (!title || !content || !category) {
-      return res
-        .status(400)
-        .json({ success: false, message: "All fields are required" });
-    }
+    if (!title || !category || !content || !content.trim() || content === "<p><br></p>") {
+  const errors = {};
+  if (!title) errors.title = "Tiêu đề không được để trống";
+  if (!category) errors.category = "Danh mục không được để trống";
+  if (!content || !content.trim() || content === "<p><br></p>") {
+    errors.content = "Nội dung không được để trống";
+  }
+
+  return res.status(400).json({ success: false, errors });
+}
 
     // Kiểm tra có ảnh không
     if (!req.file) {
