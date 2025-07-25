@@ -281,7 +281,7 @@ const ManageCategories = () => {
               <ModalBody>
                 <Form onSubmit={handleSubmit}>
                   <FormGroup>
-                    <Label for="name">Name</Label>
+                    <Label for="name">Tiêu đề</Label>
                     <Input
                       type="text"
                       id="name"
@@ -294,20 +294,7 @@ const ManageCategories = () => {
                     />
                   </FormGroup>
                   <FormGroup>
-                    <Label for="slug">Slug</Label>
-                    <Input
-                      type="text"
-                      id="slug"
-                      name="slug"
-                      placeholder="Category Slug (e.g., adventure-tour)"
-                      value={formData.slug}
-                      onChange={handleChange}
-                      required
-                      disabled={isLoading}
-                    />
-                  </FormGroup>
-                  <FormGroup>
-                    <Label for="description">Description</Label>
+                    <Label for="description">Miêu tả</Label>
                     <Input
                       type="textarea"
                       id="description"
@@ -329,7 +316,7 @@ const ManageCategories = () => {
                         onChange={handleChange}
                         disabled={isLoading}
                       />{" "}
-                      Active
+                      Trạng Thái
                     </Label>
                   </FormGroup>
                 </Form>
@@ -347,7 +334,7 @@ const ManageCategories = () => {
                   onClick={toggleModal}
                   disabled={isLoading}
                 >
-                  Cancel
+                  Hủy
                 </Button>
               </ModalFooter>
             </Modal>
@@ -355,18 +342,18 @@ const ManageCategories = () => {
             <Table striped>
               <thead>
                 <tr>
-                  <th>Name</th>
-                  <th>Slug</th> {/* Added Slug column */}
-                  <th>Description</th>
-                  <th>Active</th>
-                  <th>Actions</th>
+                  <th>Tiêu Đề</th>
+                   {/* Added Slug column */}
+                  <th>Miêu Tả</th>
+                  <th>Trạng Thái</th>
+                  <th>Hành Động</th>
                 </tr>
               </thead>
               <tbody>
                 {categories.map((category) => (
                   <tr key={category._id}>
                     <td>{category.name}</td>
-                    <td>{category.slug}</td> {/* Display slug */}
+                     {/* Display slug */}
                     <td className="description-content">
                       {category.description}
                     </td>

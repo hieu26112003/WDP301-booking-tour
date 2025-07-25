@@ -98,48 +98,46 @@ const TourDetails = () => {
   fetchSimilarTours();
 }, [tour]);
 
+const removeImagesFromHTML = (html) => {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, "text/html");
 
-  const exportPDF = () => {
-    setShowMore(true); // Ensure all content is visible
-    setTimeout(() => {
-      if (!contentRef.current) return;
+  // Xoá tất cả thẻ <img>
+  const images = doc.querySelectorAll("img");
+  images.forEach((img) => img.remove());
 
-      // Preload images to handle CORS and ensure they load in the PDF
-      const preloadImages = () => {
-        const imgElements = contentRef.current.querySelectorAll("img");
-        const promises = Array.from(imgElements).map((img) => {
-          return new Promise((resolve) => {
-            if (img.complete) {
-              resolve();
-            } else {
-              img.onload = resolve;
-              img.onerror = resolve; // Continue even if an image fails to load
-              img.crossOrigin = "anonymous"; // Set crossOrigin for CORS
-              img.src = img.src; // Trigger reload if needed
-            }
-          });
-        });
-        return Promise.all(promises);
-      };
+  // Trả lại chuỗi HTML đã được xử lý
+  return doc.body.innerHTML;
+};
+ const exportPDF = () => {
+  setShowMore(true);
 
-      preloadImages().then(() => {
-        const opt = {
-          margin: 0.3,
-          filename: "lich-trinh-tour.pdf",
-          image: { type: "jpeg", quality: 0.98 },
-          html2canvas: {
-            scale: 2,
-            useCORS: true, // Enable CORS for images
-            logging: true,
-            windowWidth: contentRef.current.scrollWidth,
-          },
-          jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
-        };
+  setTimeout(() => {
+    if (!contentRef.current) return;
 
-        html2pdf().set(opt).from(contentRef.current).save();
-      });
-    }, 300);
-  };
+    // Xoá ảnh khỏi HTML
+    const cleanHTML = `
+      <h2 style="text-align: center; margin-bottom: 1rem;">Viet Travel</h2>
+      ${removeImagesFromHTML(notes || "")}
+    `;
+    contentRef.current.innerHTML = cleanHTML;
+
+    const opt = {
+      margin: 0.3,
+      filename: "lich-trinh-tour.pdf",
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        windowWidth: contentRef.current.scrollWidth,
+      },
+      jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
+    };
+
+    html2pdf().set(opt).from(contentRef.current).save();
+  }, 300);
+};
 
   const SampleNextArrow = (props) => {
     const { className, style, onClick } = props;
@@ -453,7 +451,7 @@ const TourDetails = () => {
                       Xuất PDF Lịch trình
                     </button>
                     {notes && (
-                      <div className="mt-4" ref={contentRef}>
+                      <div className="mt-4"  ref={contentRef}>
                         <div
                           style={{
                             maxHeight: showMore ? "none" : 500,
@@ -461,7 +459,10 @@ const TourDetails = () => {
                             position: "relative",
                           }}
                         >
-                          <div dangerouslySetInnerHTML={{ __html: notes }} />
+                          <div ref={contentRef} className="pdf-export">
+  <h2>Viet Travel</h2>
+  <div dangerouslySetInnerHTML={{ __html: notes }} />
+</div>
                           {!showMore && (
                             <div
                               style={{
