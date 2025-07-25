@@ -32,19 +32,19 @@ const ManageCategories = () => {
   const [modal, setModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-const [filterStatus, setFilterStatus] = useState("all"); // all | active | inactive
+  const [filterStatus, setFilterStatus] = useState("all"); // all | active | inactive
 
-const filteredCategories = categories.filter((category) => {
-  const matchesSearch = category.name.toLowerCase().includes(searchTerm.toLowerCase());
-  const matchesStatus =
-    filterStatus === "all"
-      ? true
-      : filterStatus === "active"
-      ? category.isActive
-      : !category.isActive;
+  const filteredCategories = categories.filter((category) => {
+    const matchesSearch = category.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus =
+      filterStatus === "all"
+        ? true
+        : filterStatus === "active"
+          ? category.isActive
+          : !category.isActive;
 
-  return matchesSearch && matchesStatus;
-});
+    return matchesSearch && matchesStatus;
+  });
 
   const toggleModal = () => {
     if (!isLoading) setModal(!modal);
@@ -121,78 +121,16 @@ const filteredCategories = categories.filter((category) => {
     toggleModal();
   };
 
- const handleDelete = async (id) => {
-  const result = await Swal.fire({
-    title: "Bạn có chắc?",
-    text: "Bạn muốn xóa danh mục hướng dẫn viên này?",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#3085d6",
-    cancelButtonColor: "#d33",
-    confirmButtonText: "Xóa",
-    cancelButtonText: "Hủy",
-    backdrop: true,
-    allowOutsideClick: true,
-    customClass: {
-      popup: "custom-swal-popup",
-      title: "custom-swal-title",
-      content: "custom-swal-content",
-      confirmButton: "custom-swal-confirm",
-      cancelButton: "custom-swal-cancel",
-    },
-  });
-
-  if (!result.isConfirmed) return;
-
-  setIsLoading(true); // Nếu có spinner
-
-  try {
-    const accessToken = localStorage.getItem("accessToken");
-
-    const res = await fetch(`${BASE_URL}/category-guides/${id}`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-
-    const data = await res.json();
-    console.log("Delete category-guide response:", data);
-
-    if (!res.ok) {
-      const errorMessage =
-        data.message ===
-        "Cannot delete category guide because it has associated guides"
-          ? "Không thể xóa danh mục vì có hướng dẫn viên liên quan"
-          : data.message || "Không thể xóa danh mục";
-      throw new Error(errorMessage);
-    }
-
-    Swal.fire({
-      icon: "success",
-      title: "Xóa thành công",
-      showConfirmButton: false,
-      timer: 1500,
-      timerProgressBar: true,
-      backdrop: true,
-      allowOutsideClick: true,
-      customClass: {
-        popup: "custom-swal-popup",
-        title: "custom-swal-title",
-        content: "custom-swal-content",
-      },
-      willClose: () => {
-        document.body.style.overflow = "auto";
-      },
-    }).then(() => {
-      fetchCategories(); // load lại danh sách
-    });
-  } catch (err) {
-    Swal.fire({
-      icon: "error",
-      title: "Lỗi",
-      text: err.message,
-      confirmButtonColor: "#d33",
+  const handleDelete = async (id) => {
+    const result = await Swal.fire({
+      title: "Bạn có chắc?",
+      text: "Bạn muốn xóa danh mục hướng dẫn viên này?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Xóa",
+      cancelButtonText: "Hủy",
       backdrop: true,
       allowOutsideClick: true,
       customClass: {
@@ -200,15 +138,77 @@ const filteredCategories = categories.filter((category) => {
         title: "custom-swal-title",
         content: "custom-swal-content",
         confirmButton: "custom-swal-confirm",
-      },
-      willClose: () => {
-        document.body.style.overflow = "auto";
+        cancelButton: "custom-swal-cancel",
       },
     });
-  } finally {
-    setIsLoading(false); // nếu có loading
-  }
-};
+
+    if (!result.isConfirmed) return;
+
+    setIsLoading(true); // Nếu có spinner
+
+    try {
+      const accessToken = localStorage.getItem("accessToken");
+
+      const res = await fetch(`${BASE_URL}/category-guides/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      const data = await res.json();
+      console.log("Delete category-guide response:", data);
+
+      if (!res.ok) {
+        const errorMessage =
+          data.message ===
+            "Cannot delete category guide because it has associated guides"
+            ? "Không thể xóa danh mục vì có hướng dẫn viên liên quan"
+            : data.message || "Không thể xóa danh mục";
+        throw new Error(errorMessage);
+      }
+
+      Swal.fire({
+        icon: "success",
+        title: "Xóa thành công",
+        showConfirmButton: false,
+        timer: 1500,
+        timerProgressBar: true,
+        backdrop: true,
+        allowOutsideClick: true,
+        customClass: {
+          popup: "custom-swal-popup",
+          title: "custom-swal-title",
+          content: "custom-swal-content",
+        },
+        willClose: () => {
+          document.body.style.overflow = "auto";
+        },
+      }).then(() => {
+        fetchCategories(); // load lại danh sách
+      });
+    } catch (err) {
+      Swal.fire({
+        icon: "error",
+        title: "Lỗi",
+        text: err.message,
+        confirmButtonColor: "#d33",
+        backdrop: true,
+        allowOutsideClick: true,
+        customClass: {
+          popup: "custom-swal-popup",
+          title: "custom-swal-title",
+          content: "custom-swal-content",
+          confirmButton: "custom-swal-confirm",
+        },
+        willClose: () => {
+          document.body.style.overflow = "auto";
+        },
+      });
+    } finally {
+      setIsLoading(false); // nếu có loading
+    }
+  };
   const handleAddNew = () => {
     setFormData({ name: "", description: "", isActive: true });
     setEditId(null);
@@ -221,39 +221,39 @@ const filteredCategories = categories.filter((category) => {
         <Row>
           <Col lg="12">
             <div className="d-flex justify-content-between align-items-center mb-4">
-              <h2>Manager Categories Guides </h2>
+              <h2></h2>
               <div className="mb-3">
-  <div className="d-flex justify-content-between align-items-center flex-wrap gap-2">
-    
-    {/* Thanh tìm kiếm với icon kính lúp nằm trong input */}
-    <div style={{ flex: "1", maxWidth: "400px" }}>
-      <InputGroup>
-        <InputGroupText>
-          <FaSearch className="text-muted" />
-        </InputGroupText>
-        <Input
-          type="text"
-          placeholder="Tìm theo tên danh mục..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-      </InputGroup>
-    </div>
+                <div className="d-flex justify-content-between align-items-center flex-wrap gap-2">
 
-    {/* Dropdown lọc trạng thái */}
-    <div style={{ width: "200px" }}>
-      <Input
-        type="select"
-        value={filterStatus}
-        onChange={(e) => setFilterStatus(e.target.value)}
-      >
-        <option value="all">All Status</option>
-        <option value="active">Active</option>
-        <option value="inactive">Inactive</option>
-      </Input>
-    </div>
-  </div>
-</div>
+                  {/* Thanh tìm kiếm với icon kính lúp nằm trong input */}
+                  <div style={{ flex: "1", maxWidth: "400px" }}>
+                    <InputGroup>
+                      <InputGroupText>
+                        <FaSearch className="text-muted" />
+                      </InputGroupText>
+                      <Input
+                        type="text"
+                        placeholder="Tìm theo tên danh mục..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                      />
+                    </InputGroup>
+                  </div>
+
+                  {/* Dropdown lọc trạng thái */}
+                  <div style={{ width: "200px" }}>
+                    <Input
+                      type="select"
+                      value={filterStatus}
+                      onChange={(e) => setFilterStatus(e.target.value)}
+                    >
+                      <option value="all">All Status</option>
+                      <option value="active">Active</option>
+                      <option value="inactive">Inactive</option>
+                    </Input>
+                  </div>
+                </div>
+              </div>
               <Button color="primary" onClick={handleAddNew} className="icon-btn" disabled={isLoading}>
                 <FaPlus />
               </Button>

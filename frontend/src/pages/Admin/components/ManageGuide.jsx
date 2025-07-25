@@ -156,7 +156,7 @@ const ManageGuide = () => {
       Swal.fire(
         "Lỗi",
         err.message ||
-          (isEdit ? "Không thể cập nhật bài viết" : "Không thể tạo bài viết"),
+        (isEdit ? "Không thể cập nhật bài viết" : "Không thể tạo bài viết"),
         "error"
       );
     }
@@ -200,7 +200,7 @@ const ManageGuide = () => {
       <Row>
         <Col lg="12">
           <div className="d-flex justify-content-between align-items-center mb-4">
-            <h2>Quản lý Cẩm nang</h2>
+            <h2>Quản lý Cẩm Năng</h2>
             <Button color="primary" onClick={openCreateModal}>
               <FaPlus /> Thêm bài viết
             </Button>

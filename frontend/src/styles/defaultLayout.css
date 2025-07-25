@@ -3,9 +3,15 @@
   min-height: 100vh;
 }
 
+.staff-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
 .main-content {
   flex: 1;
-  margin-left: 30px; /* Đảm bảo nội dung không đè lên Sidebar */
+  margin-left: 30px;
+  /* Đảm bảo nội dung không đè lên Sidebar */
   padding: 20px;
   background: #f9f9f9;
   overflow-y: auto;

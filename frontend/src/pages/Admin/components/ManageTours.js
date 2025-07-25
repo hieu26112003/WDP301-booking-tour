@@ -466,9 +466,9 @@ const ManageTours = () => {
   };
 
 
- const handleViewDetail = (tour) => {
-  navigate(`/tours/${tour._id}`); // <-- chuyển đến trang user
-};
+  const handleViewDetail = (tour) => {
+    navigate(`/tours/${tour._id}`); // <-- chuyển đến trang user
+  };
   const handleSearchChange = (e) => setSearchTerm(e.target.value);
   const handleCategoryChange = (e) => setSelectedCategory(e.target.value);
   const handleStaffFilterChange = (e) => setSelectedStaff(e.target.value);
@@ -479,7 +479,7 @@ const ManageTours = () => {
       .includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory
       ? tour.categoryId?._id === selectedCategory ||
-        tour.categoryId === selectedCategory
+      tour.categoryId === selectedCategory
       : true;
     const matchesStaff = selectedStaff
       ? tour.staffId?._id === selectedStaff || tour.staffId === selectedStaff
@@ -517,7 +517,7 @@ const ManageTours = () => {
           <Col lg="12">
             <div className="d-flex justify-content-between align-items-center mb-4">
               <div className="w-100">
-                <h2>Manage Tours</h2>
+                <h2>Quản Lý Tour</h2>
                 <div className="d-flex align-items-center mt-2 flex-wrap gap-2">
                   <FormGroup
                     className="me-3 mb-0"
@@ -981,13 +981,13 @@ const ManageTours = () => {
                         <td>
                           {tour.departureDate
                             ? new Date(tour.departureDate).toLocaleDateString(
-                                "vi-VN",
-                                {
-                                  day: "2-digit",
-                                  month: "2-digit",
-                                  year: "numeric",
-                                }
-                              )
+                              "vi-VN",
+                              {
+                                day: "2-digit",
+                                month: "2-digit",
+                                year: "numeric",
+                              }
+                            )
                             : "N/A"}
                         </td>
                         <td>

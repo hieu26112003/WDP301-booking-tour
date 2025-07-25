@@ -202,7 +202,7 @@ const ManageCategories = () => {
         if (!res.ok) {
           const errorMessage =
             result.message ===
-            "Cannot delete category because it has associated tours"
+              "Cannot delete category because it has associated tours"
               ? "Không thể xóa danh mục vì có các tour liên quan"
               : result.message || "Không thể xóa danh mục";
           throw new Error(errorMessage);
@@ -263,7 +263,7 @@ const ManageCategories = () => {
         <Row>
           <Col lg="12">
             <div className="d-flex justify-content-between align-items-center mb-4">
-              <h2>Manage Categories</h2>
+              <h2>Quản Lý Danh Mục Tour</h2>
               <Button
                 color="primary"
                 onClick={handleAddNew}
