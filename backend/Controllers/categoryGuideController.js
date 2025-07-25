@@ -10,8 +10,21 @@ export const createCategoryGuide = async (req, res) => {
     const { name, description, isActive = true } = req.body;
 
     if (!name || !description) {
-      return res.status(400).json({ success: false, message: "Name và Description là bắt buộc" });
-    }
+  return res.status(400).json({ success: false, message: "Name và Description là bắt buộc" });
+}
+
+const trimmedName = name.trim();
+if (trimmedName.length < 2 || trimmedName.length > 100) {
+  return res.status(400).json({ success: false, message: "Tên phải từ 2 đến 100 ký tự" });
+}
+
+if (/^\d+$/.test(trimmedName)) {
+  return res.status(400).json({ success: false, message: "Tên không được chỉ chứa số" });
+}
+const existing = await CategoryGuide.findOne({ name });
+if (existing) {
+  return res.status(400).json({ success: false, message: "Tên danh mục đã tồn tại" });
+}
 
     const existing = await CategoryGuide.findOne({ name });
     if (existing) {
@@ -86,8 +99,17 @@ export const updateCategoryGuide = async (req, res) => {
     const { name, description, isActive } = req.body;
 
     if (!name || !description) {
-      return res.status(400).json({ success: false, message: "Name và Description là bắt buộc" });
-    }
+  return res.status(400).json({ success: false, message: "Name và Description là bắt buộc" });
+}
+
+const trimmedName = name.trim();
+if (trimmedName.length < 2 || trimmedName.length > 100) {
+  return res.status(400).json({ success: false, message: "Tên phải từ 2 đến 100 ký tự" });
+}
+
+if (/^\d+$/.test(trimmedName)) {
+  return res.status(400).json({ success: false, message: "Tên không được chỉ chứa số" });
+}
 
     const updated = await CategoryGuide.findByIdAndUpdate(
       id,
