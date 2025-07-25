@@ -7,6 +7,7 @@ import "../../styles/CamNang.css"; // CSS giữ nguyên
 const CamNang = () => {
   const [guides, setGuides] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [categoryTitle, setCategoryTitle] = useState("");
 
   const { slug } = useParams(); // lấy slug từ URL (/cam-nang/:slug)
 
@@ -38,11 +39,30 @@ const CamNang = () => {
     fetchGuides();
   }, [slug]); // reload khi slug thay đổi
 
+  useEffect(() => {
+    const fetchCategoryTitle = async () => {
+      if (!slug) return;
+      try {
+        const res = await fetch(`${BASE_URL}/category-guides/categoriesguide/${slug}`);
+        const data = await res.json();
+        if (data.success) {
+          setCategoryTitle(data.data.name); // name là tên tiếng Việt như "Ẩm thực"
+        }
+      } catch (err) {
+        console.error("Lỗi khi tải category:", err);
+      }
+    };
+
+    fetchCategoryTitle();
+  }, [slug]);
+
   return (
     <div className="camnang-page">
       <Container>
         <h2 className="camnang-heading">
-          {slug ? `Cẩm nang: ${slug.replace("-", " ")}` : "Cẩm nang du lịch"}
+          <h2 className="camnang-heading">
+            {slug ? `Cẩm nang: ${categoryTitle}` : "Cẩm nang du lịch"}
+          </h2>
         </h2>
 
         {loading && <div className="camnang-loading">Đang tải...</div>}

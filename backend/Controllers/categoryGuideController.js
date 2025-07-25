@@ -110,3 +110,20 @@ export const updateCategoryGuide = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error", error: err.message });
   }
 };
+
+// GET /api/guide-categories/:slug
+export const getCategoryBySlug = async (req, res) => {
+  try {
+    const { slug } = req.params;
+    const category = await CategoryGuide.findOne({ slug });
+
+    if (!category) {
+      return res.status(404).json({ success: false, message: "Không tìm thấy danh mục" });
+    }
+
+    res.status(200).json({ success: true, data: category });
+  } catch (err) {
+    console.error("Lỗi khi lấy category:", err);
+    res.status(500).json({ success: false, message: "Lỗi server" });
+  }
+};
