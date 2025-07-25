@@ -144,7 +144,7 @@ const ManageAccounts = () => {
         <Row>
           <Col lg="12">
             <div className="d-flex justify-content-between align-items-center mb-4">
-              <h2>Manage Accounts</h2>
+              <h2>Quản Lý Người Dùng</h2>
               <Input
                 type="text"
                 placeholder="Search by name..."

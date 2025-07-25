@@ -26,34 +26,34 @@ import "../Admin/components/index.css";
 const Sidebar = () => {
   return (
     <div className="sidebar">
-      <div className="logo">Staff Panel</div>
+      <div className="logo">Staff</div>
 
       <ul>
-        <SidebarItem to="/staff" icon={<FaTachometerAlt />} label="Dashboard" />
-        <SidebarItem to="/staff/chat" icon={<FaCommentDots />} label="Inbox" />
-        
+        {/* <SidebarItem to="/staff" icon={<FaTachometerAlt />} label="Dashboard" /> */}
+        <SidebarItem to="/staff/chat" icon={<FaCommentDots />} label="Hộp Thư" />
+
         <SidebarItem
           to="/staff/bookings"
           icon={<FaBook />}
-          label="Manage Tour Bookings"
+          label="Quản Lý Đặt Tour"
         />
         <SidebarItem
           to="/staff/feedbacks"
           icon={<FaBook />}
-          label="Feedbacks"
+          label="Phản Hồi"
         />
         <SidebarItem
           to="/staff/callbacks"
           icon={<FaBook />}
-          label="Callbacks"
- />
+          label="Yêu Cầu Gọi Lại"
+        />
         <SidebarItem
           to="/staff/comment"
           icon={<FaComments />}
-          label="Manage Comment"
+          label="Quản Lý Bình Luận"
         />
 
-        
+
         {/* <SidebarItem
           to="/admin/tours"
           icon={<FaMapMarkedAlt />}
@@ -66,7 +66,7 @@ const Sidebar = () => {
         /> */}
       </ul>
 
-      <div className="footer">© 2025 Staff Dashboard</div>
+      <div className="footer">© 2025 Staff</div>
     </div>
   );
 };

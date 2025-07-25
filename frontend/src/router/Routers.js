@@ -19,7 +19,7 @@ import ManageCategories from "../pages/Admin/components/ManageCategories";
 import StaffLayout from "../components/Layout/StaffLayout";
 import StaffChatPage from "../pages/Staff/StaffChatPage";
 import StaffComment from "../pages/Staff/StaffComment";
-import Guide from "../pages/User/Guide";
+
 import ManageGuide from "../pages/Admin/components/ManageGuide";
 import AboutUs from "../components/About/About";
 import Contact from "../components/Contact/ContactPage";
@@ -34,7 +34,7 @@ import FeedbackList from "../pages/Staff/FeedbackList";
 import GuideDetail from "../pages/User/GuideDetail";
 import NotificationList from "../components/Notification/Notification";
 import AdminStatistics from "../components/Statistic/AdminStatistics";
-import GoogleSuccess from "../pages/User/GoogleSuccess"; 
+import GoogleSuccess from "../pages/User/GoogleSuccess";
 
 const Routers = () => {
   return (
@@ -53,7 +53,7 @@ const Routers = () => {
       <Route path="/change-password" element={<ChangePassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/reset-password/:token" element={<ResetPasswordConfirm />} />
-      <Route path="/Guide" element={<Guide />} />
+
       <Route path="/about" element={<AboutUs />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/tours/" element={<ListTour />} />
@@ -143,21 +143,21 @@ const Routers = () => {
         }
       />
       <Route
-  path="/admin/category-guides"
-  element={
-    <AdminLayout>
-      <ManageCategoryGuides />
-    </AdminLayout>
-  }
-/>
-      <Route
+        path="/admin/category-guides"
+        element={
+          <AdminLayout>
+            <ManageCategoryGuides />
+          </AdminLayout>
+        }
+      />
+      {/* <Route
         path="/staff"
         element={
           <StaffLayout>
             <h1>Dashboard</h1>
           </StaffLayout>
         }
-      />
+      /> */}
       <Route
         path="/staff/chat"
         element={

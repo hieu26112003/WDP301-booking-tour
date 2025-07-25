@@ -362,10 +362,12 @@ export const getUserBookings = async (req, res) => {
 
 export const getAllBookingsforAdmin = async (req, res) => {
   try {
-    const { page = 1, limit = 10, startDate, endDate, userEmail } = req.query;
-
+    const { page = 1, limit = 10, startDate, endDate, userEmail, staffEmail, status } = req.query;
+    
+    console.log("Received status filter:", status); // Debug
+    
     const query = {};
-
+    
     // Lọc theo ngày
     if (startDate && endDate) {
       query.createdAt = {
@@ -374,20 +376,49 @@ export const getAllBookingsforAdmin = async (req, res) => {
       };
     }
 
-    // Populate dữ liệu
+    // Lọc theo trạng thái - Sửa lại cho đúng
+    if (status && status !== 'all') {
+      query.status = status.toLowerCase(); // Đảm bảo viết thường
+      console.log("Status filter applied:", query.status); // Debug
+    }
+
+    console.log("MongoDB query:", query); // Debug
+
+    // Populate dữ liệu từ 3 collections
     const allBookings = await Booking.find(query)
       .populate("userId", "email")
-      .populate("tourId", "title")
+      .populate({
+        path: "tourId",
+        select: "title staffId",
+        populate: {
+          path: "staffId",
+          select: "email"
+        }
+      })
       .sort({ createdAt: -1 });
 
-    // Lọc theo email
+    console.log("Found bookings:", allBookings.length); // Debug
+
+    // Lọc theo email user và staff email
     let filteredBookings = allBookings;
+    
+    // Lọc theo user email
     if (userEmail) {
-      const keyword = userEmail.toLowerCase();
-      filteredBookings = allBookings.filter(
-        (b) => b.userId?.email?.toLowerCase().includes(keyword)
+      const userKeyword = userEmail.toLowerCase();
+      filteredBookings = filteredBookings.filter(
+        (b) => b.userId?.email?.toLowerCase().includes(userKeyword)
       );
     }
+
+    // Lọc theo staff email
+    if (staffEmail) {
+      const staffKeyword = staffEmail.toLowerCase();
+      filteredBookings = filteredBookings.filter(
+        (b) => b.tourId?.staffId?.email?.toLowerCase().includes(staffKeyword)
+      );
+    }
+
+    console.log("Final filtered bookings:", filteredBookings.length); // Debug
 
     // Phân trang thủ công
     const total = filteredBookings.length;
@@ -408,4 +439,3 @@ export const getAllBookingsforAdmin = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
-
