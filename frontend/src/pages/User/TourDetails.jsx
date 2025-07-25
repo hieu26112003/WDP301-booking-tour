@@ -14,7 +14,7 @@ import {
   ModalBody,
   ModalFooter,
 } from "reactstrap";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, } from "react-router-dom";
 import calculateAvgRating from "../../utils/avgRating";
 import useFetch from "../../hooks/useFetch";
 import { BASE_URL } from "../../utils/config";
@@ -26,6 +26,8 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import html2pdf from "html2pdf.js";
+import TourSimilar from "../User/TourSimilar";
+
 
 // Utility function to format Date to DD/MM/YYYY
 const formatDate = (dateString) => {
@@ -38,6 +40,7 @@ const formatDate = (dateString) => {
     year: "numeric",
   });
 };
+
 
 const TourDetails = () => {
   const { id } = useParams();
@@ -75,7 +78,26 @@ const TourDetails = () => {
   const slider1 = useRef(null);
   const slider2 = useRef(null);
 
-  const pdfRef = useRef();
+  const [similarTours, setSimilarTours] = useState([]);
+  useEffect(() => {
+  const fetchSimilarTours = async () => {
+    if (!tour?._id) return;
+
+    try {
+      const res = await axios.get(`${BASE_URL}/tours`);
+      const allTours = res.data?.data || [];
+
+      // Lọc ra những tour khác tour hiện tại và lấy tối đa 6 tour
+      const similar = allTours.filter((t) => t._id !== tour._id).slice(0, 6);
+      setSimilarTours(similar);
+    } catch (err) {
+      console.error("Error fetching tours:", err);
+    }
+  };
+
+  fetchSimilarTours();
+}, [tour]);
+
 
   const exportPDF = () => {
     setShowMore(true); // Ensure all content is visible
@@ -250,24 +272,6 @@ const TourDetails = () => {
   );
 
 
-
-  const handleCallBackSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await fetch("http://localhost:8000/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: "callback", phoneNumber }),
-      });
-      const data = await res.json();
-      alert(data.message);
-      setPhoneNumber("");
-    } catch (err) {
-      alert("Lỗi gửi yêu cầu gọi lại");
-    }
-  };
-
-
   const toggleModal = () => setModal(!modal);
 
   const handleBookingSubmit = async (e) => {
@@ -416,24 +420,33 @@ const TourDetails = () => {
               </div>
 
               <div className="card p-3 mb-4">
-                <div className="d-flex gap-2 mb-3">
-                  <Button
-                    color={
-                      activeTab === "description" ? "primary" : "secondary"
-                    }
-                    onClick={() => setActiveTab("description")}
-                  >
-                    Mô Tả
-                  </Button>
-                  <Button
-                    color={activeTab === "reviews" ? "primary" : "secondary"}
-                    onClick={() => setActiveTab("reviews")}
-                  >
-                    Đánh Giá ({safeReviews.length})
-                  </Button>
-                </div>
 
+                <div className="tour-tab-wrapper">
+  <button
+    className={`tour-tab ${activeTab === "description" ? "active" : ""}`}
+    onClick={() => setActiveTab("description")}
+  >
+    Mô tả
+  </button>
+  <button
+    className={`tour-tab ${activeTab === "cancellation" ? "active" : ""}`}
+    onClick={() => setActiveTab("cancellation")}
+  >
+    Điều kiện hoàn hủy
+  </button>
+  <button
+    className={`tour-tab ${activeTab === "reviews" ? "active" : ""}`}
+    onClick={() => setActiveTab("reviews")}
+  >
+    Đánh giá ({safeReviews.length})
+  </button>
+</div>
+
+                
                 <hr />
+                {activeTab === "cancellation" && (
+                  <div dangerouslySetInnerHTML={{ __html: tour?.cancellationPolicy }} />
+                )}
                 {activeTab === "description" && (
                   <div className="tour__details">
                     <button onClick={exportPDF} style={{ marginBottom: "10px" }}>
@@ -521,7 +534,7 @@ const TourDetails = () => {
                     </Form>
                   </div>
                 )}
-                1
+
               </div>
             </div>
           </Col>
@@ -535,60 +548,44 @@ const TourDetails = () => {
                 color: "white",
               }}
             >
-              <h5 className="fw-bold text-uppercase mb-4 text-center">
-                Đăng ký tư vấn
-              </h5>
-              <ul className="list-unstyled text-white small mb-4">
-                <li className="mb-2">
-                  <strong>Ngày khởi hành:</strong> {formatDate(departureDate)}
-                </li>
-                <li className="mb-2">
-                  <strong>Thời gian:</strong> {time || "Đang cập nhật"}
-                </li>
-                <li className="mb-2">
-                  <strong>Lịch trình:</strong> {schedule || "Đang cập nhật"}
-                </li>
-              </ul>
-              <div className="text-center mb-3">
-                <h4
-                  style={{
-                    fontWeight: "bold",
-                    backgroundColor: "white",
-                    color: "#2196f3",
-                    padding: 10,
-                    borderRadius: 5,
-                  }}
-                >
-                  {priceAdult?.toLocaleString("vi-VN")} đồng
-                </h4>
-              </div>
-              <Button
-                color="danger"
-                className="w-100 mb-3 fw-bold"
-                onClick={toggleModal}
+              <div
+                style={{
+                  backgroundColor: "#2196f3",
+                  color: "white",
+                  borderRadius: "10px",
+                  padding: "20px",
+                  textAlign: "center",
+                }}
               >
-                ĐẶT TOUR NGAY
-              </Button>
-              <p className="small text-center mb-2">
-                Liên hệ càng sớm - Giá càng rẻ
-              </p>
-              <p className="small text-center mb-3">
-                Hoặc để lại số điện thoại, chúng tôi sẽ gọi lại cho bạn sau ít
-                phút!
-              </p>
-              <Form onSubmit={handleCallBackSubmit}>
-                <Input
-                  type="text"
-                  value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value)}
-                  placeholder="Số điện thoại của tôi là"
-                  className="mb-3"
-                  required
-                />
-                <Button color="warning" className="w-100 fw-bold" type="submit">
-                  YÊU CẦU GỌI LẠI
-                </Button>
-              </Form>
+                <div className="consult-box">
+
+                  <h5 className="title">ĐĂNG KÝ TƯ VẤN</h5>
+
+                  <div className="info-row">
+                    <span className="label">Ngày khởi hành:</span>
+                    <span className="value">{formatDate(departureDate)}</span>
+                  </div>
+                  <div className="info-row">
+                    <span className="label">Thời gian:</span>
+                    <span className="value">{time || "Đang cập nhật"}</span>
+                  </div>
+                  <div className="info-row">
+                    <span className="label">Lịch trình:</span>
+                    <span className="value">{schedule || "Đang cập nhật"}</span>
+                  </div>
+
+                  <div className="price-box adult">
+                    Người lớn: {priceAdult?.toLocaleString("vi-VN")} đồng
+                  </div>
+                  <div className="price-box child">
+                    Trẻ em: {priceChild?.toLocaleString("vi-VN")} đồng
+                  </div>
+
+                  <Button color="danger" className="w-100 fw-bold mt-3" onClick={toggleModal}>
+                    ĐẶT TOUR NGAY
+                  </Button>
+                </div>
+              </div>
             </div>
           </Col>
         </Row>
@@ -679,6 +676,7 @@ const TourDetails = () => {
             </Button>
           </ModalFooter>
         </Modal>
+        {similarTours.length > 0 && <TourSimilar tours={similarTours} />}
       </Container>
     </section>
   );
