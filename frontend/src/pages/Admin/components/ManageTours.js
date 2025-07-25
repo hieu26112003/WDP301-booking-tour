@@ -465,10 +465,10 @@ const ManageTours = () => {
     toggleModal();
   };
 
-  const handleViewDetail = (tour) => {
-    navigate(`/tour-detail/${tour._id}`, { state: { tour } });
-  };
 
+ const handleViewDetail = (tour) => {
+  navigate(`/tours/${tour._id}`); // <-- chuyển đến trang user
+};
   const handleSearchChange = (e) => setSearchTerm(e.target.value);
   const handleCategoryChange = (e) => setSelectedCategory(e.target.value);
   const handleStaffFilterChange = (e) => setSelectedStaff(e.target.value);

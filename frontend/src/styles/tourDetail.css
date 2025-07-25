@@ -69,6 +69,109 @@
   transform: scale(1.05);
   box-shadow: 0 0 0 2px #007bff;
 }
+.tour-tab-wrapper {
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 10px 15px;
+  display: flex;
+  justify-content: space-between; /* 👈 thêm dòng này */
+  align-items: center;
+  margin-bottom: 25px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+.similar-tours h4 {
+  font-size: 22px;
+  font-weight: bold;
+  color: #f7941d;
+}
+
+.similar-tours .tour__card {
+  transition: transform 0.3s ease;
+}
+
+.similar-tours .tour__card:hover {
+  transform: scale(1.02);
+}
+.tour-tab {
+  background-color: #00acc1;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tour-tab:hover {
+  background-color: #007c91;
+}
+
+.tour-tab.active {
+  background-color: #006064;
+  box-shadow: 0 0 0 2px #b2ebf2;
+}
+
+.consult-box {
+  background: linear-gradient(to bottom, #0288d1, #03a9f4);
+  color: white;
+  padding: 25px;
+  border-radius: 12px;
+  text-align: center;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.consult-box .title {
+  font-weight: bold;
+  font-size: 18px;
+  margin-bottom: 20px;
+}
+
+.info-row {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  margin-bottom: 8px;
+  font-size: 14px;
+  text-align: left;
+  gap: 6px;
+  align-items: start;
+}
+
+.info-row .label {
+  font-weight: bold;
+}
+
+.info-row .value {
+  color: #fffde7;
+  white-space: pre-line;
+}
+
+.price-box {
+  padding: 10px;
+  border-radius: 6px;
+  margin-top: 12px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.price-box.adult {
+  background-color: white;
+  color: #0288d1;
+}
+
+.price-box.child {
+  background-color: white;
+  color: #ff9800;
+}
+
+.price-box:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+}
 
 /* New Modal Styles */
 .modal-content {
