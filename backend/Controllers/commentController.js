@@ -69,28 +69,50 @@ export const getCommentsByTourId = async (req, res) => {
 };
 
 
+// Trong commentController.js
 export const deleteComment = async (req, res) => {
   try {
     const { id } = req.params;
     const userId = req.user.id;
-
+    
+    console.log("Delete request - Comment ID:", id); // Debug
+    console.log("Delete request - User ID:", userId); // Debug
+    console.log("Delete request - User role:", req.user.role); // Debug
+    
     const comment = await Comment.findById(id);
     if (!comment) {
-      return res.status(404).json({ success: false, message: "Comment không tồn tại" });
+      return res.status(404).json({ 
+        success: false, 
+        message: "Comment không tồn tại" 
+      });
     }
-
-    // Chỉ cho phép user sở hữu comment hoặc admin xóa
-    if (comment.userId.toString() !== userId && req.user.role !== 'admin') {
-      return res.status(403).json({ success: false, message: "Không có quyền" });
+    
+    console.log("Found comment - Owner ID:", comment.userId); // Debug
+    
+    // Chỉ cho phép user sở hữu comment hoặc admin/staff xóa
+    if (comment.userId.toString() !== userId && 
+        req.user.role !== 'admin' && 
+        req.user.role !== 'staff') {
+      return res.status(403).json({ 
+        success: false, 
+        message: "Không có quyền xóa comment này" 
+      });
     }
-
+    
     await Comment.findByIdAndDelete(id);
-    res.status(200).json({ success: true, message: "Xóa comment thành công" });
+    
+    res.status(200).json({ 
+      success: true, 
+      message: "Xóa comment thành công" 
+    });
   } catch (err) {
-    res.status(500).json({ success: false, message: "Lỗi server" });
+    console.error("Error in deleteComment:", err);
+    res.status(500).json({ 
+      success: false, 
+      message: "Lỗi server: " + err.message 
+    });
   }
 };
-
 export const updateComment = async (req, res) => {
   try {
     const { id } = req.params;

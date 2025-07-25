@@ -4,41 +4,36 @@ import mongoose from "mongoose";
 import Guide from '../models/Guide.js';
 
 // [POST] /api/category-guides
-// [POST] /api/category-guides
 export const createCategoryGuide = async (req, res) => {
   try {
     const { name, description, isActive = true } = req.body;
-
+    
     if (!name || !description) {
-  return res.status(400).json({ success: false, message: "Name và Description là bắt buộc" });
-}
+      return res.status(400).json({ success: false, message: "Name và Description là bắt buộc" });
+    }
 
-const trimmedName = name.trim();
-if (trimmedName.length < 2 || trimmedName.length > 100) {
-  return res.status(400).json({ success: false, message: "Tên phải từ 2 đến 100 ký tự" });
-}
+    const trimmedName = name.trim();
+    if (trimmedName.length < 2 || trimmedName.length > 100) {
+      return res.status(400).json({ success: false, message: "Tên phải từ 2 đến 100 ký tự" });
+    }
 
-if (/^\d+$/.test(trimmedName)) {
-  return res.status(400).json({ success: false, message: "Tên không được chỉ chứa số" });
-}
-const existing = await CategoryGuide.findOne({ name });
-if (existing) {
-  return res.status(400).json({ success: false, message: "Tên danh mục đã tồn tại" });
-}
+    if (/^\d+$/.test(trimmedName)) {
+      return res.status(400).json({ success: false, message: "Tên không được chỉ chứa số" });
+    }
 
-    const existing = await CategoryGuide.findOne({ name });
+    const existing = await CategoryGuide.findOne({ name: trimmedName });
     if (existing) {
-      return res.status(400).json({ success: false, message: "Category đã tồn tại" });
+      return res.status(400).json({ success: false, message: "Tên danh mục đã tồn tại" });
     }
 
     const newCategory = new CategoryGuide({
-      name,
+      name: trimmedName,
       description,
       isActive,
+      slug: slugify(trimmedName, { lower: true, strict: true }),
     });
 
     await newCategory.save();
-
     res.status(201).json({ success: true, message: "Tạo loại thành công", data: newCategory });
   } catch (err) {
     console.error("❌ Error creating category:", err);
@@ -60,11 +55,9 @@ export const getAllCategoryGuides = async (req, res) => {
 export const deleteCategoryGuide = async (req, res) => {
   try {
     const { id } = req.params;
-
+    
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid category guide ID" });
+      return res.status(400).json({ success: false, message: "Invalid category guide ID" });
     }
 
     // Kiểm tra nếu còn Guide liên kết với category này
@@ -78,9 +71,7 @@ export const deleteCategoryGuide = async (req, res) => {
 
     const deleted = await CategoryGuide.findByIdAndDelete(id);
     if (!deleted) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Category guide not found" });
+      return res.status(404).json({ success: false, message: "Category guide not found" });
     }
 
     res.status(200).json({ success: true, message: "Category guide deleted successfully" });
@@ -93,31 +84,41 @@ export const deleteCategoryGuide = async (req, res) => {
   }
 };
 
+// [PUT] /api/category-guides/:id
 export const updateCategoryGuide = async (req, res) => {
   try {
     const { id } = req.params;
     const { name, description, isActive } = req.body;
-
+    
     if (!name || !description) {
-  return res.status(400).json({ success: false, message: "Name và Description là bắt buộc" });
-}
+      return res.status(400).json({ success: false, message: "Name và Description là bắt buộc" });
+    }
 
-const trimmedName = name.trim();
-if (trimmedName.length < 2 || trimmedName.length > 100) {
-  return res.status(400).json({ success: false, message: "Tên phải từ 2 đến 100 ký tự" });
-}
+    const trimmedName = name.trim();
+    if (trimmedName.length < 2 || trimmedName.length > 100) {
+      return res.status(400).json({ success: false, message: "Tên phải từ 2 đến 100 ký tự" });
+    }
 
-if (/^\d+$/.test(trimmedName)) {
-  return res.status(400).json({ success: false, message: "Tên không được chỉ chứa số" });
-}
+    if (/^\d+$/.test(trimmedName)) {
+      return res.status(400).json({ success: false, message: "Tên không được chỉ chứa số" });
+    }
+
+    // Kiểm tra tên trùng lặp (trừ chính nó)
+    const existing = await CategoryGuide.findOne({ 
+      name: trimmedName, 
+      _id: { $ne: id } 
+    });
+    if (existing) {
+      return res.status(400).json({ success: false, message: "Tên danh mục đã tồn tại" });
+    }
 
     const updated = await CategoryGuide.findByIdAndUpdate(
       id,
       {
-        name,
+        name: trimmedName,
         description,
         isActive,
-        slug: slugify(name, { lower: true, strict: true }),
+        slug: slugify(trimmedName, { lower: true, strict: true }),
       },
       { new: true }
     );
@@ -133,12 +134,12 @@ if (/^\d+$/.test(trimmedName)) {
   }
 };
 
-// GET /api/guide-categories/:slug
+// [GET] /api/category-guides/:slug
 export const getCategoryBySlug = async (req, res) => {
   try {
     const { slug } = req.params;
     const category = await CategoryGuide.findOne({ slug });
-
+    
     if (!category) {
       return res.status(404).json({ success: false, message: "Không tìm thấy danh mục" });
     }
