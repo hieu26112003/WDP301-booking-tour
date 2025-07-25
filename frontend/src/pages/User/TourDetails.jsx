@@ -272,26 +272,6 @@ const TourDetails = () => {
   );
 
 
-
-
-
-  const handleCallBackSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await fetch("http://localhost:8000/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: "callback", phoneNumber }),
-      });
-      const data = await res.json();
-      alert(data.message);
-      setPhoneNumber("");
-    } catch (err) {
-      alert("Lỗi gửi yêu cầu gọi lại");
-    }
-  };
-
-
   const toggleModal = () => setModal(!modal);
 
   const handleBookingSubmit = async (e) => {
@@ -440,6 +420,7 @@ const TourDetails = () => {
               </div>
 
               <div className="card p-3 mb-4">
+
                 <div className="tour-tab-wrapper">
   <button
     className={`tour-tab ${activeTab === "description" ? "active" : ""}`}
