@@ -1,7 +1,6 @@
-// Register.js
 import React, { useContext, useState } from "react";
 import { Container, Row, Col, Form, FormGroup, Button } from "reactstrap";
-import "../../styles/register.css"; // Sử dụng register.css
+import "../../styles/register.css";
 import { Link, useNavigate } from "react-router-dom";
 import {
   User,
@@ -12,12 +11,17 @@ import {
   EyeOff,
   MapPin,
   Phone,
-} from "lucide-react"; // Thêm biểu tượng
+} from "lucide-react";
 import registerImg from "../../assets/images/login.png";
 import userIcon from "../../assets/images/user.png";
 import { AuthContext } from "../../context/AuthContext";
 import { BASE_URL } from "../../utils/config";
 import Swal from "sweetalert2";
+
+// Regex để xác thực email, số điện thoại, và mật khẩu
+const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
+const phoneRegex = /^(\+84|0)[35789][0-9]{8}$/;
+const passwordRegex = /^(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/;
 
 const Register = () => {
   const [credentials, setCredentials] = useState({
@@ -29,11 +33,112 @@ const Register = () => {
     password: "",
     avatar: null,
   });
-  const [showPassword, setShowPassword] = useState(false); // Trạng thái hiển thị mật khẩu
-  const [isLoading, setIsLoading] = useState(false); // Trạng thái loading
+  const [errors, setErrors] = useState({
+    username: "",
+    fullname: "",
+    address: "",
+    phone: "",
+    email: "",
+    password: "",
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const { dispatch } = useContext(AuthContext);
   const navigate = useNavigate();
+
+  // Hàm xử lý chỉ cho phép nhập số và dấu +
+  const handlePhoneKeyPress = (e) => {
+    const char = e.key;
+    // Cho phép số, dấu +, và các phím điều khiển (Backspace, Delete, Arrow keys, v.v.)
+    if (!/[0-9+]|Backspace|Delete|ArrowLeft|ArrowRight|Tab/.test(char)) {
+      e.preventDefault();
+    }
+    // Chỉ cho phép dấu + ở vị trí đầu tiên
+    if (char === "+" && e.target.value.length > 0) {
+      e.preventDefault();
+    }
+  };
+
+  const validateInputs = () => {
+    let isValid = true;
+    const newErrors = {
+      username: "",
+      fullname: "",
+      address: "",
+      phone: "",
+      email: "",
+      password: "",
+    };
+
+    // Xác thực username
+    if (!credentials.username) {
+      newErrors.username = "Tên đăng nhập là bắt buộc";
+      isValid = false;
+    } else if (credentials.username.length > 50) {
+      newErrors.username = "Tên đăng nhập không được vượt quá 50 ký tự";
+      isValid = false;
+    }
+
+    // Xác thực fullname
+    if (!credentials.fullname) {
+      newErrors.fullname = "Họ và tên là bắt buộc";
+      isValid = false;
+    } else if (credentials.fullname.length > 100) {
+      newErrors.fullname = "Họ và tên không được vượt quá 100 ký tự";
+      isValid = false;
+    }
+
+    // Xác thực address
+    if (!credentials.address) {
+      newErrors.address = "Địa chỉ là bắt buộc";
+      isValid = false;
+    } else if (credentials.address.length > 255) {
+      newErrors.address = "Địa chỉ không được vượt quá 255 ký tự";
+      isValid = false;
+    }
+
+    // Xác thực phone
+    if (!credentials.phone) {
+      newErrors.phone = "Số điện thoại là bắt buộc";
+      isValid = false;
+    } else if (!phoneRegex.test(credentials.phone)) {
+      newErrors.phone =
+        "Số điện thoại không hợp lệ (VD: +84987654321 hoặc 0987654321)";
+      isValid = false;
+    } else if (credentials.phone.length > 20) {
+      newErrors.phone = "Số điện thoại không được vượt quá 20 ký tự";
+      isValid = false;
+    }
+
+    // Xác thực email
+    if (!credentials.email) {
+      newErrors.email = "Email là bắt buộc";
+      isValid = false;
+    } else if (!emailRegex.test(credentials.email)) {
+      newErrors.email = "Email không hợp lệ";
+      isValid = false;
+    } else if (credentials.email.length > 100) {
+      newErrors.email = "Email không được vượt quá 100 ký tự";
+      isValid = false;
+    }
+
+    // Xác thực password
+    if (!credentials.password) {
+      newErrors.password = "Mật khẩu là bắt buộc";
+      isValid = false;
+    } else if (!passwordRegex.test(credentials.password)) {
+      newErrors.password =
+        "Mật khẩu phải có ít nhất 8 ký tự và chứa ít nhất 1 ký tự đặc biệt (VD: @, #, $, v.v.)";
+      isValid = false;
+    } else if (credentials.password.length > 50) {
+      newErrors.password = "Mật khẩu không được vượt quá 50 ký tự";
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
 
   const handleChange = (e) => {
     const { id, value, files } = e.target;
@@ -41,12 +146,19 @@ const Register = () => {
       setCredentials((prev) => ({ ...prev, avatar: files[0] }));
     } else {
       setCredentials((prev) => ({ ...prev, [id]: value }));
+      // Xóa lỗi khi người dùng nhập lại
+      setErrors((prev) => ({ ...prev, [id]: "" }));
     }
   };
 
   const handleClick = async (e) => {
     e.preventDefault();
-    setIsLoading(true); // Bật loading
+
+    if (!validateInputs()) {
+      return;
+    }
+
+    setIsLoading(true);
 
     const formData = new FormData();
     for (const key in credentials) {
@@ -62,10 +174,25 @@ const Register = () => {
       const result = await res.json();
 
       if (!res.ok) {
+        // Xử lý lỗi cụ thể từ server
+        let errorMessage = result.message;
+        if (result.message.includes("Email đã tồn tại")) {
+          setErrors((prev) => ({ ...prev, email: result.message }));
+        } else if (result.message.includes("Tên đăng nhập đã tồn tại")) {
+          setErrors((prev) => ({ ...prev, username: result.message }));
+        } else if (result.message.includes("Số điện thoại đã được sử dụng")) {
+          setErrors((prev) => ({ ...prev, phone: result.message }));
+        } else if (result.message.includes("bắt buộc")) {
+          const field = result.message.split(" ")[0].toLowerCase();
+          setErrors((prev) => ({ ...prev, [field]: result.message }));
+        } else {
+          errorMessage = result.message || "Đăng ký thất bại";
+        }
+
         Swal.fire({
           icon: "error",
           title: "Đăng ký thất bại",
-          text: result.message,
+          text: errorMessage,
           confirmButtonColor: "#d33",
           backdrop: true,
           allowOutsideClick: true,
@@ -94,8 +221,7 @@ const Register = () => {
           content: "custom-swal-content",
         },
         willClose: () => {
-          console.log("Success message closed");
-          document.body.style.overflow = "auto"; // Khôi phục cuộn
+          document.body.style.overflow = "auto";
         },
       }).then(() => {
         dispatch({ type: "REGISTER_SUCCESS" });
@@ -149,6 +275,11 @@ const Register = () => {
                         onChange={handleChange}
                         required
                       />
+                      {errors.username && (
+                        <span className="error__message">
+                          {errors.username}
+                        </span>
+                      )}
                     </div>
                   </FormGroup>
                   <FormGroup className="input__group">
@@ -160,7 +291,13 @@ const Register = () => {
                         id="fullname"
                         value={credentials.fullname}
                         onChange={handleChange}
+                        required
                       />
+                      {errors.fullname && (
+                        <span className="error__message">
+                          {errors.fullname}
+                        </span>
+                      )}
                     </div>
                   </FormGroup>
                   <FormGroup className="input__group">
@@ -172,19 +309,28 @@ const Register = () => {
                         id="address"
                         value={credentials.address}
                         onChange={handleChange}
+                        required
                       />
+                      {errors.address && (
+                        <span className="error__message">{errors.address}</span>
+                      )}
                     </div>
                   </FormGroup>
                   <FormGroup className="input__group">
                     <div className="input__wrapper">
                       <Phone className="input__icon" size={20} />
                       <input
-                        type="text"
+                        type="tel"
                         placeholder="Số điện thoại"
                         id="phone"
                         value={credentials.phone}
                         onChange={handleChange}
+                        onKeyPress={handlePhoneKeyPress}
+                        required
                       />
+                      {errors.phone && (
+                        <span className="error__message">{errors.phone}</span>
+                      )}
                     </div>
                   </FormGroup>
                   <FormGroup className="input__group">
@@ -198,6 +344,9 @@ const Register = () => {
                         onChange={handleChange}
                         required
                       />
+                      {errors.email && (
+                        <span className="error__message">{errors.email}</span>
+                      )}
                     </div>
                   </FormGroup>
                   <FormGroup className="input__group">
@@ -223,21 +372,22 @@ const Register = () => {
                         )}
                       </button>
                     </div>
+                    {errors.password && (
+                      <span className="error__message">{errors.password}</span>
+                    )}
                   </FormGroup>
-                  {/* <FormGroup className="input__group">
-                    <div className="input__wrapper">
-                      <input
-                        type="file"
-                        id="avatar"
-                        accept="image/*"
-                        onChange={handleChange}
-                      />
-                    </div>
-                  </FormGroup> */}
                   <Button
                     className="btn auth__btn"
                     type="submit"
-                    disabled={isLoading}
+                    disabled={
+                      isLoading ||
+                      errors.username ||
+                      errors.fullname ||
+                      errors.address ||
+                      errors.phone ||
+                      errors.email ||
+                      errors.password
+                    }
                   >
                     {isLoading ? (
                       <>

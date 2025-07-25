@@ -1,32 +1,38 @@
-// Login.js
 import React, { useContext, useState, useEffect } from "react";
 import { Container, Row, Col, Form, FormGroup, Button } from "reactstrap";
 import "../../styles/login.css";
 import { Link, useNavigate } from "react-router-dom";
-import { Eye, EyeOff, Mail, Lock, Loader2 } from "lucide-react"; // Thêm biểu tượng từ lucide-react
+import { Eye, EyeOff, Mail, Lock, Loader2 } from "lucide-react";
 import loginImg from "../../assets/images/login.png";
 import userIcon from "../../assets/images/user.png";
 import { AuthContext } from "../../context/AuthContext";
 import { BASE_URL } from "../../utils/config";
 import Swal from "sweetalert2";
 
+// Regex để xác thực email
+const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]\w+)*(\.\w{2,3})+$/;
+
 const Login = () => {
   const [credentials, setCredentials] = useState({
     email: "",
     password: "",
   });
-  const [showPassword, setShowPassword] = useState(false); // Trạng thái hiển thị mật khẩu
-  const [isLoading, setIsLoading] = useState(false); // Trạng thái loading cho nút
+  const [errors, setErrors] = useState({
+    email: "",
+    password: "",
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const { dispatch, user } = useContext(AuthContext);
   const navigate = useNavigate();
 
   useEffect(() => {
     const verifyToken = async () => {
-      try {
-        const accessToken = localStorage.getItem("accessToken");
-        if (!accessToken) return;
+      const accessToken = localStorage.getItem("accessToken");
+      if (!accessToken) return; // Thoát sớm nếu không có token
 
+      try {
         const res = await fetch(`${BASE_URL}/auth/me`, {
           method: "GET",
           headers: {
@@ -46,25 +52,70 @@ const Login = () => {
           } else {
             navigate("/home");
           }
+        } else {
+          // Xóa token nếu không hợp lệ
+          localStorage.removeItem("accessToken");
+          localStorage.removeItem("refreshToken");
         }
       } catch (err) {
         console.error("Lỗi xác thực token:", err);
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
       }
     };
 
-    if (!user) {
+    if (!user && localStorage.getItem("accessToken")) {
       verifyToken();
     }
   }, [dispatch, navigate, user]);
 
+  const validateInputs = () => {
+    let isValid = true;
+    const newErrors = { email: "", password: "" };
+
+    // Xác thực email
+    if (!credentials.email) {
+      newErrors.email = "Email là bắt buộc";
+      isValid = false;
+    } else if (!emailRegex.test(credentials.email)) {
+      newErrors.email = "Email không hợp lệ";
+      isValid = false;
+    } else if (credentials.email.length > 100) {
+      newErrors.email = "Email không được vượt quá 100 ký tự";
+      isValid = false;
+    }
+
+    // Xác thực password
+    if (!credentials.password) {
+      newErrors.password = "Mật khẩu là bắt buộc";
+      isValid = false;
+    } else if (credentials.password.length < 8) {
+      newErrors.password = "Mật khẩu phải có ít nhất 8 ký tự";
+      isValid = false;
+    } else if (credentials.password.length > 255) {
+      newErrors.password = "Mật khẩu không được vượt quá 255 ký tự";
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
   const handleChange = (e) => {
-    setCredentials((prev) => ({ ...prev, [e.target.id]: e.target.value }));
+    const { id, value } = e.target;
+    setCredentials((prev) => ({ ...prev, [id]: value }));
+    // Xóa lỗi khi người dùng nhập lại
+    setErrors((prev) => ({ ...prev, [id]: "" }));
   };
 
   const handleClick = async (e) => {
     e.preventDefault();
-    setIsLoading(true); // Bật trạng thái loading
 
+    if (!validateInputs()) {
+      return;
+    }
+
+    setIsLoading(true);
     dispatch({ type: "LOGIN_START" });
 
     try {
@@ -77,13 +128,32 @@ const Login = () => {
       const result = await res.json();
 
       if (!res.ok) {
+        // Xử lý lỗi cụ thể từ server
+        let errorMessage = result.message;
+        if (result.message.includes("Email")) {
+          setErrors((prev) => ({ ...prev, email: result.message }));
+        } else if (result.message.includes("Mật khẩu")) {
+          setErrors((prev) => ({ ...prev, password: result.message }));
+        } else {
+          errorMessage = result.message || "Đăng nhập thất bại";
+        }
+
         Swal.fire({
           icon: "error",
           title: "Đăng nhập thất bại",
-          text: result.message,
+          text: errorMessage,
           confirmButtonColor: "#d33",
+          backdrop: true,
+          allowOutsideClick: true,
+          customClass: {
+            popup: "custom-swal-popup",
+            title: "custom-swal-title",
+            content: "custom-swal-content",
+            confirmButton: "custom-swal-confirm",
+          },
         });
         setIsLoading(false);
+        dispatch({ type: "LOGIN_FAILURE", payload: result.message });
         return;
       }
 
@@ -95,7 +165,7 @@ const Login = () => {
       Swal.fire({
         icon: "success",
         title: "Đăng nhập thành công",
-        showConfirmButton: false, // Tự đóng
+        showConfirmButton: false,
         timer: 1500,
         timerProgressBar: true,
         backdrop: true,
@@ -106,8 +176,7 @@ const Login = () => {
           content: "custom-swal-content",
         },
         willClose: () => {
-          console.log("Success message closed");
-          document.body.style.overflow = "auto"; // Khôi phục cuộn
+          document.body.style.overflow = "auto";
         },
       }).then(() => {
         setIsLoading(false);
@@ -169,6 +238,9 @@ const Login = () => {
                         required
                       />
                     </div>
+                    {errors.email && (
+                      <span className="error__message">{errors.email}</span>
+                    )}
                   </FormGroup>
                   <FormGroup className="input__group">
                     <div className="input__wrapper">
@@ -193,11 +265,14 @@ const Login = () => {
                         )}
                       </button>
                     </div>
+                    {errors.password && (
+                      <span className="error__message">{errors.password}</span>
+                    )}
                   </FormGroup>
                   <Button
                     className="btn auth__btn"
                     type="submit"
-                    disabled={isLoading}
+                    disabled={isLoading || errors.email || errors.password}
                   >
                     {isLoading ? (
                       <>

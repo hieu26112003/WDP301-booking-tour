@@ -7,13 +7,68 @@ dotenv.config();
 
 export const register = async (req, res) => {
   try {
+    const requiredFields = [
+      "username",
+      "fullname",
+      "address",
+      "phone",
+      "email",
+      "password",
+    ];
+    for (const field of requiredFields) {
+      if (!req.body[field] || req.body[field].trim() === "") {
+        return res.status(400).json({
+          success: false,
+          message: `${
+            field.charAt(0).toUpperCase() + field.slice(1)
+          } là bắt buộc`,
+        });
+      }
+    }
+
     const existingUser = await User.findOne({
-      $or: [{ email: req.body.email }, { username: req.body.username }],
+      $or: [
+        { email: req.body.email },
+        { username: req.body.username },
+        { phone: req.body.phone },
+      ],
     });
+
     if (existingUser) {
+      if (existingUser.email === req.body.email) {
+        return res.status(400).json({
+          success: false,
+          message: "Email đã tồn tại!",
+        });
+      }
+      if (existingUser.username === req.body.username) {
+        return res.status(400).json({
+          success: false,
+          message: "Tên đăng nhập đã tồn tại!",
+        });
+      }
+      if (existingUser.phone === req.body.phone) {
+        return res.status(400).json({
+          success: false,
+          message: "Số điện thoại đã được sử dụng!",
+        });
+      }
+    }
+
+    const phoneRegex = /^(\+84|0)[35789][0-9]{8}$/;
+    if (!phoneRegex.test(req.body.phone)) {
       return res.status(400).json({
         success: false,
-        message: "Email hoặc username đã tồn tại!",
+        message:
+          "Số điện thoại không hợp lệ (VD: +84987654321 hoặc 0987654321)",
+      });
+    }
+    const passwordRegex = /^(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/;
+    if (!passwordRegex.test(req.body.password)) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Mật khẩu phải có ít nhất 8 ký tự và chứa ít nhất 1 ký tự đặc biệt",
       });
     }
 
@@ -24,9 +79,9 @@ export const register = async (req, res) => {
       username: req.body.username,
       email: req.body.email,
       password: hash,
-      fullname: req.body.fullname || "",
-      address: req.body.address || "",
-      phone: req.body.phone || "",
+      fullname: req.body.fullname,
+      address: req.body.address,
+      phone: req.body.phone,
       avatar: req.file ? `user_images/${req.file.filename}` : null,
     });
 
@@ -35,13 +90,39 @@ export const register = async (req, res) => {
     res.status(200).json({ success: true, message: "Đăng ký thành công!" });
   } catch (error) {
     console.error("Lỗi đăng ký:", error);
+    if (error.code === 11000) {
+      if (error.keyPattern.email) {
+        return res.status(400).json({
+          success: false,
+          message: "Email đã tồn tại!",
+        });
+      }
+      if (error.keyPattern.username) {
+        return res.status(400).json({
+          success: false,
+          message: "Tên đăng nhập đã tồn tại!",
+        });
+      }
+      if (error.keyPattern.phone) {
+        return res.status(400).json({
+          success: false,
+          message: "Số điện thoại đã được sử dụng!",
+        });
+      }
+    }
+    if (error.name === "ValidationError") {
+      const messages = Object.values(error.errors).map((err) => err.message);
+      return res.status(400).json({
+        success: false,
+        message: messages.join(", "),
+      });
+    }
     res.status(500).json({
       success: false,
       message: `Đăng ký thất bại: ${error.message}`,
     });
   }
 };
-
 export const login = async (req, res) => {
   try {
     const email = req.body.email;
