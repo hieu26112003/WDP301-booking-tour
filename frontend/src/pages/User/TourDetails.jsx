@@ -249,23 +249,23 @@ const TourDetails = () => {
     (b) => b.userId === user?._id && b.status === "confirmed"
   );
 
-  
+
 
   const handleCallBackSubmit = async (e) => {
-  e.preventDefault();
-  try {
-            const res = await fetch("http://localhost:8000/api/contact", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ type: "callback", phoneNumber }),
-            });
-            const data = await res.json();
-            alert(data.message);
-            setPhoneNumber("");
-        } catch (err) {
-            alert("Lỗi gửi yêu cầu gọi lại");
-        }
-    };
+    e.preventDefault();
+    try {
+      const res = await fetch("http://localhost:8000/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "callback", phoneNumber }),
+      });
+      const data = await res.json();
+      alert(data.message);
+      setPhoneNumber("");
+    } catch (err) {
+      alert("Lỗi gửi yêu cầu gọi lại");
+    }
+  };
 
 
   const toggleModal = () => setModal(!modal);
@@ -432,7 +432,7 @@ const TourDetails = () => {
                     Đánh Giá ({safeReviews.length})
                   </Button>
                 </div>
-                
+
                 <hr />
                 {activeTab === "description" && (
                   <div className="tour__details">
