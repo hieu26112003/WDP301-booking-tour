@@ -7,6 +7,8 @@ import {
   FaUsers,
   FaCommentDots,
   FaMapMarkedAlt,
+  FaCalendarCheck,
+  FaBook,
 } from "react-icons/fa";
 import "./index.css";
 const Sidebar = () => {
@@ -26,6 +28,11 @@ const Sidebar = () => {
           icon={<FaUsers />}
           label="Manage Staff"
         />
+        <SidebarItem
+          to="/admin/booking"
+          icon={<FaCalendarCheck />}
+          label="Manage Booking"
+        />
         {/* <SidebarItem
           to="/admin/hotels"
           icon={<FaCommentDots />}
@@ -36,6 +43,11 @@ const Sidebar = () => {
           icon={<FaMapMarkedAlt />}
           label="Manage Tours"
         />
+        <SidebarItem
+                  to="/staff/guides"
+                  icon={<FaBook />}
+                  label="Manage Guide"
+                />
         <SidebarItem
           to="/admin/categories"
           icon={<FaTags />}

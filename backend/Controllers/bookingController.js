@@ -359,3 +359,53 @@ export const getUserBookings = async (req, res) => {
     });
   }
 };
+
+export const getAllBookingsforAdmin = async (req, res) => {
+  try {
+    const { page = 1, limit = 10, startDate, endDate, userEmail } = req.query;
+
+    const query = {};
+
+    // Lọc theo ngày
+    if (startDate && endDate) {
+      query.createdAt = {
+        $gte: new Date(startDate),
+        $lte: new Date(endDate),
+      };
+    }
+
+    // Populate dữ liệu
+    const allBookings = await Booking.find(query)
+      .populate("userId", "email")
+      .populate("tourId", "title")
+      .sort({ createdAt: -1 });
+
+    // Lọc theo email
+    let filteredBookings = allBookings;
+    if (userEmail) {
+      const keyword = userEmail.toLowerCase();
+      filteredBookings = allBookings.filter(
+        (b) => b.userId?.email?.toLowerCase().includes(keyword)
+      );
+    }
+
+    // Phân trang thủ công
+    const total = filteredBookings.length;
+    const start = (page - 1) * limit;
+    const paginated = filteredBookings.slice(start, start + parseInt(limit));
+
+    res.status(200).json({
+      success: true,
+      data: paginated,
+      pagination: {
+        page: parseInt(page),
+        pages: Math.ceil(total / limit),
+        total,
+      },
+    });
+  } catch (error) {
+    console.error("Booking Admin Error:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+

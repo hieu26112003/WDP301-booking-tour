@@ -28,6 +28,13 @@
   color: #555;
 }
 
+.listtour-sort {
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+}
+
+
 /* Loading animation */
 .listtour-loading {
   color: #007bff;
