@@ -12,6 +12,11 @@ const CommentSchema = new mongoose.Schema(
       ref: "Tour",          // Liên kết tới collection Tour
       required: true
     },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",          // Liên kết tới collection User
+      required: true        // Bắt buộc phải có userId
+    },
     approved: {
       type: Boolean,
       default: false        // Mặc định chưa duyệt

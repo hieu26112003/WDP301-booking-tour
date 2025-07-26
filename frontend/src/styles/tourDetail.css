@@ -362,6 +362,15 @@
   text-align: center;
   margin-bottom: 1rem;
 }
+@media print {
+  img {
+    display: none !important;
+    height: 0 !important;
+    width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+}
 
 /* Responsive Adjustments */
 @media (max-width: 768px) {

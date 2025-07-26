@@ -1,15 +1,14 @@
 /* Sidebar */
 .sidebar {
   width: 250px;
-  /* Độ rộng sidebar */
-  height: 100vh;
+  min-height: 100vh;
   background: #1e293b;
-  /* Xanh đậm */
   color: white;
   display: flex;
   flex-direction: column;
   transition: all 0.3s ease-in-out;
 }
+
 
 /* Logo */
 .sidebar .logo {

@@ -49,7 +49,7 @@ const Login = () => {
           if (result.data.role === "admin") {
             navigate("/admin");
           } else if (result.data.role === "staff") {
-            navigate("/staff");
+            navigate("/staff/chat");
           } else {
             navigate("/home");
           }
@@ -184,7 +184,7 @@ const Login = () => {
         if (result.data.role === "admin") {
           navigate("/admin");
         } else if (result.data.role === "staff") {
-          navigate("/staff");
+          navigate("/staff/chat");
         } else {
           navigate("/home");
         }

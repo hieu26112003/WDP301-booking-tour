@@ -10,26 +10,26 @@ const ManageComments = () => {
   const [loading, setLoading] = useState(true);
 
   // Lấy danh sách comment
- useEffect(() => {
-  const fetchComments = async () => {
-    try {
-      const token = localStorage.getItem("accessToken");
-      const res = await axios.get(`${BASE_URL}/comment`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setComments(res.data.data || []);
-    } catch (error) {
-      console.error("Lỗi khi lấy comment:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  useEffect(() => {
+    const fetchComments = async () => {
+      try {
+        const token = localStorage.getItem("accessToken");
+        const res = await axios.get(`${BASE_URL}/comment`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        console.log("Comments data:", res.data.data); // Debug để xem cấu trúc dữ liệu
+        setComments(res.data.data || []);
+      } catch (error) {
+        console.error("Lỗi khi lấy comment:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  fetchComments(); // gọi lần đầu
-  const interval = setInterval(fetchComments, 5000); // gọi lại mỗi 5 giây
-
-  return () => clearInterval(interval); // clear khi unmount
-}, []);
+    fetchComments(); // gọi lần đầu
+    const interval = setInterval(fetchComments, 5000); // gọi lại mỗi 5 giây
+    return () => clearInterval(interval); // clear khi unmount
+  }, []);
 
   // Xóa comment
   const handleDelete = async (id) => {
@@ -65,6 +65,7 @@ const ManageComments = () => {
           <tr>
             <th>#</th>
             <th>Nội dung</th>
+            <th>Email người dùng</th>
             <th>Tour</th>
             <th>Ngày tạo</th>
             <th>Hành động</th>
@@ -75,7 +76,10 @@ const ManageComments = () => {
             comments.map((comment, index) => (
               <tr key={comment._id}>
                 <td>{index + 1}</td>
-                <td>{comment.content}</td>
+                <td style={{ maxWidth: "200px", wordWrap: "break-word" }}>
+                  {comment.content}
+                </td>
+                <td>{comment.userId?.email || "N/A"}</td>
                 <td>{comment.tourId?.title || "N/A"}</td>
                 <td>{new Date(comment.createdAt).toLocaleString("vi-VN")}</td>
                 <td>
@@ -91,7 +95,7 @@ const ManageComments = () => {
             ))
           ) : (
             <tr>
-              <td colSpan="5" className="text-center">
+              <td colSpan="6" className="text-center">
                 Không có bình luận nào
               </td>
             </tr>

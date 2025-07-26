@@ -7,13 +7,23 @@ import Comment from "../models/Comment.js";
 export const createComment = async (req, res) => {
   try {
     const { content, tourId } = req.body;
-
+    const userId = req.user.id;
+    
     if (!content || !tourId) {
       return res.status(400).json({ success: false, message: "Thiếu dữ liệu" });
     }
-
-    const comment = await Comment.create({ content, tourId });
-    res.status(201).json({ success: true, data: comment });
+    
+    const comment = await Comment.create({ 
+      content, 
+      tourId, 
+      userId 
+    });
+    
+    // Populate ngay sau khi tạo để trả về đầy đủ thông tin
+    const populatedComment = await Comment.findById(comment._id)
+      .populate('userId', 'username');
+    
+    res.status(201).json({ success: true, data: populatedComment });
   } catch (err) {
     console.error("Error in createComment:", err);
     res.status(500).json({ success: false, message: "Lỗi khi tạo comment" });
@@ -22,23 +32,18 @@ export const createComment = async (req, res) => {
 
 
 
+// Trong commentController.js
 export const getAllComments = async (req, res) => {
   try {
-    // Lấy tất cả comments và populate tên tour
     const comments = await Comment.find()
-      .populate("tourId", "title")  // chỉ lấy trường 'title' của Tour
+      .populate('userId', 'username email') // Đảm bảo populate email
+      .populate('tourId', 'title')
       .sort({ createdAt: -1 });
-
-    return res.status(200).json({
-      success: true,
-      data: comments,
-    });
+    
+    res.status(200).json({ success: true, data: comments });
   } catch (err) {
     console.error("Error in getAllComments:", err);
-    return res.status(500).json({
-      success: false,
-      message: "Lỗi khi lấy danh sách comments",
-    });
+    res.status(500).json({ success: false, message: "Lỗi server" });
   }
 };
 
@@ -47,68 +52,91 @@ export const getAllComments = async (req, res) => {
  * Lấy danh sách comment đã duyệt của 1 tour
  * @route GET /api/comments/tour/:tourId
  */
+// Trong commentController.js
 export const getCommentsByTourId = async (req, res) => {
   try {
     const { tourId } = req.params;
-    const comments = await Comment.find({ tourId, approved: true }).sort({ createdAt: -1 });
-
+    
+    const comments = await Comment.find({ tourId })
+      .populate('userId', 'username') // Populate để lấy username
+      .sort({ createdAt: -1 });
+    
     res.status(200).json({ success: true, data: comments });
   } catch (err) {
     console.error("Error in getCommentsByTourId:", err);
-    res.status(500).json({ success: false, message: "Lỗi khi lấy comment" });
+    res.status(500).json({ success: false, message: "Lỗi khi lấy comments" });
   }
 };
 
-/**
- * Lấy danh sách comment chưa duyệt (dành cho staff)
- * @route GET /api/comments/pending
- */
-export const getPendingComments = async (req, res) => {
-  try {
-    const comments = await Comment.find({ approved: false }).sort({ createdAt: -1 });
-    res.status(200).json({ success: true, data: comments });
-  } catch (err) {
-    console.error("Error in getPendingComments:", err);
-    res.status(500).json({ success: false, message: "Lỗi khi lấy comment chờ duyệt" });
-  }
-};
 
-/**
- * Duyệt comment (staff)
- * @route PATCH /api/comments/:id/approve
- */
-export const approveComment = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const updated = await Comment.findByIdAndUpdate(id, { approved: true }, { new: true });
-
-    if (!updated) {
-      return res.status(404).json({ success: false, message: "Không tìm thấy comment" });
-    }
-
-    res.status(200).json({ success: true, data: updated });
-  } catch (err) {
-    console.error("Error in approveComment:", err);
-    res.status(500).json({ success: false, message: "Lỗi khi duyệt comment" });
-  }
-};
-
-/**
- * Xóa comment (staff)
- * @route DELETE /api/comments/:id
- */
+// Trong commentController.js
 export const deleteComment = async (req, res) => {
   try {
     const { id } = req.params;
-    const deleted = await Comment.findByIdAndDelete(id);
-
-    if (!deleted) {
-      return res.status(404).json({ success: false, message: "Không tìm thấy comment" });
+    const userId = req.user.id;
+    
+    console.log("Delete request - Comment ID:", id); // Debug
+    console.log("Delete request - User ID:", userId); // Debug
+    console.log("Delete request - User role:", req.user.role); // Debug
+    
+    const comment = await Comment.findById(id);
+    if (!comment) {
+      return res.status(404).json({ 
+        success: false, 
+        message: "Comment không tồn tại" 
+      });
     }
-
-    res.status(200).json({ success: true, message: "Đã xóa comment" });
+    
+    console.log("Found comment - Owner ID:", comment.userId); // Debug
+    
+    // Chỉ cho phép user sở hữu comment hoặc admin/staff xóa
+    if (comment.userId.toString() !== userId && 
+        req.user.role !== 'admin' && 
+        req.user.role !== 'staff') {
+      return res.status(403).json({ 
+        success: false, 
+        message: "Không có quyền xóa comment này" 
+      });
+    }
+    
+    await Comment.findByIdAndDelete(id);
+    
+    res.status(200).json({ 
+      success: true, 
+      message: "Xóa comment thành công" 
+    });
   } catch (err) {
     console.error("Error in deleteComment:", err);
-    res.status(500).json({ success: false, message: "Lỗi khi xóa comment" });
+    res.status(500).json({ 
+      success: false, 
+      message: "Lỗi server: " + err.message 
+    });
+  }
+};
+export const updateComment = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { content } = req.body;
+    const userId = req.user.id;
+
+    const comment = await Comment.findById(id);
+    if (!comment) {
+      return res.status(404).json({ success: false, message: "Comment không tồn tại" });
+    }
+
+    // Chỉ cho phép user sở hữu comment hoặc admin edit
+    if (comment.userId.toString() !== userId && req.user.role !== 'admin') {
+      return res.status(403).json({ success: false, message: "Không có quyền" });
+    }
+
+    const updatedComment = await Comment.findByIdAndUpdate(
+      id, 
+      { content }, 
+      { new: true }
+    ).populate('userId', 'username');
+
+    res.status(200).json({ success: true, data: updatedComment });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Lỗi server" });
   }
 };
