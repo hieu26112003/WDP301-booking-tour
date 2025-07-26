@@ -90,32 +90,68 @@ export const getAdminStatistics = async (req, res) => {
     // 6. Tổng số bình luận
     const totalComments = await Comment.countDocuments();
 
-    // 7. Tổng doanh thu từ các booking đã xác nhận (confirmed)
-    const totalRevenue = await Booking.aggregate([
+    // 7. Tổng doanh thu từ các booking đã hoàn thành và hủy tour
+    const completedRevenue = await Booking.aggregate([
       {
-        $match: { status: "confirmed" },
+        $match: { status: "completed" },
       },
       {
         $group: {
           _id: null,
-          totalRevenue: { $sum: "$totalPrice" },
+          totalCompletedRevenue: { $sum: "$totalPrice" },
         },
       },
     ]);
 
-    // 8. Doanh thu theo ngày
+    const cancellationRevenue = await Booking.aggregate([
+      {
+        $match: { revenue: { $gt: 0 } },
+      },
+      {
+        $group: {
+          _id: null,
+          totalCancellationRevenue: { $sum: "$revenue" },
+        },
+      },
+    ]);
+
+    const totalRevenue =
+      (completedRevenue.length > 0
+        ? completedRevenue[0].totalCompletedRevenue
+        : 0) +
+      (cancellationRevenue.length > 0
+        ? cancellationRevenue[0].totalCancellationRevenue
+        : 0);
+
+    // 8. Doanh thu theo ngày (completed bookings + cancellation revenue)
     const revenueByDay = await Booking.aggregate([
       {
-        $match: { status: "confirmed" },
+        $match: {
+          $or: [{ status: "completed" }, { revenue: { $gt: 0 } }],
+        },
       },
       {
         $group: {
           _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
-          totalRevenue: { $sum: "$totalPrice" },
+          totalRevenue: {
+            $sum: {
+              $cond: [
+                { $eq: ["$status", "completed"] },
+                "$totalPrice",
+                "$revenue",
+              ],
+            },
+          },
         },
       },
-      { $sort: { _id: 1 } }, // Sắp xếp theo ngày tăng dần
+      { $sort: { _id: 1 } },
     ]);
+
+    // 9. Tổng doanh thu từ hủy tour (revenue field)
+    const totalCancellationRevenue =
+      cancellationRevenue.length > 0
+        ? cancellationRevenue[0].totalCancellationRevenue
+        : 0;
 
     // Trả về dữ liệu thống kê
     res.status(200).json({
@@ -124,8 +160,8 @@ export const getAdminStatistics = async (req, res) => {
         totalUsers,
         totalStaff,
         totalTours,
-        totalRevenue:
-          totalRevenue.length > 0 ? totalRevenue[0].totalRevenue : 0,
+        totalRevenue,
+        totalCancellationRevenue,
         topTour: topTour.length > 0 ? topTour[0] : null,
         bookingStatus,
         bookingsByCategory,

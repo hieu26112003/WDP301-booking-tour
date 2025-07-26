@@ -48,6 +48,7 @@ const AdminStatistics = () => {
     totalStaff: 0,
     totalTours: 0,
     totalRevenue: 0,
+    totalCancellationRevenue: 0,
     topTour: null,
     bookingStatus: [],
     bookingsByCategory: [],
@@ -107,17 +108,19 @@ const AdminStatistics = () => {
 
   // Dữ liệu cho biểu đồ trạng thái booking (Pie Chart)
   const bookingStatusData = {
-    labels: ["Pending", "Confirmed", "Cancelled"],
+    labels: ["Đang chờ", "Đã xác nhận đặt cọc", "Đã hoàn thành", "Đã hủy"],
     datasets: [
       {
-        label: "Booking Status",
+        label: "Trạng thái Booking",
         data: [
           stats.bookingStatus.find((s) => s._id === "pending")?.count || 0,
-          stats.bookingStatus.find((s) => s._id === "confirmed")?.count || 0,
+          stats.bookingStatus.find((s) => s._id === "deposit_confirmed")
+            ?.count || 0,
+          stats.bookingStatus.find((s) => s._id === "completed")?.count || 0,
           stats.bookingStatus.find((s) => s._id === "cancelled")?.count || 0,
         ],
-        backgroundColor: ["#FFCE56", "#36A2EB", "#FF6384"],
-        borderColor: ["#FFFFFF", "#FFFFFF", "#FFFFFF"],
+        backgroundColor: ["#FFCE56", "#28a745", "#007bff", "#FF6384"],
+        borderColor: ["#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF"],
         borderWidth: 1,
       },
     ],
@@ -128,7 +131,7 @@ const AdminStatistics = () => {
     labels: stats.bookingsByCategory.map((cat) => cat.categoryName),
     datasets: [
       {
-        label: "Bookings by Category",
+        label: "Bookings theo Danh mục",
         data: stats.bookingsByCategory.map((cat) => cat.bookingCount),
         backgroundColor: ["#36A2EB", "#FFCE56", "#FF6384"],
         borderColor: ["#FFFFFF", "#FFFFFF", "#FFFFFF"],
@@ -137,7 +140,7 @@ const AdminStatistics = () => {
     ],
   };
 
-  // Dữ liệu cho biểu đồ doanh thu theo ngày (Line Chart)
+  // Dữ liệu cho biểu đồ doanh thu theo ngày (Line Chart, completed bookings + cancellation revenue)
   const revenueByDayData = {
     labels: stats.revenueByDay.map((day) => day._id),
     datasets: [
@@ -205,6 +208,16 @@ const AdminStatistics = () => {
               <CardTitle tag="h3">Tổng Doanh Thu</CardTitle>
               <CardText>
                 {stats.totalRevenue.toLocaleString("vi-VN")} VND
+              </CardText>
+            </CardBody>
+          </Card>
+        </Col>
+        <Col md="3" sm="6" className="mb-4">
+          <Card className="stat-card">
+            <CardBody>
+              <CardTitle tag="h3">Doanh Thu Hủy Tour</CardTitle>
+              <CardText>
+                {stats.totalCancellationRevenue.toLocaleString("vi-VN")} VND
               </CardText>
             </CardBody>
           </Card>
@@ -288,7 +301,7 @@ const AdminStatistics = () => {
               legend: { position: "top", labels: { font: { size: 14 } } },
               title: {
                 display: true,
-                text: "Doanh Thu Theo Ngày",
+                text: "Doanh Thu Theo Ngày (Hoàn Thành + Hủy Tour)",
                 font: { size: 18 },
               },
             },

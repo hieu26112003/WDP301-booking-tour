@@ -22,23 +22,24 @@ const ManageBooking = () => {
     { value: "all", label: "Tất cả trạng thái" },
     { value: "pending", label: "Chờ xác nhận" },
     { value: "confirmed", label: "Đã xác nhận" },
-    { value: "cancelled", label: "Đã hủy" }
+    { value: "cancelled", label: "Đã hủy" },
+    { value: "completed", label: "Đã hoàn thành" },
   ];
 
   const fetchBookings = async () => {
     try {
       setLoading(true);
       const params = new URLSearchParams({ page, limit });
-      
+
       if (startDate && endDate) {
         params.append("startDate", startDate.toISOString());
         params.append("endDate", endDate.toISOString());
       }
-      
+
       if (userEmailFilter.trim()) {
         params.append("userEmail", userEmailFilter.trim());
       }
-      
+
       if (staffEmailFilter.trim()) {
         params.append("staffEmail", staffEmailFilter.trim());
       }
@@ -67,7 +68,11 @@ const ManageBooking = () => {
       setBookings(result.data);
       setTotalPages(result.pagination.pages);
     } catch (err) {
-      Swal.fire("Lỗi", err.message || "Không thể tải danh sách booking", "error");
+      Swal.fire(
+        "Lỗi",
+        err.message || "Không thể tải danh sách booking",
+        "error"
+      );
     } finally {
       setLoading(false);
     }
@@ -75,29 +80,38 @@ const ManageBooking = () => {
 
   useEffect(() => {
     fetchBookings();
-  }, [page, startDate, endDate, userEmailFilter, staffEmailFilter, statusFilter]);
+  }, [
+    page,
+    startDate,
+    endDate,
+    userEmailFilter,
+    staffEmailFilter,
+    statusFilter,
+  ]);
 
   const getStatusClass = (status) => {
     switch (status?.toLowerCase()) {
-      case 'confirmed':
-        return 'status-badge status-confirmed';
-      case 'pending':
-        return 'status-badge status-pending';
-      case 'cancelled':
-        return 'status-badge status-cancelled';
+      case "confirmed":
+        return "status-badge status-confirmed";
+      case "pending":
+        return "status-badge status-pending";
+      case "cancelled":
+        return "status-badge status-cancelled";
       default:
-        return 'status-badge status-pending';
+        return "status-badge status-pending";
     }
   };
 
   const getStatusLabel = (status) => {
     switch (status?.toLowerCase()) {
-      case 'confirmed':
-        return 'Đã xác nhận';
-      case 'pending':
-        return 'Chờ xác nhận';
-      case 'cancelled':
-        return 'Đã hủy';
+      case "confirmed":
+        return "Đã xác nhận đặt cọc";
+      case "pending":
+        return "Chờ xác nhận";
+      case "cancelled":
+        return "Đã hủy";
+      case "completed":
+        return "Đã hoàn thành";
       default:
         return status;
     }
@@ -106,7 +120,7 @@ const ManageBooking = () => {
   return (
     <div className="manage-booking-container">
       <h3>📄 Danh sách đặt tour</h3>
-      
+
       <div className="filter-section">
         <div className="filter-controls">
           <div className="date-range">
@@ -129,7 +143,7 @@ const ManageBooking = () => {
               />
             </div>
           </div>
-          
+
           <div className="email-input-group">
             <label>Email người dùng:</label>
             <input

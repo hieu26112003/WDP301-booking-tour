@@ -1,4 +1,3 @@
-// ResetPasswordConfirm.js
 import React, { useState } from "react";
 import { Container, Row, Col, Form, FormGroup, Button } from "reactstrap";
 import "../../styles/reset-password-confirm.css";
@@ -9,37 +8,71 @@ import userIcon from "../../assets/images/user.png";
 import Swal from "sweetalert2";
 import { BASE_URL } from "../../utils/config";
 
+// Regex để xác thực mật khẩu
+const passwordRegex = /^(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/;
+
 const ResetPasswordConfirm = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [errors, setErrors] = useState({
+    newPassword: "",
+    confirmPassword: "",
+  });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { token } = useParams();
   const navigate = useNavigate();
 
+  const validateInputs = () => {
+    let isValid = true;
+    const newErrors = { newPassword: "", confirmPassword: "" };
+
+    // Xác thực newPassword
+    if (!newPassword) {
+      newErrors.newPassword = "Mật khẩu mới là bắt buộc";
+      isValid = false;
+    } else if (!passwordRegex.test(newPassword)) {
+      newErrors.newPassword =
+        "Mật khẩu phải có ít nhất 8 ký tự và chứa ít nhất 1 ký tự đặc biệt (VD: @, #, $, v.v.)";
+      isValid = false;
+    } else if (newPassword.length > 255) {
+      newErrors.newPassword = "Mật khẩu không được vượt quá 255 ký tự";
+      isValid = false;
+    }
+
+    // Xác thực confirmPassword
+    if (!confirmPassword) {
+      newErrors.confirmPassword = "Xác nhận mật khẩu là bắt buộc";
+      isValid = false;
+    } else if (newPassword !== confirmPassword) {
+      newErrors.confirmPassword = "Mật khẩu xác nhận không khớp";
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
+  const handleNewPasswordChange = (e) => {
+    setNewPassword(e.target.value);
+    setErrors((prev) => ({ ...prev, newPassword: "" }));
+  };
+
+  const handleConfirmPasswordChange = (e) => {
+    setConfirmPassword(e.target.value);
+    setErrors((prev) => ({ ...prev, confirmPassword: "" }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
 
-    if (newPassword !== confirmPassword) {
-      Swal.fire({
-        icon: "error",
-        title: "Lỗi",
-        text: "Mật khẩu xác nhận không khớp",
-        confirmButtonColor: "#d33",
-        backdrop: true,
-        allowOutsideClick: true,
-        customClass: {
-          popup: "custom-swal-popup",
-          title: "custom-swal-title",
-          content: "custom-swal-content",
-          confirmButton: "custom-swal-confirm",
-        },
-      });
+    if (!validateInputs()) {
       setIsLoading(false);
       return;
     }
+
+    setIsLoading(true);
 
     try {
       const res = await fetch(`${BASE_URL}/auth/reset-password/confirm`, {
@@ -51,10 +84,17 @@ const ResetPasswordConfirm = () => {
       const result = await res.json();
 
       if (!res.ok) {
+        let errorMessage = result.message;
+        if (result.message.includes("Mật khẩu")) {
+          setErrors((prev) => ({ ...prev, newPassword: result.message }));
+        } else {
+          errorMessage = result.message || "Đặt lại mật khẩu thất bại";
+        }
+
         Swal.fire({
           icon: "error",
           title: "Lỗi",
-          text: result.message,
+          text: errorMessage,
           confirmButtonColor: "#d33",
           backdrop: true,
           allowOutsideClick: true,
@@ -84,8 +124,7 @@ const ResetPasswordConfirm = () => {
           content: "custom-swal-content",
         },
         willClose: () => {
-          console.log("Success message closed");
-          document.body.style.overflow = "auto"; // Khôi phục cuộn
+          document.body.style.overflow = "auto";
         },
       }).then(() => {
         setIsLoading(false);
@@ -136,7 +175,7 @@ const ResetPasswordConfirm = () => {
                         placeholder="Nhập mật khẩu mới"
                         id="newPassword"
                         value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}
+                        onChange={handleNewPasswordChange}
                         required
                       />
                       <button
@@ -151,6 +190,11 @@ const ResetPasswordConfirm = () => {
                         )}
                       </button>
                     </div>
+                    {errors.newPassword && (
+                      <span className="error__message">
+                        {errors.newPassword}
+                      </span>
+                    )}
                   </FormGroup>
                   <FormGroup className="input__group">
                     <div className="input__wrapper">
@@ -160,7 +204,7 @@ const ResetPasswordConfirm = () => {
                         placeholder="Xác nhận mật khẩu mới"
                         id="confirmPassword"
                         value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        onChange={handleConfirmPasswordChange}
                         required
                       />
                       <button
@@ -177,11 +221,18 @@ const ResetPasswordConfirm = () => {
                         )}
                       </button>
                     </div>
+                    {errors.confirmPassword && (
+                      <span className="error__message">
+                        {errors.confirmPassword}
+                      </span>
+                    )}
                   </FormGroup>
                   <Button
                     className="btn auth__btn"
                     type="submit"
-                    disabled={isLoading}
+                    disabled={
+                      isLoading || errors.newPassword || errors.confirmPassword
+                    }
                   >
                     {isLoading ? (
                       <>
