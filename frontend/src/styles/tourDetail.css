@@ -356,20 +356,45 @@
   box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
   outline: none;
 }
+.export-btn {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  font-size: 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+  transition: background-color 0.3s ease;
+}
 
+.export-btn:hover {
+  background-color: #0056b3;
+}
 .tour__booking-card p {
   font-size: 0.9rem;
   text-align: center;
   margin-bottom: 1rem;
 }
+.only-pdf {
+  display: none;
+}
 @media print {
-  img {
-    display: none !important;
-    height: 0 !important;
-    width: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
+  .only-pdf {
+    display: block;
   }
+  .no-pdf {
+    display: none !important;
+  }
+}
+.pdf-export {
+  font-family: Arial, sans-serif;
+  font-weight: normal;
+  line-height: 1.5;
+  color: #000;
+}
+.pdf-export strong, .pdf-export b {
+  font-weight: 600; /* tránh 700 hoặc 900 quá nặng */
 }
 
 /* Responsive Adjustments */

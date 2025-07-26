@@ -1,5 +1,4 @@
 /* ListTour.css */
-
 .listtour-page {
   min-height: 100vh;
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
@@ -99,38 +98,165 @@
   color: white;
 }
 
-/* Sort Box */
-.sort-box {
+/* Price Range Box */
+.price-range-box {
   display: flex;
   flex-direction: column;
 }
 
-.sort-label {
+.price-range-label {
   font-weight: 600;
   color: #2c3e50;
   font-size: 1.1rem;
   margin-bottom: 0.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.sort-select-input {
-  padding: 12px 15px;
-  border: 2px solid #e1e8ed;
-  border-radius: 8px;
+.price-value {
+  color: #3498db;
+  font-weight: 700;
   font-size: 1rem;
-  color: #2c3e50;
-  background: white;
-  cursor: pointer;
-  transition: all 0.3s ease;
 }
 
-.sort-select-input:focus {
+.price-slider-container {
+  position: relative;
+  margin-top: 0.5rem;
+}
+
+.price-range-slider {
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  background: #e1e8ed;
   outline: none;
-  border-color: #3498db;
-  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  position: relative;
 }
 
-.sort-select-input:hover {
-  border-color: #3498db;
+/* WebKit browsers (Chrome, Safari, Edge) */
+.price-range-slider::-webkit-slider-track {
+  width: 100%;
+  height: 8px;
+  cursor: pointer;
+  background: #e1e8ed;
+  border-radius: 4px;
+}
+
+.price-range-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #3498db;
+  cursor: grab;
+  border: 3px solid white;
+  box-shadow: 0 2px 6px rgba(52, 152, 219, 0.3);
+  transition: all 0.2s ease;
+  position: relative;
+  z-index: 2;
+}
+
+.price-range-slider::-webkit-slider-thumb:hover {
+  background: #2980b9;
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.4);
+  cursor: grab;
+}
+
+.price-range-slider::-webkit-slider-thumb:active {
+  cursor: grabbing;
+  transform: scale(1.2);
+}
+
+/* Firefox */
+.price-range-slider::-moz-range-track {
+  width: 100%;
+  height: 8px;
+  cursor: pointer;
+  background: #e1e8ed;
+  border-radius: 4px;
+  border: none;
+}
+
+.price-range-slider::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #3498db;
+  cursor: grab;
+  border: 3px solid white;
+  box-shadow: 0 2px 6px rgba(52, 152, 219, 0.3);
+  transition: all 0.2s ease;
+}
+
+.price-range-slider::-moz-range-thumb:hover {
+  background: #2980b9;
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.4);
+  cursor: grab;
+}
+
+.price-range-slider::-moz-range-thumb:active {
+  cursor: grabbing;
+  transform: scale(1.2);
+}
+
+/* Internet Explorer */
+.price-range-slider::-ms-track {
+  width: 100%;
+  height: 8px;
+  cursor: pointer;
+  background: transparent;
+  border-color: transparent;
+  color: transparent;
+}
+
+.price-range-slider::-ms-fill-lower {
+  background: #3498db;
+  border-radius: 4px;
+}
+
+.price-range-slider::-ms-fill-upper {
+  background: #e1e8ed;
+  border-radius: 4px;
+}
+
+.price-range-slider::-ms-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #3498db;
+  cursor: grab;
+  border: 3px solid white;
+  box-shadow: 0 2px 6px rgba(52, 152, 219, 0.3);
+}
+
+/* Add visual progress fill */
+.price-slider-container::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  height: 8px;
+  background: linear-gradient(90deg, #3498db, #2980b9);
+  border-radius: 4px;
+  width: calc(var(--progress) * 1%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.price-range-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: #7f8c8d;
 }
 
 /* Results Info */
@@ -256,6 +382,63 @@
   transition: transform 0.3s ease;
 }
 
+/* Pagination Styles */
+.pagination-container {
+  margin-top: 2rem;
+  text-align: center;
+}
+
+.pagination-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-bottom: 1rem;
+}
+
+.pagination-btn {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #dee2e6;
+  background-color: white;
+  color: #007bff;
+  cursor: pointer;
+  border-radius: 0.25rem;
+  transition: all 0.2s;
+  min-width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pagination-btn:hover:not(.disabled):not(.dots) {
+  background-color: #e9ecef;
+  border-color: #adb5bd;
+}
+
+.pagination-btn.active {
+  background-color: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+.pagination-btn.disabled {
+  color: #6c757d;
+  cursor: not-allowed;
+  background-color: #f8f9fa;
+}
+
+.pagination-btn.dots {
+  cursor: default;
+  background-color: transparent;
+  border: none;
+  color: #6c757d;
+}
+
+.page-info {
+  color: #666;
+  font-size: 0.9rem;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .listtour-page {
@@ -278,6 +461,17 @@
   .listtour-empty {
     margin: 1rem 0;
     padding: 1.5rem;
+  }
+
+  .pagination-wrapper {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .pagination-btn {
+    min-width: 35px;
+    height: 35px;
+    padding: 0.25rem 0.5rem;
   }
 }
 
@@ -309,18 +503,23 @@
 .row .col-lg-4:nth-child(1) {
   animation-delay: 0.1s;
 }
+
 .row .col-lg-4:nth-child(2) {
   animation-delay: 0.2s;
 }
+
 .row .col-lg-4:nth-child(3) {
   animation-delay: 0.3s;
 }
+
 .row .col-lg-4:nth-child(4) {
   animation-delay: 0.4s;
 }
+
 .row .col-lg-4:nth-child(5) {
   animation-delay: 0.5s;
 }
+
 .row .col-lg-4:nth-child(6) {
   animation-delay: 0.6s;
 }
@@ -337,4 +536,21 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 15px;
+}
+
+/* Update responsive design for price range */
+@media (max-width: 768px) {
+  .price-range-label {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+
+  .price-value {
+    font-size: 0.9rem;
+  }
+
+  .price-range-labels {
+    font-size: 0.8rem;
+  }
 }

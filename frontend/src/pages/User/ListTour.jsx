@@ -6,13 +6,17 @@ import { useParams } from "react-router-dom"
 import axios from "axios"
 import TourCard from "../../shared/TourCard"
 import { BASE_URL } from "../../utils/config"
-import { FaSearch, FaTimes } from "react-icons/fa"
+import { FaSearch, FaTimes, FaChevronLeft, FaChevronRight } from "react-icons/fa"
 import "./ListTour.css"
+
+const TOURS_PER_PAGE = 6
 
 const ListTour = () => {
   const [originalTours, setOriginalTours] = useState([])
-  const [tours, setTours] = useState([])
-  const [sortOrder, setSortOrder] = useState("") // asc | desc
+  const [filteredTours, setFilteredTours] = useState([])
+  const [currentPage, setCurrentPage] = useState(1)
+  const [priceRange, setPriceRange] = useState(10000000) // Default max price 10 million VND
+  const [maxPrice, setMaxPrice] = useState(10000000) // Track the maximum price from tours
   const [searchTerm, setSearchTerm] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -30,7 +34,15 @@ const ListTour = () => {
         if (res.data?.success) {
           const tourData = res.data.data || []
           setOriginalTours(tourData)
-          setTours(tourData)
+          setFilteredTours(tourData)
+
+          // Calculate max price from tours
+          if (tourData.length > 0) {
+            const maxTourPrice = Math.max(...tourData.map((tour) => tour.priceAdult || 0))
+            const adjustedMaxPrice = maxTourPrice + 500000 // Add 500,000 VND
+            setMaxPrice(adjustedMaxPrice)
+            setPriceRange(adjustedMaxPrice) // Set initial range to max
+          }
         } else {
           setError("Không lấy được danh sách tour")
         }
@@ -43,7 +55,7 @@ const ListTour = () => {
     fetchTours()
   }, [slug])
 
-  // Filter and sort tours
+  // Filter tours by search term and price range
   useEffect(() => {
     let filtered = [...originalTours]
 
@@ -52,18 +64,65 @@ const ListTour = () => {
       filtered = filtered.filter((tour) => tour.title?.toLowerCase().includes(searchTerm.toLowerCase().trim()))
     }
 
-    // Sort by price
-    if (sortOrder === "asc") {
-      filtered.sort((a, b) => a.priceAdult - b.priceAdult)
-    } else if (sortOrder === "desc") {
-      filtered.sort((a, b) => b.priceAdult - a.priceAdult)
-    }
+    // Filter by price range
+    filtered = filtered.filter((tour) => (tour.priceAdult || 0) <= priceRange)
 
-    setTours(filtered)
-  }, [sortOrder, originalTours, searchTerm])
+    setFilteredTours(filtered)
+    setCurrentPage(1) // Reset to first page when filtering
+  }, [priceRange, originalTours, searchTerm])
 
   const clearSearch = () => {
     setSearchTerm("")
+  }
+
+  // Calculate pagination
+  const totalPages = Math.ceil(filteredTours.length / TOURS_PER_PAGE)
+  const startIndex = (currentPage - 1) * TOURS_PER_PAGE
+  const endIndex = startIndex + TOURS_PER_PAGE
+  const currentTours = filteredTours.slice(startIndex, endIndex)
+
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page)
+      // Scroll to top when changing pages
+      window.scrollTo({ top: 0, behavior: "smooth" })
+    }
+  }
+
+  // Generate page numbers for pagination
+  const getPageNumbers = () => {
+    const pages = []
+    const maxVisiblePages = 5
+
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i)
+      }
+    } else {
+      if (currentPage <= 3) {
+        for (let i = 1; i <= 4; i++) {
+          pages.push(i)
+        }
+        pages.push("...")
+        pages.push(totalPages)
+      } else if (currentPage >= totalPages - 2) {
+        pages.push(1)
+        pages.push("...")
+        for (let i = totalPages - 3; i <= totalPages; i++) {
+          pages.push(i)
+        }
+      } else {
+        pages.push(1)
+        pages.push("...")
+        for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+          pages.push(i)
+        }
+        pages.push("...")
+        pages.push(totalPages)
+      }
+    }
+
+    return pages
   }
 
   return (
@@ -98,43 +157,54 @@ const ListTour = () => {
             </InputGroup>
           </div>
 
-          {/* Sort Box */}
-          <div className="sort-box">
-            <label htmlFor="sort" className="sort-label">
-              Sắp xếp theo giá:
+          {/* Price Range Box */}
+          <div className="price-range-box">
+            <label htmlFor="priceRange" className="price-range-label">
+              Lọc theo giá tối đa: <span className="price-value">{priceRange.toLocaleString("vi-VN")} VNĐ</span>
             </label>
-            <select
-              id="sort"
-              value={sortOrder}
-              onChange={(e) => setSortOrder(e.target.value)}
-              className="sort-select-input"
-            >
-              <option value="">-- Chọn --</option>
-              <option value="asc">Giá tăng dần</option>
-              <option value="desc">Giá giảm dần</option>
-            </select>
+            <div className="price-slider-container">
+              <input
+                id="priceRange"
+                type="range"
+                min="0"
+                max={maxPrice}
+                step="100000"
+                value={priceRange}
+                onChange={(e) => setPriceRange(Number.parseInt(e.target.value))}
+                className="price-range-slider"
+                style={{
+                  "--progress": maxPrice > 0 ? (priceRange / maxPrice) * 100 : 0,
+                }}
+              />
+              <div className="price-range-labels">
+                <span>0 VNĐ</span>
+                <span>{maxPrice.toLocaleString("vi-VN")} VNĐ</span>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Results Info */}
-        {!loading && (
+        {/* Results Info - Only show when searching */}
+        {!loading && searchTerm && (
           <div className="results-info">
-            {searchTerm ? (
-              <p>
-                Tìm thấy <strong>{tours.length}</strong> tour cho từ khóa "{searchTerm}"
-              </p>
-            ) : (
-              <p>
-                Hiển thị <strong>{tours.length}</strong> tour
-              </p>
-            )}
+            <p>
+              Tìm thấy <strong>{filteredTours.length}</strong> tour cho từ khóa "{searchTerm}"
+            </p>
           </div>
         )}
 
+        {/* Loading */}
         {loading && <div className="listtour-loading">Đang tải...</div>}
+
+        {/* Error */}
         {error && <div className="listtour-error">{error}</div>}
-        {!loading && tours.length === 0 && !searchTerm && <div className="listtour-empty">Chưa có tour nào.</div>}
-        {!loading && tours.length === 0 && searchTerm && (
+
+        {/* Empty States */}
+        {!loading && filteredTours.length === 0 && !searchTerm && (
+          <div className="listtour-empty">Chưa có tour nào.</div>
+        )}
+
+        {!loading && filteredTours.length === 0 && searchTerm && (
           <div className="listtour-empty">
             Không tìm thấy tour nào với từ khóa "{searchTerm}".
             <button onClick={clearSearch} className="clear-search-btn">
@@ -143,13 +213,66 @@ const ListTour = () => {
           </div>
         )}
 
-        <Row>
-          {tours.map((tour) => (
-            <Col lg="4" md="6" sm="6" className="mb-4" key={tour._id}>
-              <TourCard tour={tour} />
-            </Col>
-          ))}
-        </Row>
+        {/* Tours Grid */}
+        {!loading && currentTours.length > 0 && (
+          <>
+            <Row>
+              {currentTours.map((tour) => (
+                <Col lg="4" md="6" sm="6" className="mb-4" key={tour._id}>
+                  <TourCard tour={tour} />
+                </Col>
+              ))}
+            </Row>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="pagination-container">
+                <div className="pagination-wrapper">
+                  {/* Previous Button */}
+                  <button
+                    className={`pagination-btn ${currentPage === 1 ? "disabled" : ""}`}
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                  >
+                    <FaChevronLeft />
+                  </button>
+
+                  {/* Page Numbers */}
+                  {getPageNumbers().map((page, index) => (
+                    <button
+                      key={index}
+                      className={`pagination-btn ${page === currentPage ? "active" : ""} ${page === "..." ? "dots" : ""}`}
+                      onClick={() => page !== "..." && handlePageChange(page)}
+                      disabled={page === "..."}
+                    >
+                      {page}
+                    </button>
+                  ))}
+
+                  {/* Next Button */}
+                  <button
+                    className={`pagination-btn ${currentPage === totalPages ? "disabled" : ""}`}
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                  >
+                    <FaChevronRight />
+                  </button>
+                </div>
+
+                {/* Page Info */}
+                <div className="page-info">
+                  Trang {currentPage} / {totalPages}
+                  {!searchTerm && (
+                    <span>
+                      {" "}
+                      - Hiển thị {currentTours.length} / {filteredTours.length} tour
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
+          </>
+        )}
       </Container>
     </div>
   )
