@@ -287,7 +287,6 @@ const StaffBookings = () => {
                   <th>Doanh Thu</th>
                   <th>Trạng Thái</th>
                   <th>Ngày Đặt</th>
-                  <th>Hành Động</th>
                 </tr>
               </thead>
               <tbody>
@@ -328,27 +327,6 @@ const StaffBookings = () => {
                     </td>
                     <td>
                       {new Date(booking.createdAt).toLocaleDateString("vi-VN")}
-                    </td>
-                    <td>
-                      <Button
-                        color="primary"
-                        size="sm"
-                        onClick={() =>
-                          navigate(`/tours/${booking.tourId?._id}`)
-                        }
-                        className="me-2"
-                      >
-                        Xem Tour
-                      </Button>
-                      {canCancelBooking(booking) && (
-                        <Button
-                          color="danger"
-                          size="sm"
-                          onClick={() => handleCancelBooking(booking._id)}
-                        >
-                          Hủy
-                        </Button>
-                      )}
                     </td>
                   </tr>
                 ))}
