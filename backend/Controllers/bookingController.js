@@ -72,8 +72,8 @@ export const createBooking = async (req, res) => {
           )} đồng</p>
           <p>Thông tin thanh toán:</p>
           <ul>
-            <li><strong>Chuyển khoản ngân hàng:</strong> Vietcombank, STK: 123456789, Chủ tài khoản: Công ty Du lịch XYZ</li>
-            <li><strong>Tiền mặt:</strong> Tại văn phòng, địa chỉ: 123 Đường ABC, Quận 1, TP.HCM</li>
+            <li><strong>Chuyển khoản ngân hàng:</strong> Vietcombank, STK: 123456789, Chủ tài khoản: Công ty Du lịch Viet travel</li>
+            <li><strong>Tiền mặt:</strong> Tại văn phòng, địa chỉ: Đại học FPT, Thạch Thất, Hà Nội</li>
             <li><strong>Ví MoMo/ZaloPay:</strong> Số điện thoại: 0901234567</li>
           </ul>
           <p>Chúng tôi sẽ liên hệ để xác nhận và hướng dẫn thêm. Nếu có thắc mắc, vui lòng gọi <strong>1900 1234</strong>.</p>
