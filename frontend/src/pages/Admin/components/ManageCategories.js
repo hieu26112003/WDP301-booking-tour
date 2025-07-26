@@ -24,15 +24,24 @@ const ManageCategories = () => {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    slug: "", // Added slug to formData
     isActive: true,
+  });
+  const [errors, setErrors] = useState({
+    name: "",
+    description: "",
   });
   const [editId, setEditId] = useState(null);
   const [modal, setModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const toggleModal = () => {
-    if (!isLoading) setModal(!modal);
+    if (!isLoading) {
+      setModal(!modal);
+      if (!modal) {
+        // Reset errors when opening modal
+        setErrors({ name: "", description: "" });
+      }
+    }
   };
 
   const fetchCategories = async () => {
@@ -72,17 +81,53 @@ const ManageCategories = () => {
     fetchCategories();
   }, []);
 
+  const validateInputs = () => {
+    let isValid = true;
+    const newErrors = { name: "", description: "" };
+
+    // Xác thực name
+    if (!formData.name) {
+      newErrors.name = "Tên danh mục là bắt buộc";
+      isValid = false;
+    } else if (formData.name.length > 100) {
+      newErrors.name = "Tên danh mục không được vượt quá 100 ký tự";
+      isValid = false;
+    }
+
+    // Xác thực description
+    if (!formData.description) {
+      newErrors.description = "Mô tả là bắt buộc";
+      isValid = false;
+    } else if (formData.description.length > 500) {
+      newErrors.description = "Mô tả không được vượt quá 500 ký tự";
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
+    const newValue = type === "checkbox" ? checked : value;
+
     setFormData((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: newValue,
     }));
+    // Xóa lỗi khi người dùng nhập lại
+    setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+
+    if (!validateInputs()) {
+      setIsLoading(false);
+      return;
+    }
+
     const accessToken = localStorage.getItem("accessToken");
     try {
       let res;
@@ -107,7 +152,16 @@ const ManageCategories = () => {
       }
 
       const result = await res.json();
-      if (!res.ok) throw new Error(result.message || "Không thể lưu danh mục");
+      if (!res.ok) {
+        let errorMessage = result.message || "Không thể lưu danh mục";
+        if (result.message.includes("name")) {
+          setErrors((prev) => ({ ...prev, name: "Tên danh mục đã tồn tại" }));
+        } else {
+          errorMessage = result.message;
+        }
+
+        throw new Error(errorMessage);
+      }
 
       Swal.fire({
         icon: "success",
@@ -126,8 +180,9 @@ const ManageCategories = () => {
           document.body.style.overflow = "auto";
         },
       }).then(() => {
-        setFormData({ name: "", description: "", slug: "", isActive: true }); // Reset slug in formData
+        setFormData({ name: "", description: "", isActive: true });
         setEditId(null);
+        setErrors({ name: "", description: "" });
         toggleModal();
         fetchCategories();
       });
@@ -158,9 +213,9 @@ const ManageCategories = () => {
     setFormData({
       name: category.name,
       description: category.description,
-      slug: category.slug, // Include slug when editing
       isActive: category.isActive,
     });
+    setErrors({ name: "", description: "" });
     setEditId(category._id);
     toggleModal();
   };
@@ -197,12 +252,11 @@ const ManageCategories = () => {
           },
         });
         const result = await res.json();
-        console.log("Delete category response:", result);
 
         if (!res.ok) {
           const errorMessage =
             result.message ===
-              "Cannot delete category because it has associated tours"
+            "Cannot delete category because it has associated tours"
               ? "Không thể xóa danh mục vì có các tour liên quan"
               : result.message || "Không thể xóa danh mục";
           throw new Error(errorMessage);
@@ -252,7 +306,8 @@ const ManageCategories = () => {
   };
 
   const handleAddNew = () => {
-    setFormData({ name: "", description: "", slug: "", isActive: true }); // Reset slug for new category
+    setFormData({ name: "", description: "", isActive: true });
+    setErrors({ name: "", description: "" });
     setEditId(null);
     toggleModal();
   };
@@ -276,35 +331,43 @@ const ManageCategories = () => {
 
             <Modal isOpen={modal} toggle={toggleModal}>
               <ModalHeader toggle={toggleModal}>
-                {editId ? "Update Category" : "Create Category"}
+                {editId ? "Cập Nhật Danh Mục" : "Tạo Danh Mục"}
               </ModalHeader>
               <ModalBody>
                 <Form onSubmit={handleSubmit}>
                   <FormGroup>
-                    <Label for="name">Tiêu đề</Label>
+                    <Label for="name">Tên Danh Mục</Label>
                     <Input
                       type="text"
                       id="name"
                       name="name"
-                      placeholder="Category Name"
+                      placeholder="Nhập tên danh mục"
                       value={formData.name}
                       onChange={handleChange}
                       required
                       disabled={isLoading}
                     />
+                    {errors.name && (
+                      <span className="error__message">{errors.name}</span>
+                    )}
                   </FormGroup>
                   <FormGroup>
-                    <Label for="description">Miêu tả</Label>
+                    <Label for="description">Mô Tả</Label>
                     <Input
                       type="textarea"
                       id="description"
                       name="description"
-                      placeholder="Category Description"
+                      placeholder="Nhập mô tả danh mục"
                       value={formData.description}
                       onChange={handleChange}
                       required
                       disabled={isLoading}
                     />
+                    {errors.description && (
+                      <span className="error__message">
+                        {errors.description}
+                      </span>
+                    )}
                   </FormGroup>
                   <FormGroup check>
                     <Label check>
@@ -325,9 +388,9 @@ const ManageCategories = () => {
                 <Button
                   color="primary"
                   onClick={handleSubmit}
-                  disabled={isLoading}
+                  disabled={isLoading || errors.name || errors.description}
                 >
-                  {editId ? "Update" : "Create"}
+                  {editId ? "Cập Nhật" : "Tạo"}
                 </Button>{" "}
                 <Button
                   color="secondary"
@@ -342,9 +405,8 @@ const ManageCategories = () => {
             <Table striped>
               <thead>
                 <tr>
-                  <th>Tiêu Đề</th>
-                   {/* Added Slug column */}
-                  <th>Miêu Tả</th>
+                  <th>Tên Danh Mục</th>
+                  <th>Mô Tả</th>
                   <th>Trạng Thái</th>
                   <th>Hành Động</th>
                 </tr>
@@ -353,7 +415,6 @@ const ManageCategories = () => {
                 {categories.map((category) => (
                   <tr key={category._id}>
                     <td>{category.name}</td>
-                     {/* Display slug */}
                     <td className="description-content">
                       {category.description}
                     </td>

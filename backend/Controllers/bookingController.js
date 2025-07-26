@@ -362,12 +362,20 @@ export const getUserBookings = async (req, res) => {
 
 export const getAllBookingsforAdmin = async (req, res) => {
   try {
-    const { page = 1, limit = 10, startDate, endDate, userEmail, staffEmail, status } = req.query;
-    
-    console.log("Received status filter:", status); // Debug
-    
+    const {
+      page = 1,
+      limit = 10,
+      startDate,
+      endDate,
+      userEmail,
+      staffEmail,
+      status,
+    } = req.query;
+
+    console.log("Received status filter:", status);
+
     const query = {};
-    
+
     // Lọc theo ngày
     if (startDate && endDate) {
       query.createdAt = {
@@ -377,7 +385,7 @@ export const getAllBookingsforAdmin = async (req, res) => {
     }
 
     // Lọc theo trạng thái - Sửa lại cho đúng
-    if (status && status !== 'all') {
+    if (status && status !== "all") {
       query.status = status.toLowerCase(); // Đảm bảo viết thường
       console.log("Status filter applied:", query.status); // Debug
     }
@@ -392,8 +400,8 @@ export const getAllBookingsforAdmin = async (req, res) => {
         select: "title staffId",
         populate: {
           path: "staffId",
-          select: "email"
-        }
+          select: "email",
+        },
       })
       .sort({ createdAt: -1 });
 
@@ -401,20 +409,20 @@ export const getAllBookingsforAdmin = async (req, res) => {
 
     // Lọc theo email user và staff email
     let filteredBookings = allBookings;
-    
+
     // Lọc theo user email
     if (userEmail) {
       const userKeyword = userEmail.toLowerCase();
-      filteredBookings = filteredBookings.filter(
-        (b) => b.userId?.email?.toLowerCase().includes(userKeyword)
+      filteredBookings = filteredBookings.filter((b) =>
+        b.userId?.email?.toLowerCase().includes(userKeyword)
       );
     }
 
     // Lọc theo staff email
     if (staffEmail) {
       const staffKeyword = staffEmail.toLowerCase();
-      filteredBookings = filteredBookings.filter(
-        (b) => b.tourId?.staffId?.email?.toLowerCase().includes(staffKeyword)
+      filteredBookings = filteredBookings.filter((b) =>
+        b.tourId?.staffId?.email?.toLowerCase().includes(staffKeyword)
       );
     }
 

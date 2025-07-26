@@ -25,6 +25,6 @@ router.get("/all", verifyStaff, getAllBookings);
 
 router.get("/", verifyUser, getUserBookings);
 
-router.get("/allbooking",verifyAdmin, getAllBookingsforAdmin);
+router.get("/allbooking", getAllBookingsforAdmin);
 
 export default router;
