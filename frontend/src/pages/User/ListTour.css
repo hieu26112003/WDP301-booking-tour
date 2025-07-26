@@ -1,78 +1,556 @@
 /* ListTour.css */
-
-/* Toàn bộ trang */
 .listtour-page {
-  padding: 40px 0;
-  background-color: #f9f9f9;
   min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: 2rem 0;
 }
 
-/* Tiêu đề */
 .listtour-heading {
-  font-size: 2rem;
+  text-align: center;
+  color: #2c3e50;
+  font-size: 2.5rem;
   font-weight: 700;
-  text-align: center;
-  color: #333;
-  margin-bottom: 30px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+  margin-bottom: 2rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: relative;
 }
 
-/* Trạng thái loading */
-.listtour-loading,
-.listtour-error,
-.listtour-empty {
-  text-align: center;
-  font-size: 1.1rem;
-  padding: 20px;
-  color: #555;
+.listtour-heading::after {
+  content: "";
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(90deg, #3498db, #2980b9);
+  border-radius: 2px;
 }
 
-.listtour-sort {
+/* Filter Section */
+.filter-section {
+  background: white;
+  padding: 2rem;
+  border-radius: 15px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e1e8ed;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2rem;
+  align-items: end;
+}
+
+/* Search Box */
+.search-box {
   display: flex;
-  align-items: center;
-  font-weight: 500;
+  flex-direction: column;
 }
 
-
-/* Loading animation */
-.listtour-loading {
-  color: #007bff;
-  font-weight: 500;
-  animation: pulse 1.5s infinite;
+.search-label {
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
 }
 
-@keyframes pulse {
-  0% { opacity: 0.6; }
-  50% { opacity: 1; }
-  100% { opacity: 0.6; }
+.search-input-group {
+  position: relative;
 }
 
-/* Khi không có tour */
-.listtour-empty {
-  color: #999;
-  font-style: italic;
+.search-input-group .search-icon {
+  background: #f8f9fa;
+  border: 2px solid #e1e8ed;
+  border-right: none;
+  color: #6c757d;
 }
 
-/* Lỗi */
-.listtour-error {
+.search-input {
+  border: 2px solid #e1e8ed;
+  border-left: none;
+  border-right: none;
+  font-size: 1rem;
+  padding: 12px 15px;
+  transition: all 0.3s ease;
+}
+
+.search-input:focus {
+  border-color: #3498db;
+  box-shadow: none;
+}
+
+.search-input-group:focus-within .search-icon {
+  border-color: #3498db;
+  background: #e3f2fd;
+  color: #3498db;
+}
+
+.clear-search {
+  background: #f8f9fa;
+  border: 2px solid #e1e8ed;
+  border-left: none;
   color: #dc3545;
-  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
-/* Card container */
-.row {
-  margin-left: -15px;
-  margin-right: -15px;
+.clear-search:hover {
+  background: #dc3545;
+  color: white;
 }
 
-.mb-4 {
+/* Price Range Box */
+.price-range-box {
+  display: flex;
+  flex-direction: column;
+}
+
+.price-range-label {
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.price-value {
+  color: #3498db;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.price-slider-container {
+  position: relative;
+  margin-top: 0.5rem;
+}
+
+.price-range-slider {
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  background: #e1e8ed;
+  outline: none;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  position: relative;
+}
+
+/* WebKit browsers (Chrome, Safari, Edge) */
+.price-range-slider::-webkit-slider-track {
+  width: 100%;
+  height: 8px;
+  cursor: pointer;
+  background: #e1e8ed;
+  border-radius: 4px;
+}
+
+.price-range-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #3498db;
+  cursor: grab;
+  border: 3px solid white;
+  box-shadow: 0 2px 6px rgba(52, 152, 219, 0.3);
+  transition: all 0.2s ease;
+  position: relative;
+  z-index: 2;
+}
+
+.price-range-slider::-webkit-slider-thumb:hover {
+  background: #2980b9;
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.4);
+  cursor: grab;
+}
+
+.price-range-slider::-webkit-slider-thumb:active {
+  cursor: grabbing;
+  transform: scale(1.2);
+}
+
+/* Firefox */
+.price-range-slider::-moz-range-track {
+  width: 100%;
+  height: 8px;
+  cursor: pointer;
+  background: #e1e8ed;
+  border-radius: 4px;
+  border: none;
+}
+
+.price-range-slider::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #3498db;
+  cursor: grab;
+  border: 3px solid white;
+  box-shadow: 0 2px 6px rgba(52, 152, 219, 0.3);
+  transition: all 0.2s ease;
+}
+
+.price-range-slider::-moz-range-thumb:hover {
+  background: #2980b9;
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.4);
+  cursor: grab;
+}
+
+.price-range-slider::-moz-range-thumb:active {
+  cursor: grabbing;
+  transform: scale(1.2);
+}
+
+/* Internet Explorer */
+.price-range-slider::-ms-track {
+  width: 100%;
+  height: 8px;
+  cursor: pointer;
+  background: transparent;
+  border-color: transparent;
+  color: transparent;
+}
+
+.price-range-slider::-ms-fill-lower {
+  background: #3498db;
+  border-radius: 4px;
+}
+
+.price-range-slider::-ms-fill-upper {
+  background: #e1e8ed;
+  border-radius: 4px;
+}
+
+.price-range-slider::-ms-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #3498db;
+  cursor: grab;
+  border: 3px solid white;
+  box-shadow: 0 2px 6px rgba(52, 152, 219, 0.3);
+}
+
+/* Add visual progress fill */
+.price-slider-container::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  height: 8px;
+  background: linear-gradient(90deg, #3498db, #2980b9);
+  border-radius: 4px;
+  width: calc(var(--progress) * 1%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.price-range-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: #7f8c8d;
+}
+
+/* Results Info */
+.results-info {
+  background: #e8f4fd;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  border-left: 4px solid #3498db;
   margin-bottom: 1.5rem;
 }
 
-/* Responsive */
+.results-info p {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 1rem;
+}
+
+/* Loading State */
+.listtour-loading {
+  text-align: center;
+  padding: 3rem;
+  font-size: 1.2rem;
+  color: #7f8c8d;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  margin: 2rem 0;
+}
+
+.listtour-loading::before {
+  content: "";
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid #e1e8ed;
+  border-top: 3px solid #3498db;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-right: 10px;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Error State */
+.listtour-error {
+  text-align: center;
+  padding: 2rem;
+  background: #fff5f5;
+  border: 1px solid #fed7d7;
+  border-radius: 12px;
+  color: #e53e3e;
+  font-size: 1.1rem;
+  margin: 2rem 0;
+  box-shadow: 0 4px 15px rgba(229, 62, 62, 0.1);
+}
+
+.listtour-error::before {
+  content: "⚠️";
+  font-size: 1.5rem;
+  margin-right: 10px;
+}
+
+/* Empty State */
+.listtour-empty {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  color: #7f8c8d;
+  font-size: 1.2rem;
+  margin: 2rem 0;
+}
+
+.listtour-empty::before {
+  content: "🔍";
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.clear-search-btn {
+  display: block;
+  margin: 1rem auto 0;
+  padding: 0.5rem 1rem;
+  background: #3498db;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.3s ease;
+}
+
+.clear-search-btn:hover {
+  background: #2980b9;
+}
+
+/* Tour Cards Container */
+.row {
+  margin: 0 -15px;
+}
+
+.row .col-lg-4,
+.row .col-md-6,
+.row .col-sm-6 {
+  padding: 0 15px;
+  margin-bottom: 2rem;
+}
+
+/* Tour Card Hover Effects */
+.row .col-lg-4:hover,
+.row .col-md-6:hover,
+.row .col-sm-6:hover {
+  transform: translateY(-5px);
+  transition: transform 0.3s ease;
+}
+
+/* Pagination Styles */
+.pagination-container {
+  margin-top: 2rem;
+  text-align: center;
+}
+
+.pagination-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-bottom: 1rem;
+}
+
+.pagination-btn {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #dee2e6;
+  background-color: white;
+  color: #007bff;
+  cursor: pointer;
+  border-radius: 0.25rem;
+  transition: all 0.2s;
+  min-width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pagination-btn:hover:not(.disabled):not(.dots) {
+  background-color: #e9ecef;
+  border-color: #adb5bd;
+}
+
+.pagination-btn.active {
+  background-color: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+.pagination-btn.disabled {
+  color: #6c757d;
+  cursor: not-allowed;
+  background-color: #f8f9fa;
+}
+
+.pagination-btn.dots {
+  cursor: default;
+  background-color: transparent;
+  border: none;
+  color: #6c757d;
+}
+
+.page-info {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+/* Responsive Design */
 @media (max-width: 768px) {
+  .listtour-page {
+    padding: 1rem 0;
+  }
+
   .listtour-heading {
-    font-size: 1.6rem;
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .filter-section {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    padding: 1.5rem;
+  }
+
+  .listtour-loading,
+  .listtour-error,
+  .listtour-empty {
+    margin: 1rem 0;
+    padding: 1.5rem;
+  }
+
+  .pagination-wrapper {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .pagination-btn {
+    min-width: 35px;
+    height: 35px;
+    padding: 0.25rem 0.5rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .listtour-heading {
+    font-size: 1.8rem;
+  }
+
+  .filter-section {
+    padding: 1rem;
+  }
+
+  .row .col-lg-4,
+  .row .col-md-6,
+  .row .col-sm-6 {
+    margin-bottom: 1.5rem;
+  }
+}
+
+/* Animation for tour cards */
+.row .col-lg-4,
+.row .col-md-6,
+.row .col-sm-6 {
+  animation: fadeInUp 0.6s ease forwards;
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.row .col-lg-4:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.row .col-lg-4:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.row .col-lg-4:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.row .col-lg-4:nth-child(4) {
+  animation-delay: 0.4s;
+}
+
+.row .col-lg-4:nth-child(5) {
+  animation-delay: 0.5s;
+}
+
+.row .col-lg-4:nth-child(6) {
+  animation-delay: 0.6s;
+}
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Container styling */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 15px;
+}
+
+/* Update responsive design for price range */
+@media (max-width: 768px) {
+  .price-range-label {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+
+  .price-value {
+    font-size: 0.9rem;
+  }
+
+  .price-range-labels {
+    font-size: 0.8rem;
   }
 }

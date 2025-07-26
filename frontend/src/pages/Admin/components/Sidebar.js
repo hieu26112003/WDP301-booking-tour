@@ -14,24 +14,24 @@ import "./index.css";
 const Sidebar = () => {
   return (
     <div className="sidebar">
-      <div className="logo">Admin Panel</div>
+      <div className="logo">Admin</div>
 
       <ul>
-        <SidebarItem to="/admin" icon={<FaTachometerAlt />} label="Dashboard" />
+        <SidebarItem to="/admin" icon={<FaTachometerAlt />} label="Thống Kê" />
         <SidebarItem
           to="/admin/user"
           icon={<FaUsers />}
-          label="Manage Accounts"
+          label="Quản Lý Người Dùng"
         />
         <SidebarItem
           to="/admin/staff"
           icon={<FaUsers />}
-          label="Manage Staff"
+          label="Quản Lý Nhân Viên"
         />
         <SidebarItem
           to="/admin/booking"
           icon={<FaCalendarCheck />}
-          label="Manage Booking"
+          label="Quản Lý Đặt Tour"
         />
         {/* <SidebarItem
           to="/admin/hotels"
@@ -41,26 +41,26 @@ const Sidebar = () => {
         <SidebarItem
           to="/admin/tours"
           icon={<FaMapMarkedAlt />}
-          label="Manage Tours"
+          label="Quản Lý Tour"
         />
         <SidebarItem
-                  to="/staff/guides"
-                  icon={<FaBook />}
-                  label="Manage Guide"
-                />
+          to="/staff/guides"
+          icon={<FaBook />}
+          label="Quản Lý Cẩm Năng"
+        />
         <SidebarItem
           to="/admin/categories"
           icon={<FaTags />}
-          label="Manage Categories"
+          label="Quản Lý Danh Mục Tour"
         />
         <SidebarItem
-  to="/admin/category-guides"
-  icon={<FaBookOpen />}
-  label="Manage Guide Categories"
-/>
+          to="/admin/category-guides"
+          icon={<FaBookOpen />}
+          label="Danh Mục Hướng Dẫn"
+        />
       </ul>
 
-      <div className="footer">© 2025 Admin Dashboard</div>
+      <div className="footer">© 2025 Admin</div>
     </div>
   );
 };

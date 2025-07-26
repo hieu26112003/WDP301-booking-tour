@@ -573,7 +573,7 @@ const removeImagesFromHTML = (html) => {
 
           <Col lg="4">
             <div
-              className="tour__booking-card p-4"
+              className="tour__booking-card"
               style={{
                 backgroundColor: "#2196f3",
                 borderRadius: "10px",
