@@ -115,12 +115,26 @@ const removeImagesFromHTML = (html) => {
   setTimeout(() => {
     if (!contentRef.current) return;
 
-    // Xoá ảnh khỏi HTML
-    const cleanHTML = `
-      <h2 style="text-align: center; margin-bottom: 1rem;">Viet Travel</h2>
-      ${removeImagesFromHTML(notes || "")}
+    // Lưu nội dung gốc để restore sau khi xuất
+    const originalHTML = contentRef.current.innerHTML;
+
+    // Tạo nội dung xuất PDF (tiêu đề + cảm ơn + notes đã xóa ảnh + lời chào cuối)
+    const cleanedContent = removeImagesFromHTML(notes || "");
+    const exportHTML = `
+      <div style="text-align: center; margin-bottom: 24px;">
+        <h1 style="color: red; font-weight: bold; font-size: 28px; margin: 0;">Viet Travel</h1>
+        <p style="font-style: italic; font-size: 16px; margin: 8px 0 0;">
+          Cảm ơn bạn đã tin tưởng và lựa chọn chúng tôi!
+        </p>
+      </div>
+      ${cleanedContent}
+      <p style="text-align: center; color: red; font-weight: bold; font-size: 18px; margin-top: 32px;">
+        Chào thân ái tiễn khách và hẹn gặp lại trong những chương trình Tour tiếp theo.
+      </p>
     `;
-    contentRef.current.innerHTML = cleanHTML;
+
+    // Thay đổi nội dung để xuất PDF
+    contentRef.current.innerHTML = exportHTML;
 
     const opt = {
       margin: 0.3,
@@ -135,7 +149,10 @@ const removeImagesFromHTML = (html) => {
       jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
     };
 
-    html2pdf().set(opt).from(contentRef.current).save();
+    html2pdf().set(opt).from(contentRef.current).save().then(() => {
+      // Restore lại nội dung gốc sau khi xuất PDF
+      contentRef.current.innerHTML = originalHTML;
+    });
   }, 300);
 };
 
@@ -447,11 +464,13 @@ const removeImagesFromHTML = (html) => {
                 )}
                 {activeTab === "description" && (
                   <div className="tour__details">
-                    <button onClick={exportPDF} style={{ marginBottom: "10px" }}>
-                      Xuất PDF Lịch trình
-                    </button>
+  <div style={{ display: "flex", justifyContent: "flex-end" }}>
+    <button className="export-btn" onClick={exportPDF}>
+      📝 Xuất PDF Lịch trình
+    </button>
+  </div>
                     {notes && (
-                      <div className="mt-4"  ref={contentRef}>
+                      <div className="mt-4" >
                         <div
                           style={{
                             maxHeight: showMore ? "none" : 500,
@@ -460,7 +479,19 @@ const removeImagesFromHTML = (html) => {
                           }}
                         >
                           <div ref={contentRef} className="pdf-export">
-  <h2>Viet Travel</h2>
+  {/* Phần này ẩn trên web, chỉ hiện khi xuất PDF */}
+  <div className="only-pdf" style={{ textAlign: "center", marginBottom: "20px" }}>
+    <h1 style={{ color: "red", fontWeight: "bold", fontSize: "28px" }}>Viet Travel</h1>
+    <p style={{ fontStyle: "italic", fontSize: "16px" }}>
+      Cảm ơn bạn đã tin tưởng và lựa chọn chúng tôi!
+    </p>
+  </div>
+
+  {/* Phần mô tả trên web (ẩn trong PDF nếu bạn muốn) */}
+  <div className="no-pdf">
+    {/* Nếu có thể ẩn logo Viet Travel trên web tại đây */}
+  </div>
+  
   <div dangerouslySetInnerHTML={{ __html: notes }} />
 </div>
                           {!showMore && (

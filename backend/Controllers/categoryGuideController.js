@@ -26,11 +26,6 @@ if (existing) {
   return res.status(400).json({ success: false, message: "Tên danh mục đã tồn tại" });
 }
 
-    const existing = await CategoryGuide.findOne({ name });
-    if (existing) {
-      return res.status(400).json({ success: false, message: "Category đã tồn tại" });
-    }
-
     const newCategory = new CategoryGuide({
       name,
       description,
