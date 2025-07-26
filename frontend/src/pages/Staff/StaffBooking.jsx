@@ -54,7 +54,6 @@ const StaffBookings = () => {
           throw new Error("No token found. Please log in.");
         }
 
-        // Thêm query params cho tìm kiếm và phân trang
         const params = { page, limit: 10 };
         if (startDate) params.startDate = startDate;
         if (endDate) params.endDate = endDate;
@@ -65,7 +64,6 @@ const StaffBookings = () => {
           params,
           withCredentials: true,
         });
-        console.log("All bookings API response:", res);
         setBookings(res.data.data);
         setTotalPages(res.data.pagination.pages);
         setLoading(false);
@@ -91,43 +89,118 @@ const StaffBookings = () => {
   }, [user, navigate, startDate, endDate, statusFilter, page]);
 
   const handleUpdateStatus = async (bookingId, newStatus) => {
-    try {
-      const accessToken = localStorage.getItem("accessToken");
-      const res = await axios.put(
-        `${BASE_URL}/bookings/${bookingId}`,
-        { status: newStatus },
-        {
-          headers: { Authorization: `Bearer ${accessToken}` },
-          withCredentials: true,
-        }
-      );
-      console.log("Update booking status response:", res);
-      setBookings((prevBookings) =>
-        prevBookings.map((booking) =>
-          booking._id === bookingId
-            ? { ...booking, status: newStatus }
-            : booking
-        )
-      );
-      Swal.fire({
-        icon: "success",
-        title: "Cập nhật trạng thái thành công",
-        confirmButtonText: "OK",
-        confirmButtonColor: "#3085d6",
-      });
-    } catch (err) {
-      console.error(
-        "Error updating booking status:",
-        err.response?.status,
-        err.response?.data
-      );
-      Swal.fire({
-        icon: "error",
-        title: "Lỗi",
-        text: err.response?.data?.message || "Cập nhật trạng thái thất bại",
-        confirmButtonText: "OK",
-        confirmButtonColor: "#d33",
-      });
+    const statusDisplay = {
+      pending: "Đang chờ",
+      deposit_confirmed: "Đã xác nhận đặt cọc",
+      completed: "Đã hoàn thành",
+      cancelled: "Đã hủy",
+    };
+
+    const result = await Swal.fire({
+      title: "Xác nhận cập nhật trạng thái",
+      text: `Bạn muốn cập nhật trạng thái booking này thành "${statusDisplay[newStatus]}"?`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Cập nhật",
+      cancelButtonText: "Hủy",
+    });
+
+    if (result.isConfirmed) {
+      try {
+        const accessToken = localStorage.getItem("accessToken");
+        const res = await axios.put(
+          `${BASE_URL}/bookings/${bookingId}`,
+          { status: newStatus },
+          {
+            headers: { Authorization: `Bearer ${accessToken}` },
+            withCredentials: true,
+          }
+        );
+        setBookings((prevBookings) =>
+          prevBookings.map((booking) =>
+            booking._id === bookingId
+              ? {
+                  ...booking,
+                  status: newStatus,
+                  revenue: res.data.data.revenue,
+                }
+              : booking
+          )
+        );
+        Swal.fire({
+          icon: "success",
+          title: "Cập nhật trạng thái thành công",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      } catch (err) {
+        console.error(
+          "Error updating booking status:",
+          err.response?.status,
+          err.response?.data
+        );
+        Swal.fire({
+          icon: "error",
+          title: "Lỗi",
+          text: err.response?.data?.message || "Cập nhật trạng thái thất bại",
+          confirmButtonText: "OK",
+          confirmButtonColor: "#d33",
+        });
+      }
+    }
+  };
+
+  const handleCancelBooking = async (bookingId) => {
+    const result = await Swal.fire({
+      title: "Bạn có chắc?",
+      text: "Bạn muốn hủy booking này?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Hủy Booking",
+      cancelButtonText: "Không",
+    });
+
+    if (result.isConfirmed) {
+      try {
+        const accessToken = localStorage.getItem("accessToken");
+        const res = await axios.put(
+          `${BASE_URL}/bookings/${bookingId}/cancel`,
+          {},
+          {
+            headers: { Authorization: `Bearer ${accessToken}` },
+            withCredentials: true,
+          }
+        );
+        setBookings((prevBookings) =>
+          prevBookings.map((booking) =>
+            booking._id === bookingId
+              ? {
+                  ...booking,
+                  status: "cancelled",
+                  revenue: res.data.data.revenue,
+                }
+              : booking
+          )
+        );
+        Swal.fire({
+          icon: "success",
+          title: "Hủy booking thành công",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      } catch (err) {
+        Swal.fire({
+          icon: "error",
+          title: "Lỗi",
+          text: err.response?.data?.message || "Hủy booking thất bại",
+          confirmButtonText: "OK",
+          confirmButtonColor: "#d33",
+        });
+      }
     }
   };
 
@@ -135,6 +208,10 @@ const StaffBookings = () => {
     if (newPage >= 1 && newPage <= totalPages) {
       setPage(newPage);
     }
+  };
+
+  const canCancelBooking = (booking) => {
+    return booking.status === "deposit_confirmed";
   };
 
   if (loading) {
@@ -182,7 +259,8 @@ const StaffBookings = () => {
               >
                 <option value="">Tất cả trạng thái</option>
                 <option value="pending">Đang chờ</option>
-                <option value="confirmed">Đã xác nhận</option>
+                <option value="deposit_confirmed">Đã xác nhận đặt cọc</option>
+                <option value="completed">Đã hoàn thành</option>
                 <option value="cancelled">Đã hủy</option>
               </Input>
             </FormGroup>
@@ -205,7 +283,8 @@ const StaffBookings = () => {
                   <th>Số Điện Thoại</th>
                   <th>Số Người Lớn</th>
                   <th>Số Trẻ Em</th>
-                  <th>Tổng Tiền</th>
+                  <th>Tổng Giá</th>
+                  <th>Doanh Thu</th>
                   <th>Trạng Thái</th>
                   <th>Ngày Đặt</th>
                   <th>Hành Động</th>
@@ -222,6 +301,12 @@ const StaffBookings = () => {
                     <td>{booking.numberOfChildren}</td>
                     <td>{booking.totalPrice.toLocaleString("vi-VN")} đồng</td>
                     <td>
+                      {booking.revenue
+                        ? booking.revenue.toLocaleString("vi-VN")
+                        : "0"}{" "}
+                      đồng
+                    </td>
+                    <td>
                       <FormGroup>
                         <Input
                           type="select"
@@ -233,7 +318,10 @@ const StaffBookings = () => {
                           className={`status-select status-${booking.status}`}
                         >
                           <option value="pending">Đang chờ</option>
-                          <option value="confirmed">Đã xác nhận</option>
+                          <option value="deposit_confirmed">
+                            Đã xác nhận đặt cọc
+                          </option>
+                          <option value="completed">Đã hoàn thành</option>
                           <option value="cancelled">Đã hủy</option>
                         </Input>
                       </FormGroup>
@@ -248,9 +336,19 @@ const StaffBookings = () => {
                         onClick={() =>
                           navigate(`/tours/${booking.tourId?._id}`)
                         }
+                        className="me-2"
                       >
                         Xem Tour
                       </Button>
+                      {canCancelBooking(booking) && (
+                        <Button
+                          color="danger"
+                          size="sm"
+                          onClick={() => handleCancelBooking(booking._id)}
+                        >
+                          Hủy
+                        </Button>
+                      )}
                     </td>
                   </tr>
                 ))}

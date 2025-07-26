@@ -15,22 +15,27 @@ const bookingSchema = new mongoose.Schema(
     numberOfAdults: {
       type: Number,
       required: true,
-      min: [0, "Number of adults cannot be negative"],
+      min: [0, "Số người lớn không thể âm"],
     },
     numberOfChildren: {
       type: Number,
       required: true,
-      min: [0, "Number of children cannot be negative"],
+      min: [0, "Số trẻ em không thể âm"],
     },
     totalPrice: {
       type: Number,
       required: true,
-      min: [0, "Total price cannot be negative"],
+      min: [0, "Tổng giá không thể âm"],
     },
     status: {
       type: String,
-      enum: ["pending", "confirmed", "cancelled"],
+      enum: ["pending", "deposit_confirmed", "completed", "cancelled"],
       default: "pending",
+    },
+    revenue: {
+      type: Number,
+      default: 0,
+      min: [0, "Doanh thu không thể âm"],
     },
   },
   { timestamps: true }

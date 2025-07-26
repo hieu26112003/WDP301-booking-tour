@@ -51,7 +51,6 @@ const MyBookings = () => {
           headers: { Authorization: `Bearer ${accessToken}` },
           withCredentials: true,
         });
-        console.log("Bookings API response:", res);
         setBookings(res.data.data);
         setLoading(false);
       } catch (err) {
@@ -75,49 +74,67 @@ const MyBookings = () => {
   }, [user, navigate]);
 
   const handleCancelBooking = async (bookingId) => {
-    try {
-      const accessToken = localStorage.getItem("accessToken");
-      const res = await axios.put(
-        `${BASE_URL}/bookings/${bookingId}/cancel`,
-        {},
-        {
-          headers: { Authorization: `Bearer ${accessToken}` },
-          withCredentials: true,
-        }
-      );
-      console.log("Cancel booking response:", res);
-      setBookings((prevBookings) =>
-        prevBookings.map((booking) =>
-          booking._id === bookingId
-            ? { ...booking, status: "cancelled" }
-            : booking
-        )
-      );
-      Swal.fire({
-        icon: "success",
-        title: "Hủy tour thành công",
-        confirmButtonColor: "#3085d6",
-      });
-    } catch (err) {
-      console.error(
-        "Error cancelling booking:",
-        err.response?.status,
-        err.response?.data
-      );
-      Swal.fire({
-        icon: "error",
-        title: "Lỗi",
-        text: err.response?.data?.message || "Hủy tour thất bại",
-        confirmButtonColor: "#d33",
-      });
+    const result = await Swal.fire({
+      title: "Bạn có chắc?",
+      text: "Bạn muốn hủy booking này?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Hủy Booking",
+      cancelButtonText: "Không",
+    });
+
+    if (result.isConfirmed) {
+      try {
+        const accessToken = localStorage.getItem("accessToken");
+        const res = await axios.put(
+          `${BASE_URL}/bookings/${bookingId}/cancel`,
+          {},
+          {
+            headers: { Authorization: `Bearer ${accessToken}` },
+            withCredentials: true,
+          }
+        );
+        setBookings((prevBookings) =>
+          prevBookings.map((booking) =>
+            booking._id === bookingId
+              ? {
+                  ...booking,
+                  status: "cancelled",
+                  revenue: res.data.data.revenue,
+                }
+              : booking
+          )
+        );
+        Swal.fire({
+          icon: "success",
+          title: "Hủy tour thành công",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      } catch (err) {
+        console.error(
+          "Error cancelling booking:",
+          err.response?.status,
+          err.response?.data
+        );
+        Swal.fire({
+          icon: "error",
+          title: "Lỗi",
+          text: err.response?.data?.message || "Hủy tour thất bại",
+          confirmButtonColor: "#d33",
+        });
+      }
     }
   };
 
-  // Check if cancellation is allowed (more than 48 hours until departure)
-  const canCancelBooking = (departureDate) => {
-    if (!departureDate) return false;
+  // Check if cancellation is allowed (only for pending status and >48 hours)
+  const canCancelBooking = (booking) => {
+    if (booking.status !== "pending") return false;
+    if (!booking.tourId?.departureDate) return false;
     const now = new Date();
-    const depDate = new Date(departureDate);
+    const depDate = new Date(booking.tourId.departureDate);
     if (isNaN(depDate.getTime())) return false;
     const hoursUntilDeparture = (depDate - now) / (1000 * 60 * 60);
     return hoursUntilDeparture > 48;
@@ -157,7 +174,8 @@ const MyBookings = () => {
                     <th>Tên Tour</th>
                     <th>Số Người Lớn</th>
                     <th>Số Trẻ Em</th>
-                    <th>Tổng Tiền</th>
+                    <th>Tổng Giá</th>
+                    <th>Doanh Thu</th>
                     <th>Trạng Thái</th>
                     <th>Ngày Đặt</th>
                     <th>Ngày Khởi Hành</th>
@@ -172,20 +190,24 @@ const MyBookings = () => {
                       <td>{booking.numberOfChildren}</td>
                       <td>{booking.totalPrice.toLocaleString("vi-VN")} đồng</td>
                       <td>
+                        {booking.revenue
+                          ? booking.revenue.toLocaleString("vi-VN")
+                          : "0"}{" "}
+                        đồng
+                      </td>
+                      <td>
                         {booking.status === "pending"
                           ? "Đang chờ"
-                          : booking.status === "confirmed"
-                          ? "Đã xác nhận"
+                          : booking.status === "deposit_confirmed"
+                          ? "Đã xác nhận đặt cọc"
+                          : booking.status === "completed"
+                          ? "Đã hoàn thành"
                           : "Đã hủy"}
                       </td>
                       <td>{formatDate(booking.createdAt)}</td>
                       <td>{formatDate(booking.tourId?.departureDate)}</td>
                       <td>
-                        {(booking.status === "pending" ||
-                          (booking.status === "confirmed" &&
-                            canCancelBooking(
-                              booking.tourId?.departureDate
-                            ))) && (
+                        {canCancelBooking(booking) && (
                           <Button
                             color="danger"
                             size="sm"
