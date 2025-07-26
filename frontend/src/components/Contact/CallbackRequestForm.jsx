@@ -20,6 +20,11 @@ const CallbackRequestForm = () => {
         }
     };
 
+    const handlePhoneChange = (e) => {
+        const value = e.target.value.replace(/\D/g, ""); // chỉ giữ lại số
+        setPhone(value);
+    };
+
     return (
         <div className="card p-4 shadow-sm">
             <h4 className="text-success mb-2">Liên hệ càng sớm - Giá càng rẻ</h4>
@@ -31,7 +36,9 @@ const CallbackRequestForm = () => {
                         className="form-control"
                         placeholder="Số điện thoại của tôi là..."
                         value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
+                        onChange={handlePhoneChange}
+                        pattern="[0-9]*"
+                        inputMode="numeric"
                         required
                     />
                 </div>

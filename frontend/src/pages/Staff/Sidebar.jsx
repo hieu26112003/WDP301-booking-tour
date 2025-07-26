@@ -31,11 +31,7 @@ const Sidebar = () => {
       <ul>
         <SidebarItem to="/staff" icon={<FaTachometerAlt />} label="Dashboard" />
         <SidebarItem to="/staff/chat" icon={<FaCommentDots />} label="Inbox" />
-        <SidebarItem
-          to="/staff/guides"
-          icon={<FaBook />}
-          label="Manage Guide"
-        />
+        
         <SidebarItem
           to="/staff/bookings"
           icon={<FaBook />}

@@ -359,3 +359,83 @@ export const getUserBookings = async (req, res) => {
     });
   }
 };
+
+export const getAllBookingsforAdmin = async (req, res) => {
+  try {
+    const { page = 1, limit = 10, startDate, endDate, userEmail, staffEmail, status } = req.query;
+    
+    console.log("Received status filter:", status); // Debug
+    
+    const query = {};
+    
+    // Lọc theo ngày
+    if (startDate && endDate) {
+      query.createdAt = {
+        $gte: new Date(startDate),
+        $lte: new Date(endDate),
+      };
+    }
+
+    // Lọc theo trạng thái - Sửa lại cho đúng
+    if (status && status !== 'all') {
+      query.status = status.toLowerCase(); // Đảm bảo viết thường
+      console.log("Status filter applied:", query.status); // Debug
+    }
+
+    console.log("MongoDB query:", query); // Debug
+
+    // Populate dữ liệu từ 3 collections
+    const allBookings = await Booking.find(query)
+      .populate("userId", "email")
+      .populate({
+        path: "tourId",
+        select: "title staffId",
+        populate: {
+          path: "staffId",
+          select: "email"
+        }
+      })
+      .sort({ createdAt: -1 });
+
+    console.log("Found bookings:", allBookings.length); // Debug
+
+    // Lọc theo email user và staff email
+    let filteredBookings = allBookings;
+    
+    // Lọc theo user email
+    if (userEmail) {
+      const userKeyword = userEmail.toLowerCase();
+      filteredBookings = filteredBookings.filter(
+        (b) => b.userId?.email?.toLowerCase().includes(userKeyword)
+      );
+    }
+
+    // Lọc theo staff email
+    if (staffEmail) {
+      const staffKeyword = staffEmail.toLowerCase();
+      filteredBookings = filteredBookings.filter(
+        (b) => b.tourId?.staffId?.email?.toLowerCase().includes(staffKeyword)
+      );
+    }
+
+    console.log("Final filtered bookings:", filteredBookings.length); // Debug
+
+    // Phân trang thủ công
+    const total = filteredBookings.length;
+    const start = (page - 1) * limit;
+    const paginated = filteredBookings.slice(start, start + parseInt(limit));
+
+    res.status(200).json({
+      success: true,
+      data: paginated,
+      pagination: {
+        page: parseInt(page),
+        pages: Math.ceil(total / limit),
+        total,
+      },
+    });
+  } catch (error) {
+    console.error("Booking Admin Error:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};

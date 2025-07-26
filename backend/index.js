@@ -5,7 +5,6 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import { Server } from "socket.io";
 import http from "http";
-// import callRequestRoute from "./routes/callRequest.js";
 
 import User from "./models/User.js";
 
@@ -15,15 +14,23 @@ import tourRoute from "./routes/tour.js";
 import categoryRoute from "./routes/category.js";
 import messageRoute from "./routes/messageRoutes.js";
 import Message from "./models/Message.js";
+import categoryGuideRoutes from "./routes/categoryGuideRoutes.js";
 import guideRoutes from "./routes/guideRoutes.js";
 import contactRoutes from "./routes/contactRoutes.js";
 import bookingRoute from "./routes/booking.js";
 import commentRoute from "./routes/commentRoute.js";
 import notificationRoute from "./routes/notificationRoutes.js";
 import statisticRotue from "./routes/statisticRoutes.js";
+import googleAuthRoutes from "./routes/auth.js";
+import session from "express-session";
+import "./config/passport.js"; // hoặc đường dẫn tương ứng với dự án
+import passport from "passport";
+
+
 dotenv.config();
 const app = express();
 const port = process.env.PORT || 8000;
+
 
 // Tạo server HTTP để dùng với Socket.IO
 const server = http.createServer(app);
@@ -35,6 +42,7 @@ const io = new Server(server, {
     credentials: true,
   },
 });
+
 
 mongoose.set("strictQuery", false);
 const connect = async () => {
@@ -54,15 +62,24 @@ const connect = async () => {
 app.use(express.json());
 app.use(cors({ origin: true, credentials: true }));
 app.use(cookieParser());
+app.use(
+  session({
+    secret: process.env.COOKIE_KEY,
+    resave: false,
+    saveUninitialized: true,
+  })
+);
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Routes
 
 app.use("/api/auth", authRoute);
 app.use("/api/admin", adminRoute);
-app.use("/api/tours", tourRoute);
-app.use("/api/categories", categoryRoute);
-app.use("/api/guides", guideRoutes);
-// app.use("/api/call-request", callRequestRoute);
+app.use('/api/tours', tourRoute)
+app.use('/api/categories', categoryRoute)
+app.use('/api/guides', guideRoutes);
+app.use("/api/category-guides", categoryGuideRoutes);
 app.use("/api/bookings", bookingRoute);
 app.use("/api/messages", messageRoute);
 app.use("/api/comment", commentRoute);
@@ -72,6 +89,7 @@ app.use("/api/contact", contactRoutes);
 app.use("/api/contact/feedbacks", contactRoutes);
 app.use("/api/contact/callbacks", contactRoutes);
 app.use("/api/callback/:id/call", contactRoutes);
+app.use("/auth", googleAuthRoutes);
 
 // --- Socket.IO Logic ---
 io.on("connection", (socket) => {

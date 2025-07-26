@@ -14,15 +14,17 @@ import ChangePassword from "../pages/User/ChangePassword";
 import ResetPassword from "../pages/User/ResetPassword";
 import ResetPasswordConfirm from "../pages/User/ResetPasswordConfirm";
 import ManageTours from "../pages/Admin/components/ManageTours";
+import ManageBooking from "../pages/Admin/components/ManageBoking";
 import ManageCategories from "../pages/Admin/components/ManageCategories";
 import StaffLayout from "../components/Layout/StaffLayout";
 import StaffChatPage from "../pages/Staff/StaffChatPage";
 import StaffComment from "../pages/Staff/StaffComment";
-import Guide from "../pages/User/Guide";
-import ManageGuide from "../pages/Staff/ManageGuide";
+
+import ManageGuide from "../pages/Admin/components/ManageGuide";
 import AboutUs from "../components/About/About";
 import Contact from "../components/Contact/ContactPage";
 import TourDetails from "../pages/User/TourDetails";
+import ManageCategoryGuides from "../pages/Admin/components/ManagerCategoryGuides";
 import ListTour from "../pages/User/ListTour";
 import TourDetail from "../pages/Admin/components/TourDetail";
 import MyBookings from "../pages/User/MyBookings";
@@ -32,6 +34,7 @@ import FeedbackList from "../pages/Staff/FeedbackList";
 import GuideDetail from "../pages/User/GuideDetail";
 import NotificationList from "../components/Notification/Notification";
 import AdminStatistics from "../components/Statistic/AdminStatistics";
+import GoogleSuccess from "../pages/User/GoogleSuccess"; 
 
 const Routers = () => {
   return (
@@ -43,13 +46,14 @@ const Routers = () => {
       <Route path="/cam-nang" element={<CamNang />} />
 
       <Route path="/login" element={<Login />} />
+      <Route path="/google-success" element={<GoogleSuccess />} />
       <Route path="/tours/:id" element={<TourDetails />} />
       <Route path="/register" element={<Register />} />
       <Route path="/profile" element={<Profile />} />
       <Route path="/change-password" element={<ChangePassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/reset-password/:token" element={<ResetPasswordConfirm />} />
-      <Route path="/Guide" element={<Guide />} />
+     
       <Route path="/about" element={<AboutUs />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/tours/" element={<ListTour />} />
@@ -71,6 +75,14 @@ const Routers = () => {
         element={
           <AdminLayout>
             <ManagerUser />
+          </AdminLayout>
+        }
+      />
+      <Route
+        path="/admin/booking"
+        element={
+          <AdminLayout>
+            <ManageBooking />
           </AdminLayout>
         }
       />
@@ -109,9 +121,9 @@ const Routers = () => {
       <Route
         path="/staff/guides"
         element={
-          <StaffLayout>
+          <AdminLayout>
             <ManageGuide />
-          </StaffLayout>
+          </AdminLayout>
         }
       />
       <Route
@@ -130,6 +142,14 @@ const Routers = () => {
           </AdminLayout>
         }
       />
+      <Route
+  path="/admin/category-guides"
+  element={
+    <AdminLayout>
+      <ManageCategoryGuides />
+    </AdminLayout>
+  }
+/>
       <Route
         path="/staff"
         element={

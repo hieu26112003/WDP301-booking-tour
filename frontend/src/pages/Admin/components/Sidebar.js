@@ -1,10 +1,14 @@
 import { Link } from "react-router-dom";
+import { FaBookOpen } from "react-icons/fa";
+
 import {
   FaTachometerAlt,
   FaTags,
   FaUsers,
   FaCommentDots,
   FaMapMarkedAlt,
+  FaCalendarCheck,
+  FaBook,
 } from "react-icons/fa";
 import "./index.css";
 const Sidebar = () => {
@@ -24,6 +28,11 @@ const Sidebar = () => {
           icon={<FaUsers />}
           label="Manage Staff"
         />
+        <SidebarItem
+          to="/admin/booking"
+          icon={<FaCalendarCheck />}
+          label="Manage Booking"
+        />
         {/* <SidebarItem
           to="/admin/hotels"
           icon={<FaCommentDots />}
@@ -35,10 +44,20 @@ const Sidebar = () => {
           label="Manage Tours"
         />
         <SidebarItem
+                  to="/staff/guides"
+                  icon={<FaBook />}
+                  label="Manage Guide"
+                />
+        <SidebarItem
           to="/admin/categories"
           icon={<FaTags />}
           label="Manage Categories"
         />
+        <SidebarItem
+  to="/admin/category-guides"
+  icon={<FaBookOpen />}
+  label="Manage Guide Categories"
+/>
       </ul>
 
       <div className="footer">© 2025 Admin Dashboard</div>

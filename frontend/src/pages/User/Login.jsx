@@ -8,6 +8,7 @@ import userIcon from "../../assets/images/user.png";
 import { AuthContext } from "../../context/AuthContext";
 import { BASE_URL } from "../../utils/config";
 import Swal from "sweetalert2";
+import { FcGoogle } from "react-icons/fc";
 
 // Regex để xác thực email
 const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]\w+)*(\.\w{2,3})+$/;
@@ -284,6 +285,14 @@ const Login = () => {
                     )}
                   </Button>
                 </Form>
+
+                <div className="social__login-wrapper">
+                  <div className="social__divider">Hoặc</div>
+                  <a href="http://localhost:8000/auth/google" className="google-btn">
+                    <FcGoogle className="google-icon" />
+                    <span>Đăng nhập với Google</span>
+                  </a>
+                </div>
                 <div className="login__links">
                   <p>
                     Quên mật khẩu?{" "}

@@ -1,0 +1,80 @@
+.similar-tours-section {
+  margin-top: 60px;
+  padding-top: 40px;
+  border-top: 4px double #2196f3;
+  background: #f4faff;
+}
+
+.section-divider {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.similar-tours-title {
+  display: inline-block;
+  font-size: 28px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #2196f3;
+  padding: 10px 25px;
+  border: 2px solid #2196f3;
+  border-radius: 8px;
+  background: linear-gradient(to right, #e3f2fd, #ffffff);
+  box-shadow: 0 4px 10px rgba(33, 150, 243, 0.2);
+}
+
+.tour-slide {
+  padding: 10px;
+  transition: transform 0.3s ease;
+}
+
+.tour-slide:hover {
+  transform: scale(1.05);
+}
+.custom-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 99;
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(145deg, #1e90ff, #007bff);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 20px rgba(0, 123, 255, 0.3);
+  cursor: pointer;
+  transition: all 0.3s ease;
+   opacity: 0.2;
+  transition: all 0.3s ease;
+  pointer-events: auto;
+}
+
+.custom-arrow:hover {
+  background: #0056b3;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.next-arrow {
+  right: -25px;
+}
+
+.prev-arrow {
+  left: -25px;
+}
+.custom-arrow.disabled {
+  opacity: 0.1 !important;
+  pointer-events: none;
+  filter: grayscale(100%);
+}
+.slider-container:hover .custom-arrow {
+  opacity: 1;
+  pointer-events: auto;
+}
+.custom-arrow:active {
+  transform: translateY(-50%) scale(1.15);
+  box-shadow: 0 0 20px rgba(33, 150, 243, 0.6);
+  background: linear-gradient(to right, #42a5f5, #1e88e5);
+}

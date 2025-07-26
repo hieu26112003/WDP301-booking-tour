@@ -5,6 +5,7 @@ import TourCard from "../../shared/TourCard";
 import useFetch from "../../hooks/useFetch";
 import { BASE_URL } from "../../utils/config";
 
+
 const TourList = ({ selectedCategory, searchQuery }) => {
   const {
     data: categoriesResponse,
